@@ -11,12 +11,9 @@ export default async function handler(request: Request) {
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const webhookToken = process.env.KIWIFY_WEBHOOK_TOKEN; // Add this to Vercel Env Vars
+    const webhookToken = process.env.KIWIFY_WEBHOOK_TOKEN;
 
-    // 1. Security Check (Optional but recommended)
-    // Kiwify sends the token in the URL params usually (e.g. ?token=...)
-    // OR we can check the signature if Kiwify sends it in headers.
-    // For simplicity with Vercel/Kiwify, we check the query param 'token' if the env var is set.
+    // 1. Security Check
     const url = new URL(request.url);
     const tokenFromUrl = url.searchParams.get('token');
 
@@ -28,62 +25,91 @@ export default async function handler(request: Request) {
         const payload = await request.json();
         console.log('Webhook payload:', JSON.stringify(payload, null, 2));
 
-        // Kiwify Event Types/Status
-        // events: order.approved, order.refunded, subscription.renewed, subscription.canceled, subscription.late
+        // 2. Parse Event & Customer Data
         const orderStatus = payload.order_status || payload.status;
-        const eventType = payload.event_type || orderStatus; // Fallback
+        const eventType = payload.webhook_event_type || payload.event_type || orderStatus || 'unknown';
 
-        // Extract email
-        const customer = payload.customer || payload.Customer || {};
+        const customer = payload.Customer || payload.customer || {};
         const email = customer.email || payload.email;
+        const subscription = payload.Subscription || {};
 
-        if (!email) {
-            return new Response(JSON.stringify({ message: 'No email found in payload' }), { status: 400 });
-        }
-
-        // Determine new subscription status based on event
-        let newStatus: 'active' | 'canceled' | 'pending' | null = null;
-
-        if (orderStatus === 'paid' || eventType === 'order.approved' || eventType === 'subscription.renewed') {
-            newStatus = 'active';
-        } else if (orderStatus === 'refunded' || orderStatus === 'chargedback' || eventType === 'order.refunded' || eventType === 'subscription.canceled' || eventType === 'subscription.late') {
-            newStatus = 'canceled';
-        }
-
-        if (newStatus) {
-            if (!supabaseUrl || !supabaseServiceKey) {
-                console.error('Missing Supabase Environment Variables');
-                return new Response('Server Configuration Error', { status: 500 });
-            }
-
+        // 3. Log Event to 'webhook_events' (Abru Intelligence)
+        if (supabaseUrl && supabaseServiceKey) {
             const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-            // Update profile by email
-            // REQUIRES: 'email' column in profiles table (see add_email_column.sql)
-            const { data, error } = await supabase
-                .from('profiles')
-                .update({ subscription_status: newStatus })
-                .eq('email', email)
-                .select();
-
-            if (error) {
-                console.error('Supabase update error:', error);
-                return new Response('Database Error', { status: 500 });
-            }
-
-            if (!data || data.length === 0) {
-                console.warn('User not found:', email);
-                return new Response('User not found in database', { status: 404 });
-            }
-
-            console.log(`User ${email} updated to ${newStatus}`);
-            return new Response(JSON.stringify({ success: true, status: newStatus, user: data[0] }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
+            // Log raw event asynchronously
+            await supabase.from('webhook_events').insert({
+                event_type: eventType,
+                user_email: email,
+                payload: payload
+            }).then(({ error }) => {
+                if (error) console.error('Error logging webhook event:', error);
             });
-        }
 
-        return new Response(JSON.stringify({ message: 'Ignored event/status', event: eventType, status: orderStatus }), { status: 200 });
+            if (!email) {
+                return new Response(JSON.stringify({ message: 'No email found' }), { status: 400 });
+            }
+
+            // 4. Determine Subscription Status
+            let newStatus: 'active' | 'canceled' | 'pending' | null = null;
+
+            // Approved/Renewed/Paid
+            if (
+                orderStatus === 'paid' ||
+                eventType === 'order_approved' ||
+                eventType === 'subscription_renewed'
+            ) {
+                newStatus = 'active';
+            }
+            // Canceled/Refunded/Chargeback/Late
+            else if (
+                orderStatus === 'refunded' ||
+                orderStatus === 'chargedback' ||
+                eventType === 'order_refunded' ||
+                eventType === 'subscription_canceled' ||
+                eventType === 'subscription_late'
+            ) {
+                newStatus = 'canceled';
+            }
+
+            // 5. Update Profile (Upsert Data)
+            if (newStatus) {
+                const updateData = {
+                    subscription_status: newStatus,
+                    cpf: customer.CPF || customer.cpf,
+                    phone: customer.mobile || customer.phone,
+                    plan_type: subscription.plan?.name || payload.Product?.product_name || 'unknown',
+                    kiwify_customer_id: customer.id
+                };
+
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .update(updateData)
+                    .eq('email', email)
+                    .select();
+
+                if (error) {
+                    console.error('Supabase profile update error:', error);
+                    return new Response('Database Error', { status: 500 });
+                }
+
+                if (!data || data.length === 0) {
+                    console.warn(`User ${email} not found for update.`);
+                    return new Response('User not found in profiles', { status: 404 });
+                }
+
+                console.log(`Updated user ${email}: Status=${newStatus}, Plan=${updateData.plan_type}`);
+                return new Response(JSON.stringify({
+                    success: true,
+                    status: newStatus,
+                    data: updateData
+                }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+
+            return new Response(JSON.stringify({ message: 'Event logged but no status change needed', event: eventType }), { status: 200 });
+        } else {
+            return new Response('Server Configuration Error', { status: 500 });
+        }
 
     } catch (err) {
         console.error('Webhook processing error:', err);
