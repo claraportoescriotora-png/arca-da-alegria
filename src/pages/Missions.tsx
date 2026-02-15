@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { BottomNav } from '@/components/BottomNav';
 import { Trophy, Calendar, ArrowRight, Star } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Pagination } from '@/components/Pagination';
 
 interface MissionPack {
     id: string;
@@ -17,6 +18,15 @@ export default function Missions() {
     const navigate = useNavigate();
     const [packs, setPacks] = useState<MissionPack[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Pagination
+    const ITEMS_PER_PAGE = 5;
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(packs.length / ITEMS_PER_PAGE);
+    const currentPacks = packs.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const [enrolledPackIds, setEnrolledPackIds] = useState<Set<string>>(new Set());
 
@@ -80,7 +90,7 @@ export default function Missions() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {packs.map(pack => {
+                        {currentPacks.map(pack => {
                             const isEnrolled = enrolledPackIds.has(pack.id);
                             return (
                                 <div
@@ -135,6 +145,12 @@ export default function Missions() {
                                 <p className="text-muted-foreground">Nenhuma missão disponível no momento.</p>
                             </div>
                         )}
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 )}
             </main>

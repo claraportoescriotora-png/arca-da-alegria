@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { SearchBar } from '@/components/SearchBar';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { VideoCard } from '@/components/VideoCard';
+import { Pagination } from '@/components/Pagination';
 import { supabase } from '@/lib/supabase';
 
 interface Video {
@@ -23,6 +24,10 @@ export default function Videos() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchVideos();
@@ -96,19 +101,26 @@ export default function Videos() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredVideos.map(video => (
-              <VideoCard
-                key={video.id}
-                id={video.id}
-                title={video.title}
-                thumbnail={video.thumbnail}
-                duration={video.duration}
-                category={video.category}
-                videoUrl={video.videoUrl}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              {filteredVideos.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(video => (
+                <VideoCard
+                  key={video.id}
+                  id={video.id}
+                  title={video.title}
+                  thumbnail={video.thumbnail}
+                  duration={video.duration}
+                  category={video.category}
+                  videoUrl={video.videoUrl}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredVideos.length / ITEMS_PER_PAGE)}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
 
         {!loading && filteredVideos.length === 0 && (

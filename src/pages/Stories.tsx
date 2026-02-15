@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { SearchBar } from '@/components/SearchBar';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { StoryCard } from '@/components/StoryCard';
+import { Pagination } from '@/components/Pagination';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
 
@@ -29,6 +30,11 @@ export default function Stories() {
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination
+  const ITEMS_PER_PAGE = 6;
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   useEffect(() => {
     fetchStories();
@@ -124,19 +130,27 @@ export default function Stories() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {filteredStories.map(story => (
-              <StoryCard
-                key={story.id}
-                id={story.id}
-                title={story.title}
-                image={story.image}
-                category={story.category}
-                duration={story.duration}
-                progress={story.progress}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              {filteredStories.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(story => (
+                <StoryCard
+                  key={story.id}
+                  id={story.id}
+                  title={story.title}
+                  image={story.image}
+                  category={story.category}
+                  duration={story.duration}
+                  progress={story.progress}
+                />
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredStories.length / ITEMS_PER_PAGE)}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
 
         {!loading && filteredStories.length === 0 && (

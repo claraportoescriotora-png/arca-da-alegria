@@ -3,6 +3,7 @@ import { ArrowLeft, Trophy, Star, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { GameCard } from '@/components/GameCard';
+import { Pagination } from '@/components/Pagination';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
@@ -29,6 +30,10 @@ export default function Games() {
   const [loading, setLoading] = useState(true);
   const [dailyProgress, setDailyProgress] = useState(0);
   const [challengeCompleted, setChallengeCompleted] = useState(false);
+
+  // Pagination
+  const ITEMS_PER_PAGE = 5;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchGames();
@@ -242,19 +247,26 @@ export default function Games() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <div className="space-y-3">
-              {games.map(game => (
-                <GameCard
-                  key={game.id}
-                  id={game.id}
-                  title={game.title}
-                  image={game.image}
-                  difficulty={game.difficulty}
-                  duration={game.duration}
-                  onClick={() => handlePlayGame(game)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="space-y-3">
+                {games.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(game => (
+                  <GameCard
+                    key={game.id}
+                    id={game.id}
+                    title={game.title}
+                    image={game.image}
+                    difficulty={game.difficulty}
+                    duration={game.duration}
+                    onClick={() => handlePlayGame(game)}
+                  />
+                ))}
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(games.length / ITEMS_PER_PAGE)}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
 
           {!loading && games.length === 0 && (

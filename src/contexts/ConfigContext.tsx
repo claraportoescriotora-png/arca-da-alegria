@@ -10,22 +10,38 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
     const [logoUrl, setLogoUrl] = useState<string>('/logo/meu-amiguito.webp'); // Default fallback
+    const [faviconUrl, setFaviconUrl] = useState<string>('/logo/meu-amiguito.webp'); // Default fallback
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchConfig();
     }, []);
 
+    useEffect(() => {
+        const link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+        if (link) {
+            link.href = faviconUrl;
+        } else {
+            const newLink = document.createElement('link');
+            newLink.rel = 'icon';
+            newLink.href = faviconUrl;
+            document.head.appendChild(newLink);
+        }
+    }, [faviconUrl]);
+
     const fetchConfig = async () => {
         try {
             const { data, error } = await supabase
                 .from('app_config')
-                .select('value')
-                .eq('key', 'logo_url')
-                .single();
+                .select('key, value')
+                .in('key', ['logo_url', 'favicon_url']);
 
             if (data) {
-                setLogoUrl(data.value);
+                const logo = data.find(item => item.key === 'logo_url');
+                const favicon = data.find(item => item.key === 'favicon_url');
+
+                if (logo) setLogoUrl(logo.value);
+                if (favicon) setFaviconUrl(favicon.value);
             }
         } catch (error) {
             console.error('Error fetching config:', error);
