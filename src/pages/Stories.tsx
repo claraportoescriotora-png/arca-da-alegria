@@ -19,9 +19,12 @@ interface Story {
 
 const categories = ['Todas', 'Favoritas', 'Antigo Testamento', 'Parábolas', 'Novo Testamento'];
 
+import { useFavorites } from '@/contexts/FavoritesContext';
+
 export default function Stories() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isFavorite } = useFavorites();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [stories, setStories] = useState<Story[]>([]);
@@ -76,7 +79,12 @@ export default function Stories() {
 
   const filteredStories = stories.filter(story => {
     const matchesSearch = story.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === 'Todas' || story.category === activeCategory;
+    const matchesCategory = activeCategory === 'Todas'
+      ? true
+      : activeCategory === 'Favoritas'
+        ? isFavorite(story.id)
+        : story.category === activeCategory;
+
     return matchesSearch && matchesCategory;
   });
 

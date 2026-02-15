@@ -1,17 +1,88 @@
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Heart, BookmarkX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { StoryCard } from '@/components/StoryCard';
 import { VideoCard } from '@/components/VideoCard';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import { stories, videos } from '@/data/content';
+import { supabase } from '@/lib/supabase';
+
+interface Story {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  duration: string;
+}
+
+interface Video {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  category: string;
+}
 
 export default function Favorites() {
   const navigate = useNavigate();
   const { favorites } = useFavorites();
 
-  const favoriteStories = stories.filter(s => favorites.includes(s.id));
-  const favoriteVideos = videos.filter(v => favorites.includes(v.id));
+  const [favoriteStories, setFavoriteStories] = useState<Story[]>([]);
+  const [favoriteVideos, setFavoriteVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (favorites.length > 0) {
+      fetchFavoriteContent();
+    } else {
+      setFavoriteStories([]);
+      setFavoriteVideos([]);
+    }
+  }, [favorites]);
+
+  const fetchFavoriteContent = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch Stories
+      const { data: storiesData } = await supabase
+        .from('stories')
+        .select('*')
+        .in('id', favorites);
+
+      if (storiesData) {
+        setFavoriteStories(storiesData.map(s => ({
+          id: s.id,
+          title: s.title,
+          image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
+          category: s.category || 'Geral',
+          duration: s.duration || '5 min'
+        })));
+      }
+
+      // Fetch Videos
+      const { data: videosData } = await supabase
+        .from('videos')
+        .select('*')
+        .in('id', favorites);
+
+      if (videosData) {
+        setFavoriteVideos(videosData.map(v => ({
+          id: v.id,
+          title: v.title,
+          thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
+          duration: v.duration || '0:00',
+          category: v.category || 'Geral',
+          videoUrl: v.video_url || '' // Map from DB
+        })));
+      }
+
+    } catch (error) {
+      console.error('Error fetching favorite content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const isEmpty = favoriteStories.length === 0 && favoriteVideos.length === 0;
 
@@ -21,7 +92,7 @@ export default function Favorites() {
       <header className="sticky top-0 z-40 glass border-b border-border">
         <div className="container max-w-md mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="p-2 rounded-full bg-card hover:bg-muted transition-colors"
             >
@@ -47,7 +118,11 @@ export default function Favorites() {
           </div>
         </div>
 
-        {isEmpty ? (
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : isEmpty ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
               <BookmarkX className="w-10 h-10 text-muted-foreground" />
@@ -101,6 +176,7 @@ export default function Favorites() {
                       thumbnail={video.thumbnail}
                       duration={video.duration}
                       category={video.category}
+                      videoUrl={video.videoUrl}
                     />
                   ))}
                 </div>

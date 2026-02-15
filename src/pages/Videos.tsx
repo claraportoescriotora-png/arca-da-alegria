@@ -42,7 +42,8 @@ export default function Videos() {
         title: v.title,
         thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
         duration: v.duration || '0:00',
-        category: v.category || 'Músicas'
+        category: v.category || 'Músicas',
+        videoUrl: v.video_url || '' // Map from DB
       }));
 
       setVideos(formattedVideos);
@@ -104,6 +105,7 @@ export default function Videos() {
                 thumbnail={video.thumbnail}
                 duration={video.duration}
                 category={video.category}
+                videoUrl={video.videoUrl}
               />
             ))}
           </div>

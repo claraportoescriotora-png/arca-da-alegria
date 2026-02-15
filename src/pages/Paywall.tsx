@@ -85,25 +85,7 @@ const Paywall = () => {
                         Sair e tentar outra conta
                     </Button>
 
-                    <Button
-                        variant="link"
-                        className="w-full text-xs text-blue-300 hover:text-blue-500 mt-2"
-                        onClick={async () => {
-                            if (!user) return;
-                            const { error } = await supabase
-                                .from('profiles')
-                                .update({ subscription_status: 'active' })
-                                .eq('id', user.id);
 
-                            if (error) {
-                                alert("Erro: " + error.message);
-                            } else {
-                                window.location.reload();
-                            }
-                        }}
-                    >
-                        (Developer) Liberar Acesso Grátis
-                    </Button>
                 </CardFooter>
             </Card>
         </div>
