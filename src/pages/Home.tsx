@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Bell, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
@@ -11,15 +12,74 @@ import { NotificationsSheet } from '@/components/NotificationsSheet';
 import { UserAvatar } from '@/components/UserAvatar';
 import { BookOpen, Gamepad2, Play, FileText, ChevronRight, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { stories, games } from '@/data/content';
-
+import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
+
+interface ContentItem {
+  id: string;
+  title: string;
+  image: string;
+  category?: string;
+  difficulty?: 'Fácil' | 'Médio' | 'Difícil';
+  duration?: string;
+}
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { name, level, avatarId, notifications } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const [recentStories, setRecentStories] = useState<ContentItem[]>([]);
+  const [recentGames, setRecentGames] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHomeContent();
+  }, []);
+
+  const fetchHomeContent = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch 2 Stories
+      const { data: storiesData } = await supabase
+        .from('stories')
+        .select('*')
+        .limit(2); // Order by created_at desc if available, or just take 2
+
+      if (storiesData) {
+        setRecentStories(storiesData.map(s => ({
+          id: s.id,
+          title: s.title,
+          image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
+          duration: s.duration || '5 min'
+        })));
+      }
+
+      // Fetch 2 Games
+      const { data: gamesData } = await supabase
+        .from('games')
+        .select('*')
+        .eq('is_active', true)
+        .limit(2);
+
+      if (gamesData) {
+        setRecentGames(gamesData.map(g => ({
+          id: g.id,
+          title: g.title,
+          image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
+          difficulty: g.difficulty || 'Fácil',
+          duration: '5 min'
+        })));
+      }
+
+    } catch (error) {
+      console.error('Error loading home content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePlayGame = (title: string) => {
     toast({
@@ -43,15 +103,15 @@ export default function Home() {
                 <p className="font-fredoka font-semibold text-foreground">Nível {level}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full bg-card hover:bg-muted transition-colors"
               >
                 {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
               </button>
-              
+
               <NotificationsSheet>
                 <button className="p-2 rounded-full bg-card hover:bg-muted transition-colors relative">
                   <Bell className="w-5 h-5" />
@@ -90,7 +150,7 @@ export default function Home() {
         </div>
 
         {/* Favorites Shortcut */}
-        <button 
+        <button
           onClick={() => navigate('/favorites')}
           className="w-full flex items-center justify-between p-4 bg-card rounded-2xl shadow-sm hover:shadow-md transition-shadow"
         >
@@ -104,8 +164,8 @@ export default function Home() {
         </button>
 
         {/* Devotional */}
-        <DevotionalCard 
-          title="Pequenas Orações" 
+        <DevotionalCard
+          title="Pequenas Orações"
           subtitle="Aprenda a conversar com Deus"
         />
 
@@ -113,52 +173,64 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-fredoka text-lg font-semibold text-foreground">Para Hoje</h2>
-            <button 
+            <button
               onClick={() => navigate('/stories')}
               className="text-sm text-primary font-medium hover:underline"
             >
               Ver tudo
             </button>
           </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {stories.slice(0, 2).map(story => (
-              <StoryCard
-                key={story.id}
-                id={story.id}
-                title={story.title}
-                image={story.image}
-                progress={story.progress}
-              />
-            ))}
-          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-6">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {recentStories.map(story => (
+                <StoryCard
+                  key={story.id}
+                  id={story.id}
+                  title={story.title}
+                  image={story.image}
+                  progress={undefined} // Todo: fetch progress if needed
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Games */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-fredoka text-lg font-semibold text-foreground">Jogos Divertidos</h2>
-            <button 
+            <button
               onClick={() => navigate('/games')}
               className="text-sm text-primary font-medium hover:underline"
             >
               Ver tudo
             </button>
           </div>
-          
-          <div className="space-y-3">
-            {games.slice(0, 2).map(game => (
-              <GameCard
-                key={game.id}
-                id={game.id}
-                title={game.title}
-                image={game.image}
-                difficulty={game.difficulty}
-                duration={game.duration}
-                onClick={() => handlePlayGame(game.title)}
-              />
-            ))}
-          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-6">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentGames.map(game => (
+                <GameCard
+                  key={game.id}
+                  id={game.id}
+                  title={game.title}
+                  image={game.image}
+                  difficulty={game.difficulty}
+                  duration={game.duration}
+                  onClick={() => handlePlayGame(game.title)}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </main>
 
