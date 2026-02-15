@@ -10,7 +10,7 @@ const Privacy = () => {
       <header className="sticky top-0 z-40 glass border-b border-border">
         <div className="container max-w-md mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="p-2 rounded-full bg-card hover:bg-muted transition-colors"
             >
@@ -20,7 +20,7 @@ const Privacy = () => {
           </div>
         </div>
       </header>
-      
+
       <main className="container max-w-md mx-auto px-4 py-6 space-y-4">
         <div className="bg-card p-6 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3 mb-4">
@@ -28,7 +28,7 @@ const Privacy = () => {
             <h2 className="font-bold text-lg">Seus Dados Estão Seguros</h2>
           </div>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            A Arca da Alegria se preocupa muito com sua segurança. Nós não compartilhamos seus dados com ninguém.
+            O Meu Amiguito se preocupa muito com sua segurança. Nós não compartilhamos seus dados com ninguém.
             Tudo o que você faz aqui serve apenas para acompanhar seu progresso na jornada da fé!
           </p>
         </div>

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Volume2, Square, PlayCircle, CheckCircle, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Volume2, Square, PlayCircle, CheckCircle, HelpCircle, Trophy } from 'lucide-react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
 import { useState, useEffect } from 'react';
@@ -31,9 +31,23 @@ export default function StoryDetail() {
   const [speech, setSpeech] = useState<SpeechSynthesisUtterance | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
 
+  // Quiz State
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [loadingQuiz, setLoadingQuiz] = useState(false);
+
   useEffect(() => {
     fetchStory();
   }, [id]);
+
+  // Fetch Quiz when dialog opens
+  useEffect(() => {
+    if (showQuiz && story) {
+      fetchQuiz();
+    }
+  }, [showQuiz, story]);
 
   const fetchStory = async () => {
     if (!id) return;
@@ -107,6 +121,9 @@ export default function StoryDetail() {
     });
   };
 
+  // ...
+  const favorite = story ? isFavorite(story.id) : false;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -123,7 +140,80 @@ export default function StoryDetail() {
     );
   }
 
-  const favorite = isFavorite(story.id);
+  // Quiz logic moved to top
+  // ...
+
+  const fetchQuiz = async () => {
+    setLoadingQuiz(true);
+    setQuizQuestions([]);
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setQuizCompleted(false);
+
+    try {
+      // Fetch Questions
+      const { data: questions, error: qError } = await supabase
+        .from('quiz_questions')
+        .select(`
+          id,
+          question,
+          order_index,
+          quiz_alternatives (
+            id,
+            text,
+            is_correct
+          )
+        `)
+        .eq('content_id', story?.id)
+        .order('order_index', { ascending: true });
+
+      if (qError) throw qError;
+
+      if (questions) {
+        setQuizQuestions(questions);
+      }
+    } catch (error) {
+      console.error('Error fetching quiz:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar o quiz.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingQuiz(false);
+    }
+  };
+
+  const handleAnswer = (isCorrect: boolean) => {
+    if (isCorrect) {
+      setScore(s => s + 1);
+      toast({
+        title: "Correto! 🌟",
+        description: "Muito bem!",
+        className: "bg-green-500 text-white border-none"
+      });
+    } else {
+      toast({
+        title: "Ops!",
+        description: "Não foi dessa vez.",
+        variant: "destructive"
+      });
+    }
+
+    // Next Question
+    setTimeout(() => {
+      if (currentQuestionIndex < quizQuestions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
+      } else {
+        setQuizCompleted(true);
+        if (score + (isCorrect ? 1 : 0) === quizQuestions.length) {
+          addXp(20); // Bonus XP for perfect score
+        }
+      }
+    }, 1000);
+  };
+
+
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -155,8 +245,8 @@ export default function StoryDetail() {
             <button
               onClick={() => toggleFavorite(story.id, 'story')}
               className={`p-2 rounded-full transition-colors ${favorite
-                  ? 'bg-danger text-white'
-                  : 'bg-card/80 backdrop-blur-sm hover:bg-card'
+                ? 'bg-danger text-white'
+                : 'bg-card/80 backdrop-blur-sm hover:bg-card'
                 }`}
             >
               <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} />
@@ -182,8 +272,8 @@ export default function StoryDetail() {
           <button
             onClick={handleSpeak}
             className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl font-semibold mb-6 transition-all duration-300 ${isPlaying
-                ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-                : 'gradient-primary text-white hover:opacity-90'
+              ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+              : 'gradient-primary text-white hover:opacity-90'
               }`}
           >
             {isPlaying ? (
@@ -209,7 +299,7 @@ export default function StoryDetail() {
           {/* Progress & Actions */}
           <div className="mt-8 pt-6 border-t border-border space-y-4">
 
-            {/* Botão de Quiz (Novo) */}
+            {/* Dynamic Quiz Button */}
             <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
               <DialogTrigger asChild>
                 <button className="w-full flex items-center justify-center gap-2 p-4 bg-yellow-100 text-yellow-700 rounded-2xl font-bold hover:bg-yellow-200 transition-colors">
@@ -217,25 +307,71 @@ export default function StoryDetail() {
                   Responder Quiz
                 </button>
               </DialogTrigger>
-              <DialogContent className="rounded-3xl">
+              <DialogContent className="rounded-3xl sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Quiz: {story.title}</DialogTitle>
                 </DialogHeader>
-                <div className="py-4 space-y-4">
-                  <p className="font-medium text-center">O que você aprendeu com essa história?</p>
-                  <div className="grid gap-2">
-                    <Button variant="outline" className="justify-start h-auto py-3 px-4 text-left whitespace-normal" onClick={() => {
-                      toast({ title: "Resposta Correta! 🌟", description: "Muito bem! Você prestou atenção." });
-                      setShowQuiz(false);
-                    }}>
-                      A) Deus sempre cuida de nós.
-                    </Button>
-                    <Button variant="outline" className="justify-start h-auto py-3 px-4 text-left whitespace-normal" onClick={() => {
-                      toast({ title: "Tente novamente", description: "Essa não é a principal lição..." });
-                    }}>
-                      B) Devemos fugir dos problemas.
-                    </Button>
-                  </div>
+
+                <div className="py-4">
+                  {loadingQuiz ? (
+                    <div className="flex justify-center p-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : quizQuestions.length === 0 ? (
+                    <div className="text-center p-4">
+                      <p className="text-muted-foreground">Nenhuma pergunta encontrada para esta história.</p>
+                      <Button onClick={() => setShowQuiz(false)} className="mt-4">Fechar</Button>
+                    </div>
+                  ) : quizCompleted ? (
+                    <div className="text-center space-y-4 py-6 animate-in zoom-in duration-500">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-20 rounded-full animate-pulse"></div>
+                        <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto shadow-xl relative z-10 animate-bounce">
+                          <Trophy className="w-12 h-12 text-white drop-shadow-md" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">
+                          PARABÉNS!
+                        </h3>
+                        <p className="text-lg font-medium text-muted-foreground">
+                          Você completou o desafio!
+                        </p>
+                      </div>
+
+                      <div className="bg-secondary/10 rounded-xl p-4 border border-secondary/20">
+                        <span className="block text-sm text-muted-foreground uppercase tracking-wider font-semibold">Sua Pontuação</span>
+                        <span className="block text-4xl font-black text-secondary mt-1">
+                          {score}/{quizQuestions.length}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Questão {currentQuestionIndex + 1} de {quizQuestions.length}</span>
+                        <span>Pontos: {score}</span>
+                      </div>
+
+                      <p className="font-medium text-lg text-center">
+                        {quizQuestions[currentQuestionIndex].question}
+                      </p>
+
+                      <div className="grid gap-3">
+                        {quizQuestions[currentQuestionIndex].quiz_alternatives.map((alt: any) => (
+                          <Button
+                            key={alt.id}
+                            variant="outline"
+                            className="justify-start h-auto py-3 px-4 text-left whitespace-normal hover:bg-primary/5 hover:text-primary transition-colors"
+                            onClick={() => handleAnswer(alt.is_correct)}
+                          >
+                            {alt.text}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>

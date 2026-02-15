@@ -21,6 +21,7 @@ interface Video {
   thumbnail: string;
   duration: string;
   category: string;
+  videoUrl: string;
 }
 
 export default function Favorites() {

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Bell, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useConfig } from '@/contexts/ConfigContext';
 import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthProvider';
 import { BottomNav } from '@/components/BottomNav';
 import { ProgressCard } from '@/components/ProgressCard';
 import { QuickAccessCard } from '@/components/QuickAccessCard';
@@ -27,6 +29,8 @@ interface ContentItem {
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { name, level, avatarId, notifications } = useUser();
+  const { logoUrl } = useConfig();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,9 +38,88 @@ export default function Home() {
   const [recentGames, setRecentGames] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Mission Progress State
+  const [dailyProgress, setDailyProgress] = useState(0);
+  const [currentMission, setCurrentMission] = useState<{ packId: string, dayTitle: string } | null>(null);
+
   useEffect(() => {
     fetchHomeContent();
-  }, []);
+    if (user) {
+      fetchMissionProgress();
+    }
+  }, [user]);
+
+  const fetchMissionProgress = async () => {
+    if (!user) return;
+
+    try {
+      // 1. Get the first active pack
+      const { data: pack } = await supabase
+        .from('mission_packs')
+        .select('id, title')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+
+      if (!pack) return;
+
+      // 2. Get all days and tasks for this pack
+      const { data: days } = await supabase
+        .from('missions')
+        .select(`
+          id,
+          day_number,
+          title,
+          mission_tasks (id)
+        `)
+        .eq('pack_id', pack.id)
+        .order('day_number');
+
+      if (!days) return;
+
+      // 3. Get user's completed tasks
+      const { data: userProgress } = await supabase
+        .from('user_mission_progress')
+        .select('task_id')
+        .eq('user_id', user.id);
+
+      const completedSet = new Set(userProgress?.map(p => p.task_id));
+
+      // 4. Find current day (first incomplete or partially complete)
+      let activeDay = days[0];
+      let percent = 0;
+
+      // Logic: Find the first day that is NOT 100% complete. 
+      // If all previous days are complete, show the current one.
+      for (const day of days) {
+        const totalTasks = day.mission_tasks.length;
+        if (totalTasks === 0) continue; // Skip days with no tasks? Or count as done?
+
+        const completedTasks = day.mission_tasks.filter((t: any) => completedSet.has(t.id)).length;
+
+        if (completedTasks < totalTasks) {
+          activeDay = day;
+          percent = Math.round((completedTasks / totalTasks) * 100);
+          break; // Found our current active day
+        } else {
+          // This day is fully complete.
+          // If it's the last day, we might stay on it or show "Completed"
+          activeDay = day;
+          percent = 100;
+          // Continue loop to see if there is a NEXT day that is incomplete
+        }
+      }
+
+      setDailyProgress(percent);
+      setCurrentMission({
+        packId: pack.id,
+        dayTitle: `Dia ${activeDay.day_number}: ${activeDay.title}`
+      });
+
+    } catch (error) {
+      console.error("Error fetching progress", error);
+    }
+  };
 
   const fetchHomeContent = async () => {
     try {
@@ -46,7 +129,7 @@ export default function Home() {
       const { data: storiesData } = await supabase
         .from('stories')
         .select('*')
-        .limit(2); // Order by created_at desc if available, or just take 2
+        .limit(2);
 
       if (storiesData) {
         setRecentStories(storiesData.map(s => ({
@@ -96,7 +179,10 @@ export default function Home() {
       <header className="sticky top-0 z-40 glass border-b border-border">
         <div className="container max-w-md mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/profile')}
+            >
               <UserAvatar avatarId={avatarId} />
               <div>
                 <p className="text-sm text-muted-foreground">Olá, {name}!</p>
@@ -127,19 +213,24 @@ export default function Home() {
 
       {/* Content */}
       <main className="container max-w-md mx-auto px-4 py-6 space-y-6">
-        {/* Logo Arca da Alegria */}
+        {/* Logo Meu Amiguito */}
         <div className="flex justify-center mb-2">
-          <img src="/logo/arca-logo-2.png" alt="Arca da Alegria" className="h-16 object-contain" />
+          <img src={logoUrl} alt="Meu Amiguito" className="h-16 object-contain" />
         </div>
 
         {/* Journey Card */}
-        <div className="gradient-secondary rounded-3xl p-6 text-white">
+        <div
+          onClick={() => currentMission && navigate(`/missions/${currentMission.packId}`)}
+          className="gradient-secondary rounded-3xl p-6 text-white cursor-pointer hover:opacity-95 transition-opacity"
+        >
           <h2 className="font-fredoka text-xl font-bold mb-2">Sua Jornada de Fé 🏆</h2>
-          <p className="text-white/80 text-sm">Continue brilhando!</p>
+          <p className="text-white/80 text-sm">
+            {currentMission ? currentMission.dayTitle : "Comece sua missão hoje!"}
+          </p>
         </div>
 
         {/* Progress */}
-        <ProgressCard percentage={80} />
+        <ProgressCard percentage={dailyProgress} />
 
         {/* Quick Access */}
         <div className="grid grid-cols-4 gap-3">
@@ -193,7 +284,7 @@ export default function Home() {
                   id={story.id}
                   title={story.title}
                   image={story.image}
-                  progress={undefined} // Todo: fetch progress if needed
+                  progress={undefined}
                 />
               ))}
             </div>

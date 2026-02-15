@@ -10,6 +10,7 @@ interface Activity {
   title: string;
   image: string;
   type: 'Colorir' | 'Labirinto' | 'Ligue os Pontos' | 'Recortar';
+  pdfUrl: string; // Added pdfUrl
 }
 
 export default function Activities() {
@@ -34,6 +35,7 @@ export default function Activities() {
         id: a.id,
         title: a.title,
         image: a.image_url || 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800',
+        pdfUrl: a.pdf_url,
         type: a.type === 'coloring' ? 'Colorir' :
           a.type === 'cutting' ? 'Recortar' :
             a.type === 'puzzle' ? 'Labirinto' : 'Colorir'
@@ -45,6 +47,17 @@ export default function Activities() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (url: string, title: string) => {
+    if (!url) return;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${title}.pdf`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -78,13 +91,23 @@ export default function Activities() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {activities.map(activity => (
-              <ActivityCard
-                key={activity.id}
-                id={activity.id}
-                title={activity.title}
-                image={activity.image}
-                type={activity.type as any}
-              />
+              <div key={activity.id} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border flex flex-col">
+                <div className="aspect-square relative overflow-hidden bg-muted">
+                  <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
+                  <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 bg-white/90 rounded-full shadow-sm text-foreground uppercase tracking-wide">
+                    {activity.type}
+                  </span>
+                </div>
+                <div className="p-3 flex-1 flex flex-col">
+                  <h3 className="font-bold text-sm mb-3 line-clamp-2 leading-tight">{activity.title}</h3>
+                  <button
+                    onClick={() => handleDownload(activity.pdfUrl, activity.title)}
+                    className="mt-auto w-full py-2 bg-green-100 text-green-700 text-xs font-bold rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center gap-1"
+                  >
+                    Baixar PDF
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}

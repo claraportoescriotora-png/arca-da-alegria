@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,13 +6,16 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
+import { useConfig } from "@/contexts/ConfigContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { logoUrl } = useConfig();
   const navigate = useNavigate();
   const { toast } = useToast();
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,12 +96,12 @@ const Login = () => {
         <CardHeader className="flex flex-col items-center space-y-4 pb-2">
           <div className="w-48 h-48 relative mb-2">
             <img
-              src="/logo/arca-logo-1.png"
-              alt="Daniel Kids"
+              src={logoUrl}
+              alt="Meu Amiguito"
               className="w-full h-full object-contain drop-shadow-md"
             />
           </div>
-          <h1 className="text-2xl font-bold text-blue-600 text-center">Bem-vindo ao Daniel Kids!</h1>
+          <h1 className="text-2xl font-bold text-blue-600 text-center">Bem-vindo ao Meu Amiguito!</h1>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">

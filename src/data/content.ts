@@ -34,14 +34,7 @@ export const stories: Story[] = [
     progress: 0.66,
     content: 'Há muito tempo, Deus viu que as pessoas estavam fazendo coisas muito ruins. Mas havia um homem chamado Noé que era bom e obedecia a Deus. Então Deus disse a Noé: "Vou enviar uma grande chuva. Construa uma arca grande para você, sua família e dois de cada animal." Noé trabalhou muito e construiu a arca. Quando ficou pronta, todos os animais entraram: girafas, elefantes, leões, pássaros e muitos outros! A chuva caiu por 40 dias, mas todos estavam seguros na arca. Quando a água baixou, Noé viu um lindo arco-íris no céu - era a promessa de Deus de que nunca mais haveria um dilúvio assim.'
   },
-  {
-    id: 'bom-samaritano',
-    title: 'O Bom Samaritano',
-    image: storyGoodSamaritan,
-    category: 'Parábolas',
-    duration: '4 min',
-    content: 'Jesus contou uma história sobre um homem que viajava por uma estrada perigosa. Ladrões o atacaram e o deixaram machucado. Um homem importante passou, viu ele ali, mas não parou para ajudar. Outro homem também passou e também não ajudou. Mas então veio um samaritano - alguém que muitos não gostavam. Ele parou, cuidou das feridas do homem, colocou-o em seu burrinho e o levou para um lugar seguro. Jesus perguntou: "Quem foi o bom vizinho?" A resposta é clara: aquele que ajudou! Devemos ajudar todos, não importa quem sejam.'
-  },
+
   {
     id: 'davi-e-golias',
     title: 'Davi e Golias',

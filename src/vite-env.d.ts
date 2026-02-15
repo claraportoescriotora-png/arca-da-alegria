@@ -1,6 +1,6 @@
 /** 
   * ============================================================================ 
-  * PROTÓTIPO EDUCACIONAL - ARCA DA ALEGRIA 
+  * PROTÓTIPO EDUCACIONAL - MEU AMIGUITO 
   * ============================================================================ 
   *  
   * Este código fonte é parte de um projeto educacional desenvolvido por: 

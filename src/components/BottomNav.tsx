@@ -2,10 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
   { path: "/home", icon: "home", label: "Início" },
+  { path: "/missions", icon: "emoji_events", label: "Missões" },
   { path: "/stories", icon: "auto_stories", label: "Histórias" },
   { path: "/videos", icon: "smart_display", label: "Vídeos" },
   { path: "/games", icon: "sports_esports", label: "Jogos" },
-  { path: "/profile", icon: "person", label: "Perfil" },
 ];
 
 export function BottomNav() {
