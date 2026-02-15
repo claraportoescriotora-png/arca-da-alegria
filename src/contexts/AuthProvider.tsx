@@ -63,7 +63,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 { event: 'UPDATE', schema: 'public', table: 'profiles' },
                 (payload) => {
                     if (payload.new.id === session?.user.id) {
-                        console.log('Realtime profile update:', payload.new);
                         setProfile(payload.new as Profile);
                     }
                 }
@@ -72,7 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         return () => {
             subscription.unsubscribe();
-            supabase.removeChannel(profileSubscription);
+            // Wrap removal in try-catch to avoid unhandled errors if connection is already closed
+            try {
+                supabase.removeChannel(profileSubscription);
+            } catch (e) {
+                // Ignore cleanup error
+            }
         };
     }, [session?.user.id]); // Add dependency to re-subscribe if user changes
 
@@ -87,7 +91,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (error) {
                 console.error('Error fetching profile:', error);
             } else {
-                console.log('AuthProvider: Profile fetched:', data);
                 setProfile(data as Profile);
             }
         } catch (error) {

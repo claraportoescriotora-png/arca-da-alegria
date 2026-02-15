@@ -18,12 +18,6 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
     }
 
     // If no profile (error fetching) or pending/canceled status, redirect to Paywall
-    console.log('SubscriptionGuard Check:', {
-        hasProfile: !!profile,
-        status: profile?.subscription_status,
-        profileId: profile?.id
-    });
-
     if (!profile || profile.subscription_status !== 'active') {
         return <Navigate to="/paywall" replace />;
     }
