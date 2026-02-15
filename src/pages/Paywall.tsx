@@ -5,8 +5,18 @@ import { Check, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { supabase } from "@/lib/supabase";
 
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 const Paywall = () => {
-    const { user, signOut } = useAuth();
+    const { user, profile, signOut } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (profile?.subscription_status === 'active') {
+            navigate('/home');
+        }
+    }, [profile, navigate]);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center p-4">
