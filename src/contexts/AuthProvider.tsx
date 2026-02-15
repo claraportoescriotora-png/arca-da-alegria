@@ -56,8 +56,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         });
 
-        return () => subscription.unsubscribe();
-    }, []);
+        // NEW: Listen for Realtime changes on profiles table (e.g. Webhook updates subscription)
+        const profileSubscription = supabase
+            .channel('public:profiles')
+            .on('postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'profiles' },
+                (payload) => {
+                    if (payload.new.id === session?.user.id) {
+                        console.log('Realtime profile update:', payload.new);
+                        setProfile(payload.new as Profile);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+            supabase.removeChannel(profileSubscription);
+        };
+    }, [session?.user.id]); // Add dependency to re-subscribe if user changes
 
     const fetchProfile = async (userId: string) => {
         try {

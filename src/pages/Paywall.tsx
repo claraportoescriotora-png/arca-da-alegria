@@ -59,9 +59,17 @@ const Paywall = () => {
                 <CardFooter className="flex flex-col gap-3">
                     <Button
                         className="w-full bg-green-600 hover:bg-green-700 text-white text-lg h-12 rounded-xl shadow-lg transform transition hover:scale-105"
-                        onClick={() => window.location.href = `https://pay.kiwify.com.br/SEU_LINK?email=${user?.email}`}
+                        onClick={() => window.open('https://pay.kiwify.com.br/P002gO8', '_blank')}
                     >
                         Assinar Agora
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                        onClick={() => window.location.reload()}
+                    >
+                        Já paguei? Clique para atualizar
                     </Button>
                     <Button variant="ghost" className="w-full text-gray-500" onClick={signOut}>
                         Sair e tentar outra conta
