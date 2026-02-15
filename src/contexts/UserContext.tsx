@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from './AuthProvider';
 
 export interface Notification {
   id: string;
@@ -21,9 +22,6 @@ interface UserContextType {
   notifications: Notification[];
   markNotificationAsRead: (id: string) => void;
   clearNotifications: () => void;
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
   updateName: (name: string) => void;
   customAvatar: string | null;
   setCustomAvatar: (image: string | null) => void;
@@ -48,14 +46,14 @@ const LEVELS = [
 ];
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  // Initialize state from localStorage or defaults
-  const [name, setNameState] = useState(() => localStorage.getItem('user_name') || 'Gabriel');
+  const { profile, user } = useAuth();
+
+  // Initialize state from profile or defaults
+  const [name, setNameState] = useState(() => profile?.full_name || localStorage.getItem('user_name') || 'Visitante');
   const [avatarId, setAvatarIdState] = useState(() => localStorage.getItem('user_avatar') || 'bear');
   const [customAvatar, setCustomAvatarState] = useState<string | null>(() => localStorage.getItem('user_custom_avatar'));
-  const [xp, setXpState] = useState(() => parseInt(localStorage.getItem('user_xp') || '850'));
-  // Estado de autenticação volátil (inicia falso ao recarregar a página)
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+  const [xp, setXpState] = useState(() => profile?.xp || parseInt(localStorage.getItem('user_xp') || '0'));
+
   const [notifications, setNotificationsState] = useState<Notification[]>(() => {
     const saved = localStorage.getItem('user_notifications');
     return saved ? JSON.parse(saved) : [
@@ -69,6 +67,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
     ];
   });
+
+  // Sync with Profile from Supabase
+  useEffect(() => {
+    if (profile) {
+      setNameState(profile.full_name || 'Visitante');
+      setXpState(profile.xp);
+    }
+  }, [profile]);
 
   // Derived state for level
   const level = LEVELS.reduce((acc, curr) => xp >= curr.minXp ? curr.level : acc, 1);
@@ -101,9 +107,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
-
   const setAvatarId = (newId: string) => {
     setAvatarIdState(newId);
     if (newId !== 'custom') {
@@ -112,12 +115,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addXp = (amount: number) => {
+    // Optimistic update
     const oldLevel = LEVELS.reduce((acc, curr) => xp >= curr.minXp ? curr.level : acc, 1);
     const newXp = xp + amount;
     const newLevel = LEVELS.reduce((acc, curr) => newXp >= curr.minXp ? curr.level : acc, 1);
-    
+
     setXpState(newXp);
-    
+
     // Level up notification
     if (newLevel > oldLevel) {
       const levelTitle = LEVELS.find(l => l.level === newLevel)?.title;
@@ -156,9 +160,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       notifications,
       markNotificationAsRead,
       clearNotifications,
-      isAuthenticated,
-      login,
-      logout,
       updateName,
       customAvatar,
       setCustomAvatar

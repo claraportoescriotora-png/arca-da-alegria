@@ -1,14 +1,18 @@
 import { Navigate } from 'react-router-dom';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthProvider';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useUser();
+  const { session, loading } = useAuth();
 
-  if (!isAuthenticated) {
+  if (loading) {
+    return <div>Carregando...</div>; // Or a proper loading spinner
+  }
+
+  if (!session) {
     return <Navigate to="/" replace />;
   }
 
