@@ -247,7 +247,7 @@ export function AdminAgent() {
                                 <div className="space-y-3">
                                     <label className="text-sm font-medium text-slate-700">Modelo Gemini</label>
                                     <Select
-                                        value={agentsConfig['google_gemini_model'] || 'gemini-2-flash'}
+                                        value={agentsConfig['google_gemini_model'] || 'gemini-flash-latest'}
                                         onValueChange={(val) => updateAgentConfig('google_gemini_model', val)}
                                         disabled={processing}
                                     >
@@ -255,10 +255,10 @@ export function AdminAgent() {
                                             <SelectValue placeholder="Selecione o modelo" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Tentativa 1)</SelectItem>
-                                            <SelectItem value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Tentativa 2)</SelectItem>
-                                            <SelectItem value="gemini-flash-latest">Gemini 1.5 Flash (Fervoroso - Estável)</SelectItem>
-                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Limite 20)</SelectItem>
+                                            <SelectItem value="gemini-flash-latest">gemini-flash-latest</SelectItem>
+                                            <SelectItem value="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
+                                            <SelectItem value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</SelectItem>
+                                            <SelectItem value="gemini-2.5-flash">gemini-2.5-flash</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-[10px] text-slate-400">
