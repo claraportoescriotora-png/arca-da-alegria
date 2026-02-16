@@ -1,8 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js';
+import sharp from 'sharp';
 
 export const config = {
-    runtime: 'edge',
+    runtime: 'nodejs',
 };
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
@@ -11,7 +12,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 interface AgentRequest {
-    action: 'generate_story'; // Expanded in future for missions
+    action: 'generate_story';
     agentType: 'storyteller';
     params?: {
         theme?: string;
@@ -39,7 +40,7 @@ export default async function handler(req: Request) {
 
         if (!apiKey) return new Response(JSON.stringify({ error: 'API Key missing' }), { status: 400 });
 
-        // 2. Prompt Engineering (Strict JSON)
+        // 2. Prompt Engineering
         const theme = params?.theme || "Tema Bíblico Surpresa";
 
         const jsonSchema = {
@@ -68,7 +69,7 @@ export default async function handler(req: Request) {
         2. O quiz deve ter 2 perguntas.
         3. A categoria deve ser uma das 3 listadas.`;
 
-        // 3. Gemini Call
+        // 3. Gemini Call (Text)
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -81,52 +82,82 @@ export default async function handler(req: Request) {
         });
 
         const geminiData = await geminiResponse.json() as any;
-
-        if (!geminiResponse.ok) {
-            const errorMsg = geminiData?.error?.message || geminiData?.error?.status || "Unknown Gemini API Error";
-            throw new Error(`Gemini API Failed (${geminiResponse.status}): ${errorMsg}`);
-        }
+        if (!geminiResponse.ok) throw new Error(`Gemini Error: ${geminiData?.error?.message || "Unknown"}`);
 
         const outputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!outputText) {
-            console.error("Gemini Output Error. Full Response:", JSON.stringify(geminiData));
-            const blocked = geminiData.promptFeedback?.blockReason;
-            if (blocked) throw new Error(`Gemini blocked content: ${blocked}`);
-            throw new Error('Gemini returned success but no content. Check logs.');
-        }
+        if (!outputText) throw new Error('No content from Gemini');
 
         // 4. Parse & Validate
-        let data;
-        try {
-            const jsonMatch = outputText.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("No JSON found in response");
-            data = JSON.parse(jsonMatch[0]);
-        } catch (e: any) {
-            console.error("JSON Parse Error. Output:", outputText);
-            throw new Error(`Failed to parse AI response. Raw output logged.`);
+        const jsonMatch = outputText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("No JSON found in response");
+        const data = JSON.parse(jsonMatch[0]);
+
+        // 5. Image Generation (Imagen 3 via Vertex AI / API Studio)
+        // Note: Using the same API Key for Imagen if supported by the model version or different endpoint.
+        const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`;
+        const imagenResponse = await fetch(imagenUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                instances: [{ prompt: `Children book illustration, watercolor style, soft colors, high quality, Christian theme: ${data.title}` }],
+                parameters: { sampleCount: 1 }
+            })
+        });
+
+        const imagenData = await imagenResponse.json() as any;
+        let cover_url = 'https://images.unsplash.com/photo-1507457379470-08b800de837a'; // Default
+
+        if (imagenResponse.ok && imagenData.predictions?.[0]?.bytesBase64Encoded) {
+            const buffer = Buffer.from(imagenData.predictions[0].bytesBase64Encoded, 'base64');
+
+            // 6. Image Optimization (Sharp)
+            let optimizedBuffer = await sharp(buffer)
+                .resize(800, 800, { fit: 'inside' })
+                .webp({ quality: 70 })
+                .toBuffer();
+
+            // Dynamic size reduction if > 80kb
+            if (optimizedBuffer.length > 80 * 1024) {
+                optimizedBuffer = await sharp(buffer)
+                    .resize(600, 600, { fit: 'inside' })
+                    .webp({ quality: 60 })
+                    .toBuffer();
+            }
+
+            // 7. Upload to Supabase Storage
+            const fileName = `story_${Date.now()}.webp`;
+            const { error: uploadError } = await supabase.storage
+                .from('stories')
+                .upload(fileName, optimizedBuffer, {
+                    contentType: 'image/webp',
+                    cacheControl: '3600'
+                });
+
+            if (!uploadError) {
+                const { data: { publicUrl } } = supabase.storage.from('stories').getPublicUrl(fileName);
+                cover_url = publicUrl;
+            } else {
+                console.error("Upload error:", uploadError);
+            }
         }
 
-        // 5. Duplicate Check
+        // 8. Duplicate Check
         const { data: existing } = await supabase
             .from('stories')
             .select('id')
             .eq('title', data.title)
             .maybeSingle();
 
-        if (existing) {
-            throw new Error(`Duplicate story: "${data.title}" already exists.`);
-        }
+        if (existing) throw new Error(`Duplicate story: "${data.title}"`);
 
-        // 6. DB Transaction (Story -> Questions -> Options)
-        // Insert Story
+        // 9. DB Transaction
         const { data: story, error: storyError } = await supabase.from('stories').insert({
             title: data.title,
             content: data.content,
             moral: data.moral,
             category: data.category || 'Histórias',
             is_published: false,
-            cover_url: 'https://images.unsplash.com/photo-1507457379470-08b800de837a' // Placeholder
+            cover_url: cover_url
         }).select().single();
 
         if (storyError) throw storyError;
@@ -140,12 +171,7 @@ export default async function handler(req: Request) {
                     order_index: 1
                 }).select().single();
 
-                if (qError) {
-                    console.error("Failed to save question", qError);
-                    continue;
-                }
-
-                if (q.options && Array.isArray(q.options)) {
+                if (!qError && q.options) {
                     const optionsPayload = q.options.map((opt: any) => ({
                         question_id: question.id,
                         text: opt.text,
@@ -155,15 +181,6 @@ export default async function handler(req: Request) {
                 }
             }
         }
-
-        // 7. Log & Return
-        await supabase.from('agent_logs').insert({
-            action,
-            performed_by: userId,
-            status: 'success',
-            input_summary: `Theme: ${theme}`,
-            output_summary: `Created: ${data.title}`
-        });
 
         return new Response(JSON.stringify({ success: true, data: data.title }), {
             headers: { 'Content-Type': 'application/json' }
