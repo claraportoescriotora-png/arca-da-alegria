@@ -77,7 +77,7 @@ export function AdminAgent() {
         setLoadingConfig(true);
         const updates = [
             { key: 'google_gemini_api_key', value: apiKey },
-            ...Object.keys(agentsConfig).filter(k => k.startsWith('agent_')).map(k => ({ key: k, value: agentsConfig[k] }))
+            ...Object.keys(agentsConfig).filter(k => k.startsWith('agent_') || k === 'google_gemini_model').map(k => ({ key: k, value: agentsConfig[k] }))
         ];
 
         for (const update of updates) {
@@ -89,6 +89,27 @@ export function AdminAgent() {
 
     const updateAgentConfig = (key: string, value: string) => {
         setAgentsConfig((prev: any) => ({ ...prev, [key]: value }));
+    };
+
+    const diagnosticModels = async () => {
+        addLog("🔍 Solicitando lista de modelos permitidos para sua chave...");
+        try {
+            const response = await fetch('/api/agent/flow', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'list_models', agentType: 'storyteller' })
+            });
+            const result = await response.json();
+            if (result.models) {
+                const names = result.models.map((m: any) => m.name.replace('models/', ''));
+                addLog(`✅ Modelos encontrados: ${names.join(', ')}`);
+                console.log("Full Model List:", result.models);
+            } else {
+                addLog("⚠️ Nenhum modelo retornado. Verifique sua chave API.");
+            }
+        } catch (err: any) {
+            addLog(`❌ Erro no diagnóstico: ${err.message}`);
+        }
     };
 
     // --- Factory Logic (Client-Side Orchestrator) ---
@@ -243,6 +264,9 @@ export function AdminAgent() {
                                     <p className="text-[10px] text-slate-400">
                                         Dica: Use o '2 Flash' para lotes grandes. O '2.5' é limitado.
                                     </p>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[10px] text-indigo-500 p-0" onClick={diagnosticModels}>
+                                        🔍 Verificar quais modelos minha chave aceita
+                                    </Button>
                                 </div>
 
                                 {/* Agent Selector */}

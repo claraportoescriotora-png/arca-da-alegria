@@ -202,11 +202,18 @@ export default async function handler(req: any, res: any) {
             }
         }
 
-        console.log("Flow completed successfully!");
-        return res.status(200).json({ success: true, data: data.title });
-
-    } catch (error: any) {
-        console.error("Handler Error:", error.message);
-        return res.status(500).json({ error: error.message });
+    } else if (action === 'list_models') {
+        const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const listResponse = await fetch(listUrl);
+        const listData = await listResponse.json() as any;
+        return res.status(200).json({ success: true, models: listData.models || [] });
     }
+
+    console.log("Flow completed successfully!");
+    return res.status(200).json({ success: true, data: data.title });
+
+} catch (error: any) {
+    console.error("Handler Error:", error.message);
+    return res.status(500).json({ error: error.message });
+}
 }
