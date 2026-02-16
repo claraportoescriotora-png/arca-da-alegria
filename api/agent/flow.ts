@@ -80,7 +80,7 @@ export default async function handler(req: Request) {
             })
         });
 
-        const geminiData = await geminiResponse.json();
+        const geminiData = await geminiResponse.json() as any;
 
         if (!geminiResponse.ok) {
             const errorMsg = geminiData?.error?.message || geminiData?.error?.status || "Unknown Gemini API Error";
@@ -102,7 +102,7 @@ export default async function handler(req: Request) {
             const jsonMatch = outputText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("No JSON found in response");
             data = JSON.parse(jsonMatch[0]);
-        } catch (e) {
+        } catch (e: any) {
             console.error("JSON Parse Error. Output:", outputText);
             throw new Error(`Failed to parse AI response. Raw output logged.`);
         }
