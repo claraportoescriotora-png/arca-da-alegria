@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -25,6 +27,10 @@ export function AdminStories() {
     const [stories, setStories] = useState<Story[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalStories, setTotalStories] = useState(0);
+    const [pageSize] = useState(10);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const { toast } = useToast();
 
     // Form State
@@ -35,22 +41,44 @@ export function AdminStories() {
 
     useEffect(() => {
         fetchStories();
-    }, []);
+    }, [page]);
+
+    // Simple debounce for search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (page === 1) fetchStories();
+            else setPage(1);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const fetchStories = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('stories')
-            .select('*')
-            .order('created_at', { ascending: false });
+        try {
+            let query = supabase
+                .from('stories')
+                .select('*', { count: 'exact' });
 
-        if (error) {
+            if (searchTerm) {
+                query = query.ilike('title', `%${searchTerm}%`);
+            }
+
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
+
+            const { data, error, count } = await query
+                .order('created_at', { ascending: false })
+                .range(from, to);
+
+            if (error) throw error;
+            setStories(data || []);
+            setTotalStories(count || 0);
+        } catch (error: any) {
             console.error(error);
             toast({ variant: "destructive", title: "Erro ao carregar histórias" });
-        } else {
-            setStories(data || []);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleSave = async () => {
@@ -106,6 +134,38 @@ export function AdminStories() {
         }
     };
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (!confirm(`Tem certeza que deseja excluir ${selectedIds.length} histórias?`)) return;
+
+        setLoading(true);
+        try {
+            const { error } = await supabase.from('stories').delete().in('id', selectedIds);
+            if (error) throw error;
+            toast({ title: `${selectedIds.length} histórias excluídas com sucesso!` });
+            setSelectedIds([]);
+            fetchStories();
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Erro na exclusão em massa", description: error.message });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === stories.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(stories.map(s => s.id));
+        }
+    };
+
+    const toggleSelectOne = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
     const openNew = () => {
         setCurrentStory({ category: 'biblical', is_premium: false });
         setIsEditing(false);
@@ -136,21 +196,44 @@ export function AdminStories() {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex gap-2">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-4 bg-slate-50/50">
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
-                            placeholder="Buscar história..."
-                            className="pl-10 bg-slate-50 border-slate-200"
+                            placeholder="Buscar história pelo título..."
+                            className="pl-10 bg-white border-slate-200"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
+
+                    {selectedIds.length > 0 && (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
+                            <span className="text-sm font-medium text-slate-600">
+                                {selectedIds.length} selecionadas
+                            </span>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleBulkDelete}
+                                className="h-9"
+                            >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Excluir em Massa
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50">
+                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableHead className="w-[50px]">
+                                <Checkbox
+                                    checked={selectedIds.length === stories.length && stories.length > 0}
+                                    onCheckedChange={toggleSelectAll}
+                                />
+                            </TableHead>
                             <TableHead className="w-[80px]">Capa</TableHead>
                             <TableHead>Título</TableHead>
                             <TableHead>Categoria</TableHead>
@@ -173,8 +256,14 @@ export function AdminStories() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            filteredStories.map((story) => (
-                                <TableRow key={story.id}>
+                            stories.map((story) => (
+                                <TableRow key={story.id} className={selectedIds.includes(story.id) ? "bg-blue-50/30" : ""}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={selectedIds.includes(story.id)}
+                                            onCheckedChange={() => toggleSelectOne(story.id)}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <img src={story.cover_url} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" />
                                     </TableCell>
@@ -207,6 +296,34 @@ export function AdminStories() {
                         )}
                     </TableBody>
                 </Table>
+
+                {/* Pagination */}
+                <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <p className="text-sm text-slate-500">
+                        Mostrando <b>{stories.length}</b> de <b>{totalStories}</b> histórias
+                    </p>
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                            </PaginationItem>
+
+                            <PaginationItem>
+                                <span className="text-sm px-4">Página {page}</span>
+                            </PaginationItem>
+
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => setPage(p => p + 1)}
+                                    className={page * pageSize >= totalStories ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             </div>
 
             {/* Create/Edit Dialog */}

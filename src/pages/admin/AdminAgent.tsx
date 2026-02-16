@@ -261,14 +261,14 @@ export function AdminAgent() {
                                             <SelectValue placeholder="Selecione o modelo" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="gemini-flash-latest">Gemini Flash (Google)</SelectItem>
-                                            <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Google)</SelectItem>
+                                            <SelectItem value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq - RECOMENDADO)</SelectItem>
+                                            <SelectItem value="llama-3.1-8b-instant">Llama 3.1 8B (Groq - Muito Rápido)</SelectItem>
+                                            <SelectItem value="mixtral-8x7b-32768">Mixtral 8x7B (Groq - Alternativa)</SelectItem>
                                             <SelectItem value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (OpenRouter)</SelectItem>
                                             <SelectItem value="google/gemini-2.0-flash-lite-001">Gemini 2.0 Flash Lite (OpenRouter)</SelectItem>
-                                            <SelectItem value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq)</SelectItem>
-                                            <SelectItem value="llama-3.1-8b-instant">Llama 3.1 8B (Groq)</SelectItem>
                                             <SelectItem value="llama3.1-70b">Llama 3.1 70B (Cerebras)</SelectItem>
-                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Direto)</SelectItem>
+                                            <SelectItem value="gemini-flash-latest">Gemini Flash (Google - Se cota liberar)</SelectItem>
+                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Google - Limite 20)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-[10px] text-slate-400">
