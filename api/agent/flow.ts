@@ -81,18 +81,30 @@ export default async function handler(req: Request) {
         });
 
         const geminiData = await geminiResponse.json();
+
+        if (!geminiResponse.ok) {
+            const errorMsg = geminiData?.error?.message || geminiData?.error?.status || "Unknown Gemini API Error";
+            throw new Error(`Gemini API Failed (${geminiResponse.status}): ${errorMsg}`);
+        }
+
         const outputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        if (!outputText) throw new Error('No content from Gemini');
+        if (!outputText) {
+            console.error("Gemini Output Error. Full Response:", JSON.stringify(geminiData));
+            const blocked = geminiData.promptFeedback?.blockReason;
+            if (blocked) throw new Error(`Gemini blocked content: ${blocked}`);
+            throw new Error('Gemini returned success but no content. Check logs.');
+        }
 
         // 4. Parse & Validate
         let data;
         try {
             const jsonMatch = outputText.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("No JSON found");
+            if (!jsonMatch) throw new Error("No JSON found in response");
             data = JSON.parse(jsonMatch[0]);
         } catch (e) {
-            throw new Error(`Failed to parse JSON: ${outputText.substring(0, 50)}...`);
+            console.error("JSON Parse Error. Output:", outputText);
+            throw new Error(`Failed to parse AI response. Raw output logged.`);
         }
 
         // 5. Duplicate Check
