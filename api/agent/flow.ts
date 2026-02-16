@@ -38,23 +38,33 @@ export default async function handler(req: any, res: any) {
         console.log(`Action: ${action}, Agent: ${agentType}, Theme: ${params?.theme}, Requested Model: ${model}`);
 
         // 1. Config & Auth
+        const keysToFetch = [
+            'google_gemini_api_key',
+            'google_gemini_model',
+            `agent_${agentType}_prompt`,
+            'openrouter_api_key',
+            'groq_api_key',
+            'cerebras_api_key'
+        ];
+
         const { data: configData } = await supabase
             .from('agent_config')
             .select('key, value')
-            .in('key', ['google_gemini_api_key', 'google_gemini_model', `agent_${agentType}_prompt`]);
+            .in('key', keysToFetch);
 
-        const apiKey = configData?.find(c => c.key === 'google_gemini_api_key')?.value;
-        const dbModel = configData?.find(c => c.key === 'google_gemini_model')?.value;
-        const selectedModel = model || dbModel || 'gemini-2-flash'; // Prioritize request, then DB, then default
-        const systemPrompt = configData?.find(c => c.key === `agent_${agentType}_prompt`)?.value
-            || 'Você é um assistente útil.';
+        const config = (key: string) => configData?.find(c => c.key === key)?.value;
 
-        if (!apiKey) return res.status(400).json({ error: 'API Key missing' });
+        const googleKey = config('google_gemini_api_key');
+        const openrouterKey = config('openrouter_api_key');
+        const groqKey = config('groq_api_key');
+        const cerebrasKey = config('cerebras_api_key');
+
+        const dbModel = config('google_gemini_model');
+        const selectedModel = model || dbModel || 'gemini-flash-latest';
+        const systemPrompt = config(`agent_${agentType}_prompt`) || 'Você é um assistente útil.';
 
         if (action === 'generate_story') {
-            // 2. Prompt Engineering
             const theme = params?.theme || "Tema Bíblico Surpresa";
-
             const jsonSchema = {
                 title: "Título da História",
                 moral: "Moral da história em uma frase",
@@ -81,24 +91,99 @@ export default async function handler(req: any, res: any) {
             2. O quiz deve ter 2 perguntas.
             3. A categoria deve ser obrigatoriamente 'biblical' (para histórias da Bíblia) ou 'moral' (para histórias educativas).`;
 
-            // 3. Gemini Call (Text)
-            console.log(`Calling Gemini Model: ${selectedModel}...`);
-            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
-            const geminiResponse = await fetch(geminiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `System: ${systemPrompt}\nUser: ${userPrompt}` }]
-                    }]
-                })
-            });
+            let outputText = "";
+            let providerUsed = "";
 
-            const geminiData = await geminiResponse.json() as any;
-            if (!geminiResponse.ok) throw new Error(`Gemini Error: ${geminiData?.error?.message || "Unknown"}`);
+            // Determine Provider
+            if (selectedModel.includes('/') && openrouterKey) {
+                // OpenRouter
+                providerUsed = "OpenRouter";
+                console.log(`Calling OpenRouter: ${selectedModel}...`);
+                const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openrouterKey}`,
+                        'HTTP-Referer': 'https://arcadaalegria.com.br',
+                        'X-Title': 'Arca da Alegria Agent'
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        response_format: { type: 'json_object' }
+                    })
+                });
+                const orData = await orRes.json() as any;
+                if (!orRes.ok) throw new Error(`OpenRouter Error: ${orData?.error?.message || "Unknown"}`);
+                outputText = orData.choices?.[0]?.message?.content;
+            } else if (selectedModel.startsWith('llama-') && groqKey) {
+                // Groq
+                providerUsed = "Groq";
+                console.log(`Calling Groq: ${selectedModel}...`);
+                const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${groqKey}`
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        response_format: { type: 'json_object' }
+                    })
+                });
+                const groqData = await groqRes.json() as any;
+                if (!groqRes.ok) throw new Error(`Groq Error: ${groqData?.error?.message || "Unknown"}`);
+                outputText = groqData.choices?.[0]?.message?.content;
+            } else if (selectedModel === 'llama3.1-70b' && cerebrasKey) {
+                // Cerebras
+                providerUsed = "Cerebras";
+                console.log(`Calling Cerebras: ${selectedModel}...`);
+                const cerRes = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${cerebrasKey}`
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ]
+                    })
+                });
+                const cerData = await cerRes.json() as any;
+                if (!cerRes.ok) throw new Error(`Cerebras Error: ${JSON.stringify(cerData?.error || "Unknown")}`);
+                outputText = cerData.choices?.[0]?.message?.content;
+            } else {
+                // Default to Google GeminiDirect
+                providerUsed = "Google Gemini";
+                if (!googleKey) throw new Error("Google Gemini API Key missing");
+                console.log(`Calling Google: ${selectedModel}...`);
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${googleKey}`;
+                const geminiResponse = await fetch(geminiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: `System: ${systemPrompt}\nUser: ${userPrompt}` }]
+                        }]
+                    })
+                });
+                const geminiData = await geminiResponse.json() as any;
+                if (!geminiResponse.ok) throw new Error(`Gemini Error: ${geminiData?.error?.message || "Unknown"}`);
+                outputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            }
 
-            const outputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!outputText) throw new Error('No content from Gemini');
+            if (!outputText) throw new Error(`No content received from ${providerUsed}`);
+            console.log(`Response received from ${providerUsed}.`);
 
             const jsonMatch = outputText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("No JSON found in response");
@@ -109,7 +194,7 @@ export default async function handler(req: any, res: any) {
             let cover_url = 'https://images.unsplash.com/photo-1507457379470-08b800de837a'; // Default
 
             try {
-                const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`;
+                const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${googleKey}`;
 
                 // Set a strict timeout for image generation to avoid 504
                 const controller = new AbortController();
@@ -207,7 +292,7 @@ export default async function handler(req: any, res: any) {
             return res.status(200).json({ success: true, data: data.title });
 
         } else if (action === 'list_models') {
-            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${googleKey}`;
             const listResponse = await fetch(listUrl);
             const listData = await listResponse.json() as any;
             return res.status(200).json({ success: true, models: listData.models || [] });

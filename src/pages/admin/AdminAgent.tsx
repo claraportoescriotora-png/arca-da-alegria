@@ -77,7 +77,13 @@ export function AdminAgent() {
         setLoadingConfig(true);
         const updates = [
             { key: 'google_gemini_api_key', value: apiKey },
-            ...Object.keys(agentsConfig).filter(k => k.startsWith('agent_') || k === 'google_gemini_model').map(k => ({ key: k, value: agentsConfig[k] }))
+            ...Object.keys(agentsConfig).filter(k =>
+                k.startsWith('agent_') ||
+                k === 'google_gemini_model' ||
+                k === 'openrouter_api_key' ||
+                k === 'groq_api_key' ||
+                k === 'cerebras_api_key'
+            ).map(k => ({ key: k, value: agentsConfig[k] }))
         ];
 
         for (const update of updates) {
@@ -255,10 +261,14 @@ export function AdminAgent() {
                                             <SelectValue placeholder="Selecione o modelo" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="gemini-flash-latest">gemini-flash-latest</SelectItem>
-                                            <SelectItem value="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
-                                            <SelectItem value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</SelectItem>
-                                            <SelectItem value="gemini-2.5-flash">gemini-2.5-flash</SelectItem>
+                                            <SelectItem value="gemini-flash-latest">Gemini Flash (Google)</SelectItem>
+                                            <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Google)</SelectItem>
+                                            <SelectItem value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (OpenRouter)</SelectItem>
+                                            <SelectItem value="google/gemini-2.0-flash-lite-001">Gemini 2.0 Flash Lite (OpenRouter)</SelectItem>
+                                            <SelectItem value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq)</SelectItem>
+                                            <SelectItem value="llama-3.1-8b-instant">Llama 3.1 8B (Groq)</SelectItem>
+                                            <SelectItem value="llama3.1-70b">Llama 3.1 70B (Cerebras)</SelectItem>
+                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Direto)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-[10px] text-slate-400">
@@ -388,17 +398,61 @@ export function AdminAgent() {
                         </CardHeader>
                         <CardContent className="space-y-6">
 
-                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <label className="text-sm font-bold text-slate-700 mb-2 block">Google Gemini API Key (Mestra)</label>
-                                <div className="relative">
-                                    <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <Input
-                                        type="password"
-                                        className="pl-9 bg-white"
-                                        placeholder="AIzaSy..."
-                                        value={apiKey}
-                                        onChange={(e) => setApiKey(e.target.value)}
-                                    />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <label className="text-sm font-bold text-slate-700 mb-2 block">Google Gemini API Key (Mestra)</label>
+                                    <div className="relative">
+                                        <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                                        <Input
+                                            type="password"
+                                            className="pl-9 bg-white"
+                                            placeholder="AIzaSy..."
+                                            value={apiKey}
+                                            onChange={(e) => setApiKey(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <label className="text-sm font-bold text-slate-700 mb-2 block">OpenRouter API Key</label>
+                                    <div className="relative">
+                                        <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                                        <Input
+                                            type="password"
+                                            className="pl-9 bg-white"
+                                            placeholder="sk-or-v1-..."
+                                            value={agentsConfig['openrouter_api_key'] || ''}
+                                            onChange={(e) => updateAgentConfig('openrouter_api_key', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <label className="text-sm font-bold text-slate-700 mb-2 block">Groq API Key</label>
+                                    <div className="relative">
+                                        <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                                        <Input
+                                            type="password"
+                                            className="pl-9 bg-white"
+                                            placeholder="gsk_..."
+                                            value={agentsConfig['groq_api_key'] || ''}
+                                            onChange={(e) => updateAgentConfig('groq_api_key', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <label className="text-sm font-bold text-slate-700 mb-2 block">Cerebras API Key</label>
+                                    <div className="relative">
+                                        <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                                        <Input
+                                            type="password"
+                                            className="pl-9 bg-white"
+                                            placeholder="csk_..."
+                                            value={agentsConfig['cerebras_api_key'] || ''}
+                                            onChange={(e) => updateAgentConfig('cerebras_api_key', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
