@@ -172,8 +172,8 @@ export function AdminAgent() {
 
             // 2. Smart Delay (Anti-Rate Limit)
             if (i < themes.length - 1) {
-                addLog("⏸️ Esfriando motores (15s para evitar bloqueio)...");
-                await new Promise(res => setTimeout(res, 15000));
+                addLog("⏸️ Esfriando motores (18s para segurança máxima)...");
+                await new Promise(res => setTimeout(res, 18000));
             }
         }
 
