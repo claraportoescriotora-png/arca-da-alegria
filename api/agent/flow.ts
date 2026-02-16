@@ -53,7 +53,7 @@ export default async function handler(req: any, res: any) {
         const jsonSchema = {
             title: "Título da História",
             moral: "Moral da história em uma frase",
-            category: "Antigo Testamento | Novo Testamento | Moral",
+            category: "biblical | moral",
             content: "Texto completo da história (min 3 parágrafos)...",
             quiz: [
                 {
@@ -74,7 +74,7 @@ export default async function handler(req: any, res: any) {
         Regras:
         1. A história deve ser doce, educativa e cristã.
         2. O quiz deve ter 2 perguntas.
-        3. A categoria deve ser uma das 3 listadas.`;
+        3. A categoria deve ser obrigatoriamente 'biblical' (para histórias da Bíblia) ou 'moral' (para histórias educativas).`;
 
         // 3. Gemini Call (Text)
         console.log("Calling Gemini...");
@@ -158,15 +158,22 @@ export default async function handler(req: any, res: any) {
 
         // 6. DB Insertion
         console.log("Saving to Supabase...");
+
+        // Map category to DB constraint
+        let finalCategory = 'biblical';
+        const receivedCat = String(data.category).toLowerCase();
+        if (receivedCat.includes('moral')) finalCategory = 'moral';
+        if (receivedCat.includes('biblical')) finalCategory = 'biblical';
+
         const { data: story, error: storyError } = await supabase.from('stories').insert({
             title: data.title,
             content: data.content,
             moral: data.moral,
-            category: data.category || 'Histórias',
+            category: finalCategory,
             cover_url: cover_url,
-            duration: '5 min', // Default duration
-            is_premium: false, // Default to free
-            audio_url: ''      // Empty for now
+            duration: '5 min',
+            is_premium: true, // Standard for Arca
+            audio_url: ''
         }).select().single();
 
         if (storyError) throw storyError;
