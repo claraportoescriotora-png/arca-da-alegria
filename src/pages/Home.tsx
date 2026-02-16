@@ -214,8 +214,10 @@ export default function Home() {
       {/* Content */}
       <main className="container max-w-md mx-auto px-4 py-6 space-y-6">
         {/* Logo Meu Amiguito */}
-        <div className="flex justify-center mb-2">
-          <img src={logoUrl} alt="Meu Amiguito" className="h-16 object-contain" />
+        <div className="flex justify-center mb-2 h-16">
+          {logoUrl && (
+            <img src={logoUrl} alt="Meu Amiguito" className="h-full object-contain animate-in fade-in duration-500" />
+          )}
         </div>
 
         {/* Journey Card */}

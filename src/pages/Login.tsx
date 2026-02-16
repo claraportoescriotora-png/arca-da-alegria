@@ -96,9 +96,9 @@ const Login = () => {
         <CardHeader className="flex flex-col items-center space-y-4 pb-2">
           <div className="w-48 h-48 relative mb-2">
             <img
-              src={logoUrl}
+              src={logoUrl || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} // Transparent pixel while loading
               alt="Meu Amiguito"
-              className="w-full h-full object-contain drop-shadow-md"
+              className={`w-full h-full object-contain drop-shadow-md transition-opacity duration-300 ${logoUrl ? 'opacity-100' : 'opacity-0'}`}
             />
           </div>
           <h1 className="text-2xl font-bold text-blue-600 text-center">Bem-vindo ao Meu Amiguito!</h1>
@@ -113,7 +113,8 @@ const Login = () => {
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50"
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
               />
             </div>
             <div className="space-y-2">
@@ -124,7 +125,8 @@ const Login = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50"
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
               />
             </div>
             <div className="flex flex-col gap-3">

@@ -9,8 +9,8 @@ interface ConfigContextType {
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
-    const [logoUrl, setLogoUrl] = useState<string>('/logo/meu-amiguito.webp'); // Default fallback
-    const [faviconUrl, setFaviconUrl] = useState<string>('/logo/meu-amiguito.webp'); // Default fallback
+    const [logoUrl, setLogoUrl] = useState<string>(''); // Start empty to prevent flicker
+    const [faviconUrl, setFaviconUrl] = useState<string>(''); // Start empty
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

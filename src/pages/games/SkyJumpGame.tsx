@@ -265,7 +265,28 @@ export default function SkyJumpGame() {
 
             // Draw relative to camera
             ctx.beginPath();
-            ctx.roundRect(p.x, p.y - cameraY.current, PLATFORM_WIDTH, PLATFORM_HEIGHT, 5);
+
+            // Compatibility fix for older iOS/Browsers that don't support roundRect
+            if (ctx.roundRect) {
+                ctx.roundRect(p.x, p.y - cameraY.current, PLATFORM_WIDTH, PLATFORM_HEIGHT, 5);
+            } else {
+                // Fallback for older browsers
+                const x = p.x;
+                const y = p.y - cameraY.current;
+                const w = PLATFORM_WIDTH;
+                const h = PLATFORM_HEIGHT;
+                const r = 5;
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+            }
+
             ctx.fill();
 
             if (p.type === 'boost') {
