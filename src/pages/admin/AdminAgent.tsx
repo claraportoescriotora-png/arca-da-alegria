@@ -153,7 +153,8 @@ export function AdminAgent() {
                         action: 'generate_story', // Only Storyteller implemented fully
                         agentType: selectedAgent,
                         params: { theme },
-                        userId: user?.id
+                        userId: user?.id,
+                        model: agentsConfig['google_gemini_model'] || 'gemini-2-flash'
                     })
                 });
 

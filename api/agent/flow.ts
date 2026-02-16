@@ -20,6 +20,7 @@ interface AgentRequest {
         theme?: string;
     };
     userId?: string;
+    model?: string;
 }
 
 export default async function handler(req: any, res: any) {
@@ -28,13 +29,13 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        console.log("--- Starting Agent Flow (Fixed Node.js Signature) ---");
+        console.log("--- Starting Agent Flow (Dynamic Model) ---");
 
         // In Vercel Node.js, body is already a parsed object
         const body = req.body as AgentRequest;
-        const { action, agentType, params, userId } = body;
+        const { action, agentType, params, userId, model } = body;
 
-        console.log(`Action: ${action}, Agent: ${agentType}, Theme: ${params?.theme}`);
+        console.log(`Action: ${action}, Agent: ${agentType}, Theme: ${params?.theme}, Requested Model: ${model}`);
 
         // 1. Config & Auth
         const { data: configData } = await supabase
@@ -43,7 +44,8 @@ export default async function handler(req: any, res: any) {
             .in('key', ['google_gemini_api_key', 'google_gemini_model', `agent_${agentType}_prompt`]);
 
         const apiKey = configData?.find(c => c.key === 'google_gemini_api_key')?.value;
-        const selectedModel = configData?.find(c => c.key === 'google_gemini_model')?.value || 'gemini-2.5-flash';
+        const dbModel = configData?.find(c => c.key === 'google_gemini_model')?.value;
+        const selectedModel = model || dbModel || 'gemini-2-flash'; // Prioritize request, then DB, then default
         const systemPrompt = configData?.find(c => c.key === `agent_${agentType}_prompt`)?.value
             || 'Você é um assistente útil.';
 
