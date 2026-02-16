@@ -234,10 +234,10 @@ export function AdminAgent() {
                                             <SelectValue placeholder="Selecione o modelo" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="gemini-2-flash">Gemini 2 Flash (Rápido + 1.5K/dia)</SelectItem>
-                                            <SelectItem value="gemini-2-flash-lite">Gemini 2 Flash Lite (Mais rápido)</SelectItem>
-                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Novo - 20/dia)</SelectItem>
-                                            <SelectItem value="gemini-2-pro-exp">Gemini 2 Pro (Experimental)</SelectItem>
+                                            <SelectItem value="gemini-2.0-flash">Gemini 2 Flash (1.5K RPD)</SelectItem>
+                                            <SelectItem value="gemini-2.0-flash-lite-preview-02-05">Gemini 2 Flash Lite (1.5K RPD)</SelectItem>
+                                            <SelectItem value="gemini-2.0-pro-exp-02-05">Gemini 2 Pro Exp (1.5K RPD)</SelectItem>
+                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (20 RPD)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-[10px] text-slate-400">
