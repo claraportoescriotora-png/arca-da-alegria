@@ -65,6 +65,16 @@ export default async function handler(req: any, res: any) {
 
         if (action === 'generate_story') {
             const theme = params?.theme || "Tema Bíblico Surpresa";
+
+            // Fetch existing titles to avoid duplication
+            const { data: existingStories } = await supabase
+                .from('stories')
+                .select('title')
+                .order('created_at', { ascending: false })
+                .limit(100);
+
+            const existingTitles = existingStories?.map(s => s.title).join(', ') || 'Nenhum ainda';
+
             const jsonSchema = {
                 title: "Título da História",
                 moral: "Moral da história em uma frase",
@@ -83,6 +93,12 @@ export default async function handler(req: any, res: any) {
             };
 
             const userPrompt = `Crie uma história infantil INÉDITA sobre: ${theme}.
+            
+            IMPORTANTE - EVITE DUPLICIDADE:
+            Já existem histórias com os seguintes títulos: [${existingTitles}].
+            VOCÊ NÃO PODE REPETIR NENHUM DESSES TÍTULOS. Crie algo novo e criativo. 
+            Você pode repetir personagens (ex: Daniel, Noé), mas o título e o enredo devem ser diferentes das histórias existentes.
+
             OBRIGATÓRIO: Retorne APENAS um JSON válido seguindo exatamente esta estrutura:
             ${JSON.stringify(jsonSchema)}
             
@@ -247,6 +263,17 @@ export default async function handler(req: any, res: any) {
             }
 
             // 6. DB Insertion
+            console.log("Checking for duplicate title...");
+            const { data: existingTitleCheck } = await supabase
+                .from('stories')
+                .select('id')
+                .eq('title', data.title)
+                .single();
+
+            if (existingTitleCheck) {
+                throw new Error(`Título Duplicado: "${data.title}". A IA repetiu um título que já existe. Tente novamente.`);
+            }
+
             console.log("Saving to Supabase...");
 
             // Map category to DB constraint
