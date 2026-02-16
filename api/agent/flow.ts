@@ -4,6 +4,7 @@ import sharp from 'sharp';
 
 export const config = {
     runtime: 'nodejs',
+    maxDuration: 60, // Increase timeout to 60s (Pro/Advanced plans)
 };
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
@@ -26,7 +27,9 @@ export default async function handler(req: Request) {
     }
 
     try {
+        console.log("--- Starting Agent Flow ---");
         const { action, agentType, params, userId } = await req.json() as AgentRequest;
+        console.log(`Action: ${action}, Agent: ${agentType}, Theme: ${params?.theme}`);
 
         // 1. Config & Auth
         const { data: configData } = await supabase
@@ -70,6 +73,7 @@ export default async function handler(req: Request) {
         3. A categoria deve ser uma das 3 listadas.`;
 
         // 3. Gemini Call (Text)
+        console.log("Calling Gemini for text generation...");
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -93,55 +97,70 @@ export default async function handler(req: Request) {
         const data = JSON.parse(jsonMatch[0]);
 
         // 5. Image Generation (Imagen 3 via Vertex AI / API Studio)
-        // Note: Using the same API Key for Imagen if supported by the model version or different endpoint.
+        console.log("Calling Imagen 3 for cover art...");
         const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`;
-        const imagenResponse = await fetch(imagenUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                instances: [{ prompt: `Children book illustration, watercolor style, soft colors, high quality, Christian theme: ${data.title}` }],
-                parameters: { sampleCount: 1 }
-            })
-        });
 
-        const imagenData = await imagenResponse.json() as any;
         let cover_url = 'https://images.unsplash.com/photo-1507457379470-08b800de837a'; // Default
 
-        if (imagenResponse.ok && imagenData.predictions?.[0]?.bytesBase64Encoded) {
-            const buffer = Buffer.from(imagenData.predictions[0].bytesBase64Encoded, 'base64');
+        try {
+            const imagenResponse = await fetch(imagenUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    instances: [{ prompt: `Children book illustration, watercolor style, soft colors, high quality, Christian theme: ${data.title}` }],
+                    parameters: { sampleCount: 1 }
+                })
+            });
 
-            // 6. Image Optimization (Sharp)
-            let optimizedBuffer = await sharp(buffer)
-                .resize(800, 800, { fit: 'inside' })
-                .webp({ quality: 70 })
-                .toBuffer();
+            const imagenData = await imagenResponse.json() as any;
+            console.log("Imagen response status:", imagenResponse.status);
 
-            // Dynamic size reduction if > 80kb
-            if (optimizedBuffer.length > 80 * 1024) {
-                optimizedBuffer = await sharp(buffer)
-                    .resize(600, 600, { fit: 'inside' })
-                    .webp({ quality: 60 })
+            if (imagenResponse.ok && imagenData.predictions?.[0]?.bytesBase64Encoded) {
+                console.log("Image generated successfully, optimizing with Sharp...");
+                const buffer = Buffer.from(imagenData.predictions[0].bytesBase64Encoded, 'base64');
+
+                // 6. Image Optimization (Sharp)
+                let optimizedBuffer = await sharp(buffer)
+                    .resize(800, 800, { fit: 'inside' })
+                    .webp({ quality: 70 })
                     .toBuffer();
-            }
 
-            // 7. Upload to Supabase Storage
-            const fileName = `story_${Date.now()}.webp`;
-            const { error: uploadError } = await supabase.storage
-                .from('stories')
-                .upload(fileName, optimizedBuffer, {
-                    contentType: 'image/webp',
-                    cacheControl: '3600'
-                });
+                // Dynamic size reduction if > 80kb
+                if (optimizedBuffer.length > 80 * 1024) {
+                    console.log("Image > 80kb, retrying with lower resolution...");
+                    optimizedBuffer = await sharp(buffer)
+                        .resize(600, 600, { fit: 'inside' })
+                        .webp({ quality: 60 })
+                        .toBuffer();
+                }
 
-            if (!uploadError) {
-                const { data: { publicUrl } } = supabase.storage.from('stories').getPublicUrl(fileName);
-                cover_url = publicUrl;
+                // 7. Upload to Supabase Storage
+                console.log("Uploading to Supabase Storage...");
+                const fileName = `story_${Date.now()}.webp`;
+                const { error: uploadError } = await supabase.storage
+                    .from('stories')
+                    .upload(fileName, optimizedBuffer, {
+                        contentType: 'image/webp',
+                        cacheControl: '3600'
+                    });
+
+                if (!uploadError) {
+                    const { data: { publicUrl } } = supabase.storage.from('stories').getPublicUrl(fileName);
+                    cover_url = publicUrl;
+                    console.log("Upload successful:", cover_url);
+                } else {
+                    console.error("Upload error:", uploadError);
+                }
             } else {
-                console.error("Upload error:", uploadError);
+                console.warn("Imagen failed or returned no data:", imagenData?.error?.message || "No predictions");
             }
+        } catch (imgError: any) {
+            console.error("Critical error in image generation flow:", imgError.message);
+            // Non-blocking, continue with default cover
         }
 
         // 8. Duplicate Check
+        console.log("Checking for duplicates and inserting into DB...");
         const { data: existing } = await supabase
             .from('stories')
             .select('id')
