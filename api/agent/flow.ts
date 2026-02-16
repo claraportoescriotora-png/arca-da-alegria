@@ -163,8 +163,10 @@ export default async function handler(req: any, res: any) {
             content: data.content,
             moral: data.moral,
             category: data.category || 'Histórias',
-            is_published: false,
-            cover_url: cover_url
+            cover_url: cover_url,
+            duration: '5 min', // Default duration
+            is_premium: false, // Default to free
+            audio_url: ''      // Empty for now
         }).select().single();
 
         if (storyError) throw storyError;
