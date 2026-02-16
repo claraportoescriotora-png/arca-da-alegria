@@ -40,9 +40,10 @@ export default async function handler(req: any, res: any) {
         const { data: configData } = await supabase
             .from('agent_config')
             .select('key, value')
-            .in('key', ['google_gemini_api_key', `agent_${agentType}_prompt`]);
+            .in('key', ['google_gemini_api_key', 'google_gemini_model', `agent_${agentType}_prompt`]);
 
         const apiKey = configData?.find(c => c.key === 'google_gemini_api_key')?.value;
+        const selectedModel = configData?.find(c => c.key === 'google_gemini_model')?.value || 'gemini-2.5-flash';
         const systemPrompt = configData?.find(c => c.key === `agent_${agentType}_prompt`)?.value
             || 'Você é um assistente útil.';
 
@@ -78,8 +79,8 @@ export default async function handler(req: any, res: any) {
         3. A categoria deve ser obrigatoriamente 'biblical' (para histórias da Bíblia) ou 'moral' (para histórias educativas).`;
 
         // 3. Gemini Call (Text)
-        console.log("Calling Gemini...");
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        console.log(`Calling Gemini Model: ${selectedModel}...`);
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // --- SMART THEMES LIST ---
 const BIBLICAL_THEMES = [
@@ -219,6 +220,29 @@ export function AdminAgent() {
                                 <CardTitle className="text-indigo-700 text-lg">Painel de Controle</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6 pt-6">
+
+                                {/* Model Selector */}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-medium text-slate-700">Modelo Gemini</label>
+                                    <Select
+                                        value={agentsConfig['google_gemini_model'] || 'gemini-2-flash'}
+                                        onValueChange={(val) => updateAgentConfig('google_gemini_model', val)}
+                                        disabled={processing}
+                                    >
+                                        <SelectTrigger className="bg-white">
+                                            <SelectValue placeholder="Selecione o modelo" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="gemini-2-flash">Gemini 2 Flash (Rápido + 1.5K/dia)</SelectItem>
+                                            <SelectItem value="gemini-2-flash-lite">Gemini 2 Flash Lite (Mais rápido)</SelectItem>
+                                            <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Novo - 20/dia)</SelectItem>
+                                            <SelectItem value="gemini-2-pro-exp">Gemini 2 Pro (Experimental)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-[10px] text-slate-400">
+                                        Dica: Use o '2 Flash' para lotes grandes. O '2.5' é limitado.
+                                    </p>
+                                </div>
 
                                 {/* Agent Selector */}
                                 <div className="space-y-3">
