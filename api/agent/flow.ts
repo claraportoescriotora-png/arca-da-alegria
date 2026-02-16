@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 export const config = {
     runtime: 'nodejs',
-    maxDuration: 60, // Increase timeout to 60s (Pro/Advanced plans)
+    maxDuration: 60,
 };
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
@@ -21,14 +21,18 @@ interface AgentRequest {
     userId?: string;
 }
 
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
-        return new Response('Method not allowed', { status: 405 });
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        console.log("--- Starting Agent Flow ---");
-        const { action, agentType, params, userId } = await req.json() as AgentRequest;
+        console.log("--- Starting Agent Flow (Fixed Node.js Signature) ---");
+
+        // In Vercel Node.js, body is already a parsed object
+        const body = req.body as AgentRequest;
+        const { action, agentType, params, userId } = body;
+
         console.log(`Action: ${action}, Agent: ${agentType}, Theme: ${params?.theme}`);
 
         // 1. Config & Auth
@@ -41,7 +45,7 @@ export default async function handler(req: Request) {
         const systemPrompt = configData?.find(c => c.key === `agent_${agentType}_prompt`)?.value
             || 'Você é um assistente útil.';
 
-        if (!apiKey) return new Response(JSON.stringify({ error: 'API Key missing' }), { status: 400 });
+        if (!apiKey) return res.status(400).json({ error: 'API Key missing' });
 
         // 2. Prompt Engineering
         const theme = params?.theme || "Tema Bíblico Surpresa";
@@ -73,7 +77,7 @@ export default async function handler(req: Request) {
         3. A categoria deve ser uma das 3 listadas.`;
 
         // 3. Gemini Call (Text)
-        console.log("Calling Gemini for text generation...");
+        console.log("Calling Gemini...");
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -91,51 +95,49 @@ export default async function handler(req: Request) {
         const outputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!outputText) throw new Error('No content from Gemini');
 
-        // 4. Parse & Validate
         const jsonMatch = outputText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) throw new Error("No JSON found in response");
         const data = JSON.parse(jsonMatch[0]);
 
-        // 5. Image Generation (Imagen 3 via Vertex AI / API Studio)
-        console.log("Calling Imagen 3 for cover art...");
-        const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`;
-
+        // 5. Image Generation (Non-blocking & Timed)
+        console.log("Starting Image Flow...");
         let cover_url = 'https://images.unsplash.com/photo-1507457379470-08b800de837a'; // Default
 
         try {
+            const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`;
+
+            // Set a strict timeout for image generation to avoid 504
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max for image
+
             const imagenResponse = await fetch(imagenUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                     instances: [{ prompt: `Children book illustration, watercolor style, soft colors, high quality, Christian theme: ${data.title}` }],
                     parameters: { sampleCount: 1 }
                 })
             });
+            clearTimeout(timeoutId);
 
             const imagenData = await imagenResponse.json() as any;
-            console.log("Imagen response status:", imagenResponse.status);
-
             if (imagenResponse.ok && imagenData.predictions?.[0]?.bytesBase64Encoded) {
-                console.log("Image generated successfully, optimizing with Sharp...");
+                console.log("Image received, optimizing...");
                 const buffer = Buffer.from(imagenData.predictions[0].bytesBase64Encoded, 'base64');
 
-                // 6. Image Optimization (Sharp)
                 let optimizedBuffer = await sharp(buffer)
                     .resize(800, 800, { fit: 'inside' })
                     .webp({ quality: 70 })
                     .toBuffer();
 
-                // Dynamic size reduction if > 80kb
                 if (optimizedBuffer.length > 80 * 1024) {
-                    console.log("Image > 80kb, retrying with lower resolution...");
                     optimizedBuffer = await sharp(buffer)
                         .resize(600, 600, { fit: 'inside' })
                         .webp({ quality: 60 })
                         .toBuffer();
                 }
 
-                // 7. Upload to Supabase Storage
-                console.log("Uploading to Supabase Storage...");
                 const fileName = `story_${Date.now()}.webp`;
                 const { error: uploadError } = await supabase.storage
                     .from('stories')
@@ -147,29 +149,15 @@ export default async function handler(req: Request) {
                 if (!uploadError) {
                     const { data: { publicUrl } } = supabase.storage.from('stories').getPublicUrl(fileName);
                     cover_url = publicUrl;
-                    console.log("Upload successful:", cover_url);
-                } else {
-                    console.error("Upload error:", uploadError);
                 }
-            } else {
-                console.warn("Imagen failed or returned no data:", imagenData?.error?.message || "No predictions");
             }
         } catch (imgError: any) {
-            console.error("Critical error in image generation flow:", imgError.message);
-            // Non-blocking, continue with default cover
+            console.warn("Image skip:", imgError.message);
+            // Fallback to default
         }
 
-        // 8. Duplicate Check
-        console.log("Checking for duplicates and inserting into DB...");
-        const { data: existing } = await supabase
-            .from('stories')
-            .select('id')
-            .eq('title', data.title)
-            .maybeSingle();
-
-        if (existing) throw new Error(`Duplicate story: "${data.title}"`);
-
-        // 9. DB Transaction
+        // 6. DB Insertion
+        console.log("Saving to Supabase...");
         const { data: story, error: storyError } = await supabase.from('stories').insert({
             title: data.title,
             content: data.content,
@@ -181,16 +169,16 @@ export default async function handler(req: Request) {
 
         if (storyError) throw storyError;
 
-        // Insert Quiz
+        // 7. Quiz Insertion
         if (data.quiz && Array.isArray(data.quiz)) {
             for (const q of data.quiz) {
-                const { data: question, error: qError } = await supabase.from('quiz_questions').insert({
+                const { data: question } = await supabase.from('quiz_questions').insert({
                     content_id: story.id,
                     question: q.question,
                     order_index: 1
                 }).select().single();
 
-                if (!qError && q.options) {
+                if (question && q.options) {
                     const optionsPayload = q.options.map((opt: any) => ({
                         question_id: question.id,
                         text: opt.text,
@@ -201,14 +189,11 @@ export default async function handler(req: Request) {
             }
         }
 
-        return new Response(JSON.stringify({ success: true, data: data.title }), {
-            headers: { 'Content-Type': 'application/json' }
-        });
+        console.log("Flow completed successfully!");
+        return res.status(200).json({ success: true, data: data.title });
 
     } catch (error: any) {
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        console.error("Handler Error:", error.message);
+        return res.status(500).json({ error: error.message });
     }
 }
