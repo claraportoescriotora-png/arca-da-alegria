@@ -126,7 +126,7 @@ export default async function handler(req: Request) {
             moral: data.moral,
             category: data.category || 'Histórias',
             is_published: false,
-            image_url: 'https://images.unsplash.com/photo-1507457379470-08b800de837a' // Placeholder
+            cover_url: 'https://images.unsplash.com/photo-1507457379470-08b800de837a' // Placeholder
         }).select().single();
 
         if (storyError) throw storyError;
