@@ -4,6 +4,7 @@ import { ArrowLeft, RefreshCw, Trophy } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabase';
 
 // --- Constants ---
 const GRAVITY = 0.15; // Super Floaty

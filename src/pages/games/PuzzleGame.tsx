@@ -54,6 +54,12 @@ export default function PuzzleGame() {
 
       if (error) throw error;
 
+      if (data.status !== 'available') {
+        toast({ title: "Jogo Indisponível", description: "Este jogo estará disponível em breve!", variant: "default" });
+        navigate('/games');
+        return;
+      }
+
       const config = data.config || {};
       const img = config.image || data.image_url;
       const size = Math.sqrt(config.pieces || 9);

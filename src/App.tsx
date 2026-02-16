@@ -34,6 +34,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Paywall from "./pages/Paywall";
 import SubscriptionGuard from "./components/SubscriptionGuard";
+import Admin from "./pages/admin/Admin";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,11 @@ const App = () => (
                     <Route path="/notifications" element={<ProtectedRoute><SubscriptionGuard><Notifications /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/privacy" element={<ProtectedRoute><SubscriptionGuard><Privacy /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/help" element={<ProtectedRoute><SubscriptionGuard><Help /></SubscriptionGuard></ProtectedRoute>} />
+                    <Route path="/help" element={<ProtectedRoute><SubscriptionGuard><Help /></SubscriptionGuard></ProtectedRoute>} />
+
+                    {/* Admin Route - Checks permission inside the component */}
+                    <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
