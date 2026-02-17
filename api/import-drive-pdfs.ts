@@ -5,61 +5,66 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Helper: Fetch folder HTML
-async function fetchFolderHtml(url: string): Promise<string> {
-    const response = await fetch(url, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-        }
+const GOOGLE_API_KEY = process.env.GOOGLE_DRIVE_API_KEY || '';
+
+interface DriveFile {
+    id: string;
+    name: string;
+    category?: string;
+}
+
+// Helper: Extract folder ID from URL
+function extractFolderId(url: string): string | null {
+    const match = url.match(/folders\/([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+}
+
+// Helper: List files in a folder using Google Drive API (fetch-based, no googleapis dependency)
+async function listFilesInFolder(folderId: string, apiKey: string): Promise<{ files: DriveFile[], subfolders: Array<{ id: string, name: string }> }> {
+    const url = `https://www.googleapis.com/drive/v3/files?` + new URLSearchParams({
+        q: `'${folderId}' in parents and trashed=false`,
+        fields: 'files(id, name, mimeType)',
+        pageSize: '1000',
+        key: apiKey
     });
 
+    const response = await fetch(url);
+
     if (!response.ok) {
-        throw new Error(`Failed to fetch folder. Status: ${response.status}`);
+        throw new Error(`Google Drive API error: ${response.statusText}`);
     }
 
-    return await response.text();
-}
+    const data = await response.json();
 
-// Helper: Extract folder IDs from HTML
-function extractSubfolderIds(html: string): Array<{ id: string, name: string }> {
-    const folders = [];
-    // Google Drive uses format like: ["FOLDER_ID", "FOLDER_NAME", null, "application/vnd.google-apps.folder"]
-    const folderRegex = /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/vnd\.google-apps\.folder"/g;
+    const files: DriveFile[] = [];
+    const subfolders: Array<{ id: string, name: string }> = [];
 
-    let match;
-    while ((match = folderRegex.exec(html)) !== null) {
-        const [_, id, name] = match;
-        if (id.length > 20) {
-            folders.push({ id, name });
+    for (const file of data.files || []) {
+        if (file.mimeType === 'application/vnd.google-apps.folder') {
+            subfolders.push({ id: file.id, name: file.name });
+        } else if (file.mimeType === 'application/pdf') {
+            files.push({ id: file.id, name: file.name });
         }
     }
 
-    return folders;
+    return { files, subfolders };
 }
 
-// Helper: Extract PDF files from HTML
-function extractPdfFiles(html: string): Array<{ id: string, name: string }> {
-    const files = [];
+// Recursive: Process folder and all subfolders
+async function processFolder(folderId: string, apiKey: string, category?: string): Promise<DriveFile[]> {
+    const { files, subfolders } = await listFilesInFolder(folderId, apiKey);
 
-    // Multiple strategies to find PDFs
-    const strategies = [
-        /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/pdf"/g,
-        /"([\w-]{15,})".{1,200}?"([^"]+\.pdf)".{1,200}?"application\/pdf"/g,
-        /\["([\w-]{15,})","([^"]+)",[^\]]*"application\/pdf"/g
-    ];
+    // Tag files with category
+    const taggedFiles = files.map(f => ({ ...f, category: category || 'Geral' }));
 
-    for (const regex of strategies) {
-        let match;
-        while ((match = regex.exec(html)) !== null) {
-            const [_, id, name] = match;
-            if (id.length > 20 && !id.includes(' ') && !files.find(f => f.id === id)) {
-                files.push({ id, name });
-            }
-        }
+    // Process subfolders recursively
+    const subfolderFiles: DriveFile[] = [];
+    for (const subfolder of subfolders) {
+        const nestedFiles = await processFolder(subfolder.id, apiKey, subfolder.name);
+        subfolderFiles.push(...nestedFiles);
     }
 
-    return files;
+    return [...taggedFiles, ...subfolderFiles];
 }
 
 export default async function handler(req: any, res: any) {
@@ -74,42 +79,29 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ success: false, error: 'Folder URL is required' });
         }
 
-        console.log(`Starting RECURSIVE import for: ${folderUrl}`);
-
-        // 1. Fetch main folder
-        const mainHtml = await fetchFolderHtml(folderUrl);
-
-        // 2. Extract subfolders
-        const subfolders = extractSubfolderIds(mainHtml);
-        console.log(`Found ${subfolders.length} subfolders`);
-
-        // 3. Extract files from main folder (if any)
-        let allFiles = extractPdfFiles(mainHtml);
-
-        // 4. Process each subfolder
-        for (const folder of subfolders) {
-            try {
-                const subfolderUrl = `https://drive.google.com/drive/folders/${folder.id}`;
-                console.log(`Fetching subfolder: ${folder.name}`);
-
-                const subHtml = await fetchFolderHtml(subfolderUrl);
-                const subFiles = extractPdfFiles(subHtml);
-
-                // Tag files with their category (folder name)
-                subFiles.forEach(file => {
-                    file.category = folder.name;
-                });
-
-                allFiles = [...allFiles, ...subFiles];
-            } catch (error) {
-                console.error(`Error in subfolder ${folder.name}:`, error);
-                // Continue with other folders
-            }
+        if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'YOUR_API_KEY_HERE') {
+            return res.status(500).json({
+                success: false,
+                error: 'Google Drive API key not configured. Please add your API key to .env.local as GOOGLE_DRIVE_API_KEY'
+            });
         }
 
-        console.log(`Total PDFs found across all folders: ${allFiles.length}`);
+        const folderId = extractFolderId(folderUrl);
+        if (!folderId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Google Drive folder URL. Expected format: https://drive.google.com/drive/folders/[FOLDER_ID]'
+            });
+        }
 
-        // 5. DB Insertion
+        console.log(`Starting recursive API import for folder: ${folderId}`);
+
+        // Process folder recursively
+        const allFiles = await processFolder(folderId, GOOGLE_API_KEY);
+
+        console.log(`Found ${allFiles.length} PDF files across all folders`);
+
+        // DB Insertion
         let importedCount = 0;
         let skippedCount = 0;
 
@@ -126,7 +118,7 @@ export default async function handler(req: any, res: any) {
 
                 const { error } = await supabase.from('activities').insert({
                     title: title,
-                    description: `Importado do Google Drive`,
+                    description: `Importado do Google Drive - ${file.category}`,
                     type: 'coloring',
                     category: file.category || 'Geral',
                     file_id: file.id,
@@ -150,8 +142,7 @@ export default async function handler(req: any, res: any) {
             imported: importedCount,
             totalFound: allFiles.length,
             skipped: skippedCount,
-            subfoldersProcessed: subfolders.length,
-            message: `Processado ${subfolders.length} pastas. Encontrados: ${allFiles.length} PDFs. Importados: ${importedCount}.`
+            message: `✅ Importação concluída! Encontrados: ${allFiles.length} PDFs. Novos: ${importedCount}. Já existentes: ${skippedCount}.`
         });
 
     } catch (error: any) {
@@ -159,7 +150,7 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({
             success: false,
             error: error.message || 'Unknown server error',
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            hint: error.message?.includes('API') ? 'Verifique se a API do Google Drive está habilitada e a chave está correta' : undefined
         });
     }
 }
