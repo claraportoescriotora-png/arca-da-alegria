@@ -7,23 +7,19 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req: any, res: any) {
-    // 1. Method Check
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
 
-    // Global Guard for JSON Response
     try {
         const { folderUrl } = req.body;
 
-        // 2. Input Validation
         if (!folderUrl) {
             return res.status(400).json({ success: false, error: 'Folder URL is required' });
         }
 
         console.log(`Starting import for folder: ${folderUrl}`);
 
-        // 3. Native Fetch (No Dependencies)
         const response = await fetch(folderUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -40,44 +36,56 @@ export default async function handler(req: any, res: any) {
 
         const html = await response.text();
 
-        // 4. Pure Regex Parsing (No Cheerio)
-        // Matches roughly: "ID", "Name", "mimetype"
-        // We look for the specific sequence that Google uses for files.
-        // Pattern: "ID" (15+ chars), "Name" (anything), "application/pdf"
-        // The regex is permissive to allow for variations in the JSON structure.
-        const pdfRegex = /"([\w-]{15,})".{1,300}?"([^"]{3,})".{1,300}?"application\/pdf"/g;
+        // MULTI-STRATEGY PARSING
+        // We try strictly from most specific to least specific.
 
-        const filesToImport: any[] = [];
-        let match;
+        let filesToImport: any[] = [];
         let matchCount = 0;
 
-        while ((match = pdfRegex.exec(html)) !== null) {
-            matchCount++;
-            const [_, id, name] = match;
+        // Strategy 1: Look for the specific JSON structure Google uses for file lists
+        // e.g. ["ID", "Name", null, "application/pdf"]
+        // We match strict quoted strings for ID and Name
+        const strictRegex = /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/pdf"/g;
 
-            // Basic filtering to ensure it's a valid file ID and not some UI element ID
-            // Drive IDs are usually long alphanumeric strings without spaces
-            // We also filter out names that look like URLs or HTML tags
-            if (id.length > 20 && !id.includes(' ') && !name.includes('<') && !name.startsWith('http')) {
-                filesToImport.push({
-                    id,
-                    name,
-                    type: 'coloring',
-                    category: 'Geral'
-                });
+        // Strategy 2: Relaxed "Proximity" Regex
+        // Looks for ID ... Name ... application/pdf within a reasonable distance (200 chars)
+        const relaxedRegex = /"([\w-]{15,})".{1,200}?"([^"]{3,})".{1,200}?"application\/pdf"/g;
+
+        // Strategy 3: "Array-like" fallback
+        // ["[ID]","[Name]", ... "application/pdf"]
+        const arrayRegex = /\["([\w-]{15,})","([^"]+)",[^\]]*"application\/pdf"/g;
+
+        const strategies = [strictRegex, relaxedRegex, arrayRegex];
+
+        for (const regex of strategies) {
+            let match;
+            // We reset lastIndex for new loop if needed, but creating new regex literals in loop does that.
+            while ((match = regex.exec(html)) !== null) {
+                const [_, id, name] = match;
+
+                // Filter garbage
+                if (id.length > 20 && !id.includes(' ') && !name.includes('<') && !name.startsWith('http')) {
+                    // Avoid duplicates
+                    if (!filesToImport.find(f => f.id === id)) {
+                        matchCount++;
+                        filesToImport.push({
+                            id,
+                            name,
+                            type: 'coloring',
+                            category: 'Geral'
+                        });
+                    }
+                }
             }
         }
 
         console.log(`Regex matches: ${matchCount}`);
 
-        // 5. Deduplicate
-        const uniqueFiles = Array.from(new Map(filesToImport.map(item => [item.id, item])).values());
-
-        // 6. DB Insertion
+        // DB Insertion
         let importedCount = 0;
         let skippedCount = 0;
 
-        for (const file of uniqueFiles) {
+        for (const file of filesToImport) {
             const { data: existing } = await supabase
                 .from('activities')
                 .select('id')
@@ -109,27 +117,39 @@ export default async function handler(req: any, res: any) {
             }
         }
 
-        // 7. Success Response (Always JSON)
+        // Context Debugging
+        // If we found nothing, let's grab the text around "application/pdf" to see what the actual structure is
+        const pdfContexts = [];
+        if (matchCount === 0) {
+            const mimeRegex = /application\/pdf/g;
+            let m;
+            let safety = 0;
+            while ((m = mimeRegex.exec(html)) !== null && safety < 5) {
+                safety++;
+                const start = Math.max(0, m.index - 150);
+                const end = Math.min(html.length, m.index + 50);
+                // Clean up newlines for log readability
+                pdfContexts.push(html.substring(start, end).replace(/\s+/g, ' '));
+            }
+        }
+
         return res.status(200).json({
             success: true,
             imported: importedCount,
-            totalFound: uniqueFiles.length,
+            totalFound: matchCount,
             skipped: skippedCount,
-            message: `Processado. Encontrados: ${uniqueFiles.length}. Importados: ${importedCount}.`,
+            message: `Processado. Encontrados: ${matchCount}. Importados: ${importedCount}.`,
             debug: {
                 matchesTotal: matchCount,
-                matchesUnique: uniqueFiles.length,
                 htmlLength: html.length,
-                // Return a safe snippet of HTML for debugging logic without breaking JSON
-                htmlSnippet: html.substring(0, 1000).replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+                // Provide contexts if no files found
+                pdfContexts: pdfContexts,
+                htmlSnippet: html.substring(0, 500)
             }
         });
 
     } catch (error: any) {
         console.error('CRITICAL HANDLER ERROR:', error);
-
-        // 8. Error Response (Always JSON)
-        // Ensure we never break the JSON structure, even for stack traces
         return res.status(200).json({
             success: false,
             error: error.message || 'Unknown server error',
