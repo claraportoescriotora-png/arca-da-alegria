@@ -160,9 +160,11 @@ export function AdminDownloads() {
             const result = await response.json();
 
             if (response.ok) {
+                console.log("IMPORT DEBUG:", result.debug);
+                console.log("FULL RESULT:", result);
                 toast({
                     title: "Importação Concluída",
-                    description: result.message || `${result.imported} arquivos novos importados.`
+                    description: result.message || `${result.imported} arquivos novos importados. (Ver Console para Detalhes)`
                 });
                 setIsImportOpen(false);
                 setImportUrl("");

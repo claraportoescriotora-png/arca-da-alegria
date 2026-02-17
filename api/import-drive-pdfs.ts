@@ -1,6 +1,6 @@
 
-import { createClient } from '@supabase/supabase-js';
-import * as cheerio from 'cheerio';
+// @ts-ignore
+const cheerio = require('cheerio');
 
 // Initialize Supabase client
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
@@ -43,9 +43,10 @@ export default async function handler(req: any, res: any) {
             throw new Error("Failed to parse HTML with Cheerio: " + e.message);
         }
 
-        // Improved Regex to be more flexible with whitespace and potential JSON variations
-        // Look for pattern: "ID", "NAME", "application/pdf"
-        const pdfRegex = /"([^"]{10,100})"\s*,\s*"([^"]+)"\s*,\s*"application\/pdf"/g;
+        // ULTRA-PERMISSIVE REGEX
+        // Matches: "ID" ... "Name" ... "application/pdf"
+        // This handles cases where there are many fields between ID and Name, or Name and MimeType
+        const pdfRegex = /"([\w-]{15,})".{1,200}?"([^"]{5,})".{1,200}?"application\/pdf"/g;
 
         const filesToImport: any[] = [];
         let match;
@@ -54,7 +55,8 @@ export default async function handler(req: any, res: any) {
         while ((match = pdfRegex.exec(html)) !== null) {
             matchCount++;
             const [_, id, name] = match;
-            if (id.length > 15) {
+            // Basic filtering to avoid garbage
+            if (id.length > 20 && !name.includes('http') && !name.includes('<')) {
                 filesToImport.push({ id, name, type: 'coloring', category: 'Geral' });
             }
         }
