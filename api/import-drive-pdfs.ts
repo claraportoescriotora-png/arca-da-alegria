@@ -1,10 +1,66 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Helper: Fetch folder HTML
+async function fetchFolderHtml(url: string): Promise<string> {
+    const response = await fetch(url, {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch folder. Status: ${response.status}`);
+    }
+
+    return await response.text();
+}
+
+// Helper: Extract folder IDs from HTML
+function extractSubfolderIds(html: string): Array<{ id: string, name: string }> {
+    const folders = [];
+    // Google Drive uses format like: ["FOLDER_ID", "FOLDER_NAME", null, "application/vnd.google-apps.folder"]
+    const folderRegex = /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/vnd\.google-apps\.folder"/g;
+
+    let match;
+    while ((match = folderRegex.exec(html)) !== null) {
+        const [_, id, name] = match;
+        if (id.length > 20) {
+            folders.push({ id, name });
+        }
+    }
+
+    return folders;
+}
+
+// Helper: Extract PDF files from HTML
+function extractPdfFiles(html: string): Array<{ id: string, name: string }> {
+    const files = [];
+
+    // Multiple strategies to find PDFs
+    const strategies = [
+        /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/pdf"/g,
+        /"([\w-]{15,})".{1,200}?"([^"]+\.pdf)".{1,200}?"application\/pdf"/g,
+        /\["([\w-]{15,})","([^"]+)",[^\]]*"application\/pdf"/g
+    ];
+
+    for (const regex of strategies) {
+        let match;
+        while ((match = regex.exec(html)) !== null) {
+            const [_, id, name] = match;
+            if (id.length > 20 && !id.includes(' ') && !files.find(f => f.id === id)) {
+                files.push({ id, name });
+            }
+        }
+    }
+
+    return files;
+}
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -18,74 +74,46 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ success: false, error: 'Folder URL is required' });
         }
 
-        console.log(`Starting import for folder: ${folderUrl}`);
+        console.log(`Starting RECURSIVE import for: ${folderUrl}`);
 
-        const response = await fetch(folderUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
-            }
-        });
+        // 1. Fetch main folder
+        const mainHtml = await fetchFolderHtml(folderUrl);
 
-        if (!response.ok) {
-            return res.status(response.status).json({
-                success: false,
-                error: `Failed to fetch Drive folder. Status: ${response.status}`
-            });
-        }
+        // 2. Extract subfolders
+        const subfolders = extractSubfolderIds(mainHtml);
+        console.log(`Found ${subfolders.length} subfolders`);
 
-        const html = await response.text();
+        // 3. Extract files from main folder (if any)
+        let allFiles = extractPdfFiles(mainHtml);
 
-        // MULTI-STRATEGY PARSING
-        // We try strictly from most specific to least specific.
+        // 4. Process each subfolder
+        for (const folder of subfolders) {
+            try {
+                const subfolderUrl = `https://drive.google.com/drive/folders/${folder.id}`;
+                console.log(`Fetching subfolder: ${folder.name}`);
 
-        let filesToImport: any[] = [];
-        let matchCount = 0;
+                const subHtml = await fetchFolderHtml(subfolderUrl);
+                const subFiles = extractPdfFiles(subHtml);
 
-        // Strategy 1: Look for the specific JSON structure Google uses for file lists
-        // e.g. ["ID", "Name", null, "application/pdf"]
-        // We match strict quoted strings for ID and Name
-        const strictRegex = /"([\w-]{15,})"\s*,\s*"([^"]+)"\s*,\s*[^,]*\s*,\s*"application\/pdf"/g;
+                // Tag files with their category (folder name)
+                subFiles.forEach(file => {
+                    file.category = folder.name;
+                });
 
-        // Strategy 2: Relaxed "Proximity" Regex
-        // Looks for ID ... Name ... application/pdf within a reasonable distance (200 chars)
-        const relaxedRegex = /"([\w-]{15,})".{1,200}?"([^"]{3,})".{1,200}?"application\/pdf"/g;
-
-        // Strategy 3: "Array-like" fallback
-        // ["[ID]","[Name]", ... "application/pdf"]
-        const arrayRegex = /\["([\w-]{15,})","([^"]+)",[^\]]*"application\/pdf"/g;
-
-        const strategies = [strictRegex, relaxedRegex, arrayRegex];
-
-        for (const regex of strategies) {
-            let match;
-            // We reset lastIndex for new loop if needed, but creating new regex literals in loop does that.
-            while ((match = regex.exec(html)) !== null) {
-                const [_, id, name] = match;
-
-                // Filter garbage
-                if (id.length > 20 && !id.includes(' ') && !name.includes('<') && !name.startsWith('http')) {
-                    // Avoid duplicates
-                    if (!filesToImport.find(f => f.id === id)) {
-                        matchCount++;
-                        filesToImport.push({
-                            id,
-                            name,
-                            type: 'coloring',
-                            category: 'Geral'
-                        });
-                    }
-                }
+                allFiles = [...allFiles, ...subFiles];
+            } catch (error) {
+                console.error(`Error in subfolder ${folder.name}:`, error);
+                // Continue with other folders
             }
         }
 
-        console.log(`Regex matches: ${matchCount}`);
+        console.log(`Total PDFs found across all folders: ${allFiles.length}`);
 
-        // DB Insertion
+        // 5. DB Insertion
         let importedCount = 0;
         let skippedCount = 0;
 
-        for (const file of filesToImport) {
+        for (const file of allFiles) {
             const { data: existing } = await supabase
                 .from('activities')
                 .select('id')
@@ -100,7 +128,7 @@ export default async function handler(req: any, res: any) {
                     title: title,
                     description: `Importado do Google Drive`,
                     type: 'coloring',
-                    category: file.category,
+                    category: file.category || 'Geral',
                     file_id: file.id,
                     pdf_url: downloadUrl,
                     image_url: null,
@@ -117,35 +145,13 @@ export default async function handler(req: any, res: any) {
             }
         }
 
-        // Context Debugging
-        // If we found nothing, let's grab the text around "application/pdf" to see what the actual structure is
-        const pdfContexts = [];
-        if (matchCount === 0) {
-            const mimeRegex = /application\/pdf/g;
-            let m;
-            let safety = 0;
-            while ((m = mimeRegex.exec(html)) !== null && safety < 5) {
-                safety++;
-                const start = Math.max(0, m.index - 150);
-                const end = Math.min(html.length, m.index + 50);
-                // Clean up newlines for log readability
-                pdfContexts.push(html.substring(start, end).replace(/\s+/g, ' '));
-            }
-        }
-
         return res.status(200).json({
             success: true,
             imported: importedCount,
-            totalFound: matchCount,
+            totalFound: allFiles.length,
             skipped: skippedCount,
-            message: `Processado. Encontrados: ${matchCount}. Importados: ${importedCount}.`,
-            debug: {
-                matchesTotal: matchCount,
-                htmlLength: html.length,
-                // Provide contexts if no files found
-                pdfContexts: pdfContexts,
-                htmlSnippet: html.substring(0, 500)
-            }
+            subfoldersProcessed: subfolders.length,
+            message: `Processado ${subfolders.length} pastas. Encontrados: ${allFiles.length} PDFs. Importados: ${importedCount}.`
         });
 
     } catch (error: any) {
