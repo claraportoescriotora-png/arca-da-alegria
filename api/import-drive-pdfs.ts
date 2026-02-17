@@ -166,22 +166,38 @@ export default async function handler(req: any, res: any) {
 
         console.log(`Found ${allFiles.length} PDF files across all folders`);
 
-        // DB Insertion
+        // DB Insertion with detailed logging
         let importedCount = 0;
         let skippedCount = 0;
+        const errors: string[] = [];
+
+        console.log(`Starting DB insertion for ${allFiles.length} files...`);
 
         for (const file of allFiles) {
-            const { data: existing } = await supabase
-                .from('activities')
-                .select('id')
-                .eq('file_id', file.id)
-                .single();
+            try {
+                // Check if exists
+                const { data: existing, error: checkError } = await supabase
+                    .from('activities')
+                    .select('id')
+                    .eq('file_id', file.id)
+                    .maybeSingle();
 
-            if (!existing) {
+                if (checkError) {
+                    console.error(`Check error for ${file.name}:`, checkError);
+                    errors.push(`Check failed: ${file.name} - ${checkError.message}`);
+                    continue;
+                }
+
+                if (existing) {
+                    console.log(`Skipping existing file: ${file.name}`);
+                    skippedCount++;
+                    continue;
+                }
+
                 const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
                 const title = file.name.replace('.pdf', '').replace(/[-_]/g, ' ');
 
-                const { error } = await supabase.from('activities').insert({
+                const insertData = {
                     title: title,
                     description: `Importado do Google Drive - ${file.category}`,
                     type: 'coloring',
@@ -190,24 +206,37 @@ export default async function handler(req: any, res: any) {
                     pdf_url: downloadUrl,
                     image_url: null,
                     is_active: true
-                });
+                };
 
-                if (error) {
-                    console.error(`DB Error ${file.name}:`, error);
+                console.log(`Inserting: ${file.name}`, insertData);
+
+                const { data: inserted, error: insertError } = await supabase
+                    .from('activities')
+                    .insert(insertData)
+                    .select();
+
+                if (insertError) {
+                    console.error(`Insert error for ${file.name}:`, insertError);
+                    errors.push(`Insert failed: ${file.name} - ${insertError.message}`);
                 } else {
+                    console.log(`Successfully inserted: ${file.name}`);
                     importedCount++;
                 }
-            } else {
-                skippedCount++;
+            } catch (err: any) {
+                console.error(`Exception processing ${file.name}:`, err);
+                errors.push(`Exception: ${file.name} - ${err.message}`);
             }
         }
+
+        console.log(`Import complete. Imported: ${importedCount}, Skipped: ${skippedCount}, Errors: ${errors.length}`);
 
         return res.status(200).json({
             success: true,
             imported: importedCount,
             totalFound: allFiles.length,
             skipped: skippedCount,
-            message: `✅ Importação concluída! Encontrados: ${allFiles.length} PDFs. Novos: ${importedCount}. Já existentes: ${skippedCount}.`
+            errors: errors.length > 0 ? errors : undefined,
+            message: `✅ Importação concluída! Encontrados: ${allFiles.length} PDFs. Novos: ${importedCount}. Já existentes: ${skippedCount}.${errors.length > 0 ? ` Erros: ${errors.length}` : ''}`
         });
 
     } catch (error: any) {
