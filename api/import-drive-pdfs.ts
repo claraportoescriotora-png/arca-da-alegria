@@ -1,11 +1,9 @@
-
 import { createClient } from '@supabase/supabase-js';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; // Must use service role key for admin inserts
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req: any, res: any) {
@@ -22,14 +20,18 @@ export default async function handler(req: any, res: any) {
     try {
         console.log(`Starting import for folder: ${folderUrl}`);
 
-        // 1. Fetch the main folder HTML
-        const response = await axios.get(folderUrl, {
+        // 1. Fetch the main folder HTML using native fetch
+        const response = await fetch(folderUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
         });
 
-        const html = response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to fetch Drive folder. Status: ${response.status}`);
+        }
+
+        const html = await response.text();
         const $ = cheerio.load(html);
 
         // 2. Extract the hidden JSON data
