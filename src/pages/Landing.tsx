@@ -4,11 +4,14 @@ export default function Landing() {
     return (
         <div className="min-h-screen bg-[#FFF8F0] font-fredoka">
             {/* Header */}
-            <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b-2 border-lavender-200">
+            <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b-2 border-purple-100">
                 <div className="container max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl">🐑</span>
-                        <span className="font-bold text-lg text-gray-800">Meu Amiguito</span>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo/arca-logo-2.png"
+                            alt="Meu Amiguito"
+                            className="h-10 w-auto"
+                        />
                     </div>
                     <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-soft">
                         Quero acessar agora
@@ -59,12 +62,13 @@ export default function Landing() {
                         </button>
                     </div>
 
-                    {/* Illustration Placeholder */}
-                    <div className="bg-white/50 rounded-3xl p-8 backdrop-blur-sm border-2 border-white/80 flex items-center justify-center min-h-[400px]">
-                        <div className="text-center space-y-4">
-                            <div className="text-8xl">👦🐑</div>
-                            <p className="text-sm text-gray-600 italic">Ilustração: Criança com ovelhinha</p>
-                        </div>
+                    {/* Hero Illustration */}
+                    <div className="flex items-center justify-center">
+                        <img
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daneil%20e%20a%20ovelhinha.webp"
+                            alt="Daniel e a ovelhinha"
+                            className="w-full max-w-md h-auto"
+                        />
                     </div>
                 </div>
             </section>
