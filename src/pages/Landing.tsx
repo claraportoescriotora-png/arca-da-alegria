@@ -8,9 +8,9 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <img
-                            src="/logo/arca-logo-2.png"
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
                             alt="Meu Amiguito"
-                            className="h-10 w-auto"
+                            className="h-12 w-auto"
                         />
                     </div>
                     <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-soft">
