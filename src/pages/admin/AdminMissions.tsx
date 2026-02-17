@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Loader2, Plus, Target, ChevronRight, ArrowLeft, Trophy, Calendar, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MissionPack {
     id: string;
@@ -28,6 +29,8 @@ interface Mission {
     description: string;
     xp_reward: number;
     icon: string;
+    linked_content_type?: 'story' | 'video' | 'game' | null;
+    linked_content_id?: string | null;
 }
 
 export function AdminMissions() {
@@ -50,6 +53,13 @@ export function AdminMissions() {
     const [saving, setSaving] = useState(false);
     const { toast } = useToast();
 
+    // Content for linking
+    const [availableContent, setAvailableContent] = useState<{
+        stories: { id: string, title: string }[];
+        videos: { id: string, title: string }[];
+        games: { id: string, title: string }[];
+    }>({ stories: [], videos: [], games: [] });
+
     useEffect(() => {
         fetchPacks();
     }, []);
@@ -59,6 +69,26 @@ export function AdminMissions() {
             fetchMissions(selectedPack.id);
         }
     }, [selectedPack]);
+
+    useEffect(() => {
+        if (isMissionDialogOpen) {
+            fetchAvailableContent();
+        }
+    }, [isMissionDialogOpen]);
+
+    const fetchAvailableContent = async () => {
+        const [storiesRes, videosRes, gamesRes] = await Promise.all([
+            supabase.from('stories').select('id, title').order('title'),
+            supabase.from('videos').select('id, title').order('title'),
+            supabase.from('games').select('id, title').order('title')
+        ]);
+
+        setAvailableContent({
+            stories: storiesRes.data || [],
+            videos: videosRes.data || [],
+            games: gamesRes.data || []
+        });
+    };
 
     // --- Packs Logic ---
 
@@ -154,7 +184,9 @@ export function AdminMissions() {
                 title: missionFormData.title,
                 description: missionFormData.description,
                 xp_reward: missionFormData.xp_reward || 50,
-                icon: missionFormData.icon || 'star'
+                icon: missionFormData.icon || 'star',
+                linked_content_type: missionFormData.linked_content_type || null,
+                linked_content_id: missionFormData.linked_content_id || null
             };
 
             let error;
@@ -319,6 +351,61 @@ export function AdminMissions() {
                                         placeholder="Ex: star, heart, book"
                                     />
                                 </div>
+                            </div>
+
+                            <hr className="border-slate-100" />
+
+                            <div className="space-y-4">
+                                <Label className="text-slate-900 font-bold block mb-2">Linkar Conteúdo Interno (Opcional)</Label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Tipo de Conteúdo</Label>
+                                        <Select
+                                            value={missionFormData.linked_content_type || 'none'}
+                                            onValueChange={(val) => setMissionFormData({
+                                                ...missionFormData,
+                                                linked_content_type: val === 'none' ? null : val as any,
+                                                linked_content_id: null
+                                            })}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecione o tipo" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">Nenhum (Apenas Texto)</SelectItem>
+                                                <SelectItem value="story">História</SelectItem>
+                                                <SelectItem value="video">Vídeo</SelectItem>
+                                                <SelectItem value="game">Jogo</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {missionFormData.linked_content_type && (
+                                        <div className="space-y-2">
+                                            <Label>Selecionar Item</Label>
+                                            <Select
+                                                value={missionFormData.linked_content_id || ''}
+                                                onValueChange={(val) => setMissionFormData({ ...missionFormData, linked_content_id: val })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Escolha o conteúdo..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {missionFormData.linked_content_type === 'story' && availableContent.stories.map(s => (
+                                                        <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
+                                                    ))}
+                                                    {missionFormData.linked_content_type === 'video' && availableContent.videos.map(v => (
+                                                        <SelectItem key={v.id} value={v.id}>{v.title}</SelectItem>
+                                                    ))}
+                                                    {missionFormData.linked_content_type === 'game' && availableContent.games.map(g => (
+                                                        <SelectItem key={g.id} value={g.id}>{g.title}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-[10px] text-slate-400">Ao linkar um conteúdo, o app exibirá um botão de ação direta para o usuário.</p>
                             </div>
                         </div>
                         <DialogFooter>

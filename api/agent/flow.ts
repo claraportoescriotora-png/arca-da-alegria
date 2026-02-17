@@ -94,6 +94,12 @@ export default async function handler(req: any, res: any) {
 
             const userPrompt = `Crie uma história infantil INÉDITA sobre: ${theme}.
             
+            IMPORTANTE - FIDELIDADE BÍBLICA:
+            1. Se a categoria for 'biblical', você deve seguir RIGOROSAMENTE o texto sagrado. 
+            2. NÃO invente fatos, milagres ou eventos que não estão na Bíblia. "Inédita" significa uma nova forma de contar para crianças, não inventar novos fatos.
+            3. JAMAIS misture personagens ou locais de épocas diferentes (ex: Noé não viveu em Sodoma, Davi não conheceu Moisés).
+            4. Mantenha os personagens em seus contextos originais.
+
             IMPORTANTE - EVITE DUPLICIDADE:
             Já existem histórias com os seguintes títulos: [${existingTitles}].
             VOCÊ NÃO PODE REPETIR NENHUM DESSES TÍTULOS. Crie algo novo e criativo. 
@@ -102,10 +108,10 @@ export default async function handler(req: any, res: any) {
             OBRIGATÓRIO: Retorne APENAS um JSON válido seguindo exatamente esta estrutura:
             ${JSON.stringify(jsonSchema)}
             
-            Regras:
+            Regras Adicionais:
             1. A história deve ser doce, educativa e cristã.
-            2. O quiz deve ter 2 perguntas.
-            3. A categoria deve ser obrigatoriamente 'biblical' (para histórias da Bíblia) ou 'moral' (para histórias educativas).`;
+            2. O quiz deve ter 2 perguntas baseadas no texto gerado.
+            3. A categoria deve ser 'biblical' (história da Bíblia) ou 'moral' (educativa/cotidiana).`;
 
             let outputText = "";
             let providerUsed = "";
