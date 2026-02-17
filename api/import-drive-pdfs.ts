@@ -40,7 +40,7 @@ export default async function handler(req: any, res: any) {
         // Note: Google's structure changes. A robust way is to look for the script containing the data.
         let driveData = null;
 
-        $('script').each((i, el) => {
+        $('script').each((i: number, el: any) => {
             const content = $(el).html();
             if (content && content.includes('window._DRIVE_IV_INITIAL_DATA')) {
                 try {
