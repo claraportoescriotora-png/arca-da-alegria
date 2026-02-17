@@ -83,8 +83,8 @@ export default function Landing() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                         {/* Card 1 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
-                            <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center text-3xl">
-                                😟
+                            <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center overflow-hidden">
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais ansiosas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -94,8 +94,8 @@ export default function Landing() {
 
                         {/* Card 2 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
-                            <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-3xl">
-                                ⚡
+                            <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais agitadas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -105,8 +105,8 @@ export default function Landing() {
 
                         {/* Card 3 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
-                            <div className="w-16 h-16 mx-auto bg-pink-100 rounded-full flex items-center justify-center text-3xl">
-                                🧠
+                            <div className="w-16 h-16 mx-auto bg-pink-100 rounded-full flex items-center justify-center overflow-hidden">
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Menos concentradas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -116,8 +116,8 @@ export default function Landing() {
 
                         {/* Card 4 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
-                            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-3xl">
-                                👨‍👩‍👧
+                            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais distantes da família</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -149,10 +149,11 @@ export default function Landing() {
                     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 shadow-soft border-2 border-yellow-200">
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                             <div className="bg-yellow-50 rounded-3xl p-8 flex items-center justify-center min-h-[300px]">
-                                <div className="text-center space-y-4">
-                                    <div className="text-8xl">👦📖🐑</div>
-                                    <p className="text-sm text-gray-600 italic">Ilustração: Criança lendo com ovelhinha</p>
-                                </div>
+                                <img
+                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daneil%20e%20a%20ovelhinha.webp"
+                                    alt="Criança lendo com ovelhinha"
+                                    className="w-full max-w-sm h-auto"
+                                />
                             </div>
 
                             <div className="space-y-6">
