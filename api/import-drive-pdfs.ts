@@ -141,11 +141,43 @@ export default async function handler(req: any, res: any) {
         }
 
         return res.status(200).json({
+            // ... existing code ...
+            console.log(`HTML Length: ${html.length}`);
+
+            // Try to find the drive data script
+            let driveData = null;
+            // ... (existing script parsing logic) ...
+
+            const filesToImport: any[] = [];
+
+            // Improved Regex to be more flexible with whitespace and potential JSON variations
+            // Look for pattern: "ID", "NAME", "application/pdf"
+            const pdfRegex = /"([^"]{10,100})"\s*,\s*"([^"]+)"\s*,\s*"application\/pdf"/g;
+
+            let match;
+            let matchCount = 0;
+
+            while((match = pdfRegex.exec(html)) !== null) {
+            matchCount++;
+            const [_, id, name] = match;
+            if (id.length > 15) {
+                filesToImport.push({ id, name, type: 'coloring', category: 'Geral' });
+            }
+        }
+
+        console.log(`Regex matches found: ${matchCount}`);
+
+        // Remove duplicates
+        // ... (existing duplicate removal) ...
+        const uniqueFiles = Array.from(new Map(filesToImport.map(item => [item.id, item])).values());
+        console.log(`Unique files to process: ${uniqueFiles.length}`);
+
+        // ... (existing insert loop) ...
+
+        return res.status(200).json({
             success: true,
-            message: `Importação concluída. ${importedCount} importados, ${skippedCount} já existiam.`,
-            totalFound: uniqueFiles.length,
-            imported: importedCount,
-            skipped: skippedCount
+            message: `Processado. Encontrados: ${matchCount}. Importados: ${importedCount}. Já existiam: ${skippedCount}. (HTML: ${html.length} bytes)`,
+            debug: { matches: matchCount, htmlLength: html.length, sample: html.substring(0, 500) }
         });
 
     } catch (error: any) {
