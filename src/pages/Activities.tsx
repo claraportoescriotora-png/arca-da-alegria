@@ -17,6 +17,8 @@ export default function Activities() {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchActivities();
@@ -89,27 +91,77 @@ export default function Activities() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {activities.map(activity => (
-              <div key={activity.id} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border flex flex-col">
-                <div className="aspect-square relative overflow-hidden bg-muted">
-                  <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
-                  <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 bg-white/90 rounded-full shadow-sm text-foreground uppercase tracking-wide">
-                    {activity.type}
-                  </span>
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              {activities
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map(activity => (
+                  <div key={activity.id} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border flex flex-col">
+                    <div className="aspect-square relative overflow-hidden bg-muted">
+                      <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
+                      <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 bg-white/90 rounded-full shadow-sm text-foreground uppercase tracking-wide">
+                        {activity.type}
+                      </span>
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <h3 className="font-bold text-sm mb-3 line-clamp-2 leading-tight">{activity.title}</h3>
+                      <button
+                        onClick={() => handleDownload(activity.pdfUrl, activity.title)}
+                        className="mt-auto w-full py-2 bg-green-100 text-green-700 text-xs font-bold rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center gap-1"
+                      >
+                        Baixar PDF
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {activities.length > itemsPerPage && (
+              <div className="flex items-center justify-center gap-2 py-6">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-lg bg-card border border-border font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+                >
+                  Anterior
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.ceil(activities.length / itemsPerPage) }, (_, i) => i + 1)
+                    .filter(page => {
+                      const totalPages = Math.ceil(activities.length / itemsPerPage);
+                      // Show first page, last page, current page, and adjacent pages
+                      return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1;
+                    })
+                    .map((page, idx, arr) => (
+                      <div key={page} className="flex items-center gap-1">
+                        {idx > 0 && arr[idx - 1] !== page - 1 && (
+                          <span className="text-muted-foreground px-1">...</span>
+                        )}
+                        <button
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-10 h-10 rounded-lg font-medium text-sm transition-colors ${currentPage === page
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-card border border-border hover:bg-muted'
+                            }`}
+                        >
+                          {page}
+                        </button>
+                      </div>
+                    ))}
                 </div>
-                <div className="p-3 flex-1 flex flex-col">
-                  <h3 className="font-bold text-sm mb-3 line-clamp-2 leading-tight">{activity.title}</h3>
-                  <button
-                    onClick={() => handleDownload(activity.pdfUrl, activity.title)}
-                    className="mt-auto w-full py-2 bg-green-100 text-green-700 text-xs font-bold rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center gap-1"
-                  >
-                    Baixar PDF
-                  </button>
-                </div>
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(activities.length / itemsPerPage), prev + 1))}
+                  disabled={currentPage === Math.ceil(activities.length / itemsPerPage)}
+                  className="px-4 py-2 rounded-lg bg-card border border-border font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+                >
+                  Próxima
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {!loading && activities.length === 0 && (
