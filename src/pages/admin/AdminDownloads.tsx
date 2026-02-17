@@ -30,6 +30,11 @@ export function AdminDownloads() {
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
 
+    // Import Dialog State
+    const [isImportOpen, setIsImportOpen] = useState(false);
+    const [importUrl, setImportUrl] = useState("");
+    const [importing, setImporting] = useState(false);
+
     const { toast } = useToast();
 
     useEffect(() => {
@@ -142,6 +147,37 @@ export function AdminDownloads() {
         setIsOpen(true);
     };
 
+    const handleImportDrive = async () => {
+        if (!importUrl) return;
+        setImporting(true);
+        try {
+            const response = await fetch('/api/import-drive-pdfs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folderUrl: importUrl })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast({
+                    title: "Importação Concluída",
+                    description: result.message || `${result.imported} arquivos novos importados.`
+                });
+                setIsImportOpen(false);
+                setImportUrl("");
+                fetchActivities();
+            } else {
+                throw new Error(result.error || 'Falha na importação');
+            }
+        } catch (error: any) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Erro na importação", description: error.message });
+        } finally {
+            setImporting(false);
+        }
+    };
+
     return (
         <div>
             <div className="flex items-center justify-between mb-8">
@@ -149,10 +185,16 @@ export function AdminDownloads() {
                     <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Downloads</h2>
                     <p className="text-slate-500">Adicione atividades (PDFs) para as crianças baixarem.</p>
                 </div>
-                <Button onClick={() => openDialog()} className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nova Atividade
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={() => setIsImportOpen(true)} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Importar do Drive
+                    </Button>
+                    <Button onClick={() => openDialog()} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Nova Atividade
+                    </Button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -303,6 +345,38 @@ export function AdminDownloads() {
                         <Button onClick={handleSave} disabled={saving}>
                             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Salvar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Import Dialog */}
+            <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Importar do Google Drive</DialogTitle>
+                        <DialogDescription>
+                            Cole o link de uma pasta pública do Google Drive para importar os PDFs automaticamente.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Link da Pasta (Google Drive)</Label>
+                            <Input
+                                value={importUrl}
+                                onChange={(e) => setImportUrl(e.target.value)}
+                                placeholder="https://drive.google.com/drive/folders/..."
+                            />
+                            <p className="text-xs text-slate-500">
+                                Certifique-se de que a pasta está configurada como "Qualquer pessoa com o link".
+                            </p>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsImportOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleImportDrive} disabled={importing || !importUrl}>
+                            {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+                            {importing ? 'Importando...' : 'Iniciar Importação'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
