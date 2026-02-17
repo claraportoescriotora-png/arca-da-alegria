@@ -1,16 +1,70 @@
 
 import { createClient } from '@supabase/supabase-js';
+import * as crypto from 'crypto';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const GOOGLE_API_KEY = process.env.GOOGLE_DRIVE_API_KEY || '';
-
 interface DriveFile {
     id: string;
     name: string;
     category?: string;
+}
+
+// Helper: Create JWT for Google Service Account
+function createJWT(serviceAccount: any): string {
+    const now = Math.floor(Date.now() / 1000);
+
+    const header = {
+        alg: 'RS256',
+        typ: 'JWT'
+    };
+
+    const payload = {
+        iss: serviceAccount.client_email,
+        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        aud: 'https://oauth2.googleapis.com/token',
+        exp: now + 3600,
+        iat: now
+    };
+
+    const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
+    const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
+
+    const signatureInput = `${encodedHeader}.${encodedPayload}`;
+
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(signatureInput);
+    sign.end();
+
+    const signature = sign.sign(serviceAccount.private_key, 'base64url');
+
+    return `${signatureInput}.${signature}`;
+}
+
+// Helper: Exchange JWT for access token
+async function getAccessToken(serviceAccount: any): Promise<string> {
+    const jwt = createJWT(serviceAccount);
+
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            assertion: jwt
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to get access token: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
 }
 
 // Helper: Extract folder ID from URL
@@ -19,19 +73,23 @@ function extractFolderId(url: string): string | null {
     return match ? match[1] : null;
 }
 
-// Helper: List files in a folder using Google Drive API (fetch-based, no googleapis dependency)
-async function listFilesInFolder(folderId: string, apiKey: string): Promise<{ files: DriveFile[], subfolders: Array<{ id: string, name: string }> }> {
+// Helper: List files in a folder using authenticated API call
+async function listFilesInFolder(folderId: string, accessToken: string): Promise<{ files: DriveFile[], subfolders: Array<{ id: string, name: string }> }> {
     const url = `https://www.googleapis.com/drive/v3/files?` + new URLSearchParams({
         q: `'${folderId}' in parents and trashed=false`,
         fields: 'files(id, name, mimeType)',
-        pageSize: '1000',
-        key: apiKey
+        pageSize: '1000'
     });
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
 
     if (!response.ok) {
-        throw new Error(`Google Drive API error: ${response.statusText}`);
+        const error = await response.text();
+        throw new Error(`Google Drive API error: ${response.statusText} - ${error}`);
     }
 
     const data = await response.json();
@@ -51,8 +109,8 @@ async function listFilesInFolder(folderId: string, apiKey: string): Promise<{ fi
 }
 
 // Recursive: Process folder and all subfolders
-async function processFolder(folderId: string, apiKey: string, category?: string): Promise<DriveFile[]> {
-    const { files, subfolders } = await listFilesInFolder(folderId, apiKey);
+async function processFolder(folderId: string, accessToken: string, category?: string): Promise<DriveFile[]> {
+    const { files, subfolders } = await listFilesInFolder(folderId, accessToken);
 
     // Tag files with category
     const taggedFiles = files.map(f => ({ ...f, category: category || 'Geral' }));
@@ -60,7 +118,7 @@ async function processFolder(folderId: string, apiKey: string, category?: string
     // Process subfolders recursively
     const subfolderFiles: DriveFile[] = [];
     for (const subfolder of subfolders) {
-        const nestedFiles = await processFolder(subfolder.id, apiKey, subfolder.name);
+        const nestedFiles = await processFolder(subfolder.id, accessToken, subfolder.name);
         subfolderFiles.push(...nestedFiles);
     }
 
@@ -79,12 +137,16 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ success: false, error: 'Folder URL is required' });
         }
 
-        if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'YOUR_API_KEY_HERE') {
+        // Get service account credentials
+        const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
+        if (!credentials) {
             return res.status(500).json({
                 success: false,
-                error: 'Google Drive API key not configured. Please add your API key to .env.local as GOOGLE_DRIVE_API_KEY'
+                error: 'GOOGLE_SERVICE_ACCOUNT_CREDENTIALS not configured in environment variables'
             });
         }
+
+        const serviceAccount = JSON.parse(credentials);
 
         const folderId = extractFolderId(folderUrl);
         if (!folderId) {
@@ -94,10 +156,13 @@ export default async function handler(req: any, res: any) {
             });
         }
 
-        console.log(`Starting recursive API import for folder: ${folderId}`);
+        console.log(`Starting recursive import for folder: ${folderId}`);
+
+        // Get access token
+        const accessToken = await getAccessToken(serviceAccount);
 
         // Process folder recursively
-        const allFiles = await processFolder(folderId, GOOGLE_API_KEY);
+        const allFiles = await processFolder(folderId, accessToken);
 
         console.log(`Found ${allFiles.length} PDF files across all folders`);
 
@@ -150,7 +215,11 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({
             success: false,
             error: error.message || 'Unknown server error',
-            hint: error.message?.includes('API') ? 'Verifique se a API do Google Drive está habilitada e a chave está correta' : undefined
+            hint: error.message?.includes('GOOGLE_SERVICE_ACCOUNT') ?
+                'Configure GOOGLE_SERVICE_ACCOUNT_CREDENTIALS na Vercel com o JSON da Service Account' :
+                error.message?.includes('access token') ?
+                    'Verifique se as credenciais da Service Account estão corretas' :
+                    'Verifique se a Service Account tem permissão de leitura na pasta do Drive (compartilhe a pasta com o email da Service Account)'
         });
     }
 }
