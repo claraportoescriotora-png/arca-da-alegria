@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
 
@@ -11,13 +12,14 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { folderUrl } = req.body;
-
-    if (!folderUrl) {
-        return res.status(400).json({ error: 'Folder URL is required' });
-    }
-
+    // Global Try-Catch to prevent 500 HTML responses
     try {
+        const { folderUrl } = req.body;
+
+        if (!folderUrl) {
+            return res.status(400).json({ error: 'Folder URL is required' });
+        }
+
         console.log(`Starting import for folder: ${folderUrl}`);
 
         // 1. Fetch the main folder HTML using native fetch
@@ -32,76 +34,36 @@ export default async function handler(req: any, res: any) {
         }
 
         const html = await response.text();
-        const $ = cheerio.load(html);
 
-        // 2. Extract the hidden JSON data
-        // Google Drive stores initial data in a script tag starting with 'window._DRIVE_IV_INITIAL_DATA'
-        // or sometimes straightforward JSON in script tags. 
-        // We look for the pattern that contains the file structure.
+        let $;
+        try {
+            $ = cheerio.load(html);
+        } catch (e: any) {
+            console.error("Cheerio load failed", e);
+            throw new Error("Failed to parse HTML with Cheerio: " + e.message);
+        }
 
-        // Note: Google's structure changes. A robust way is to look for the script containing the data.
-        let driveData = null;
-
-        $('script').each((i: number, el: any) => {
-            const content = $(el).html();
-            if (content && content.includes('window._DRIVE_IV_INITIAL_DATA')) {
-                try {
-                    // Extract the JSON object
-                    const jsonStr = content.split('window._DRIVE_IV_INITIAL_DATA = ')[1].split(';')[0];
-                    driveData = JSON.parse(jsonStr);
-                } catch (e) {
-                    console.error("Error parsing drive data", e);
-                }
-            }
-        });
-
-        // 3. Fallback: If strict parsing fails, try regex for file IDs and names in the raw HTML
-        // This is often more resilient for public folders which expose file lists in the DOM or JSON.
-
-        // Let's implement a logical flow:
-        // A. Identify Subfolders (Categories)
-        // B. Identify Files within those folders (or root)
-
-        // Since parsing minified dynamic JSON from Google is complex and brittle, 
-        // we will use a simplified heuristic for this "Ninja" scraper:
-        // We will look for sequences that look like file metadata.
-
-        // However, a better approach for "Recursive" scraping without API is:
-        // 1. Convert the input URL to a proper ID.
-        // 2. Use a recursive function to fetch content.
-
-        // SIMPLIFIED APPROACH:
-        // We will assume the user provides a folder that contains files directly or subfolders.
-        // We will try to extract `[id, name, mimetype]` tuples from the HTML.
-
-        // Regex to find file-like objects in the big JSON blob
-        // Google often represents files as arrays: [id, name, mimeType, ...]
-        // We look for strings starting with "1..." (common drive ID length) and associated PDF mime types.
+        // Improved Regex to be more flexible with whitespace and potential JSON variations
+        // Look for pattern: "ID", "NAME", "application/pdf"
+        const pdfRegex = /"([^"]{10,100})"\s*,\s*"([^"]+)"\s*,\s*"application\/pdf"/g;
 
         const filesToImport: any[] = [];
-
-        // Naive Regex to find PDF files and their names
-        // Pattern: "file-id", "file-name", "application/pdf"
-        // This is a heuristic.
-        const pdfRegex = /"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"application\/pdf"/g;
         let match;
+        let matchCount = 0;
 
         while ((match = pdfRegex.exec(html)) !== null) {
+            matchCount++;
             const [_, id, name] = match;
-            if (id.length > 20) { // filter out short garbage
-                filesToImport.push({
-                    id,
-                    name,
-                    type: 'coloring', // Default
-                    category: 'Geral' // Default if we can't determine subfolder easily
-                });
+            if (id.length > 15) {
+                filesToImport.push({ id, name, type: 'coloring', category: 'Geral' });
             }
         }
 
-        // Remove duplicates from our list
-        const uniqueFiles = Array.from(new Map(filesToImport.map(item => [item.id, item])).values());
+        console.log(`Regex matches found: ${matchCount}`);
 
-        console.log(`Found ${uniqueFiles.length} PDF files.`);
+        // Remove duplicates
+        const uniqueFiles = Array.from(new Map(filesToImport.map(item => [item.id, item])).values());
+        console.log(`Unique files to process: ${uniqueFiles.length}`);
 
         // 4. Insert into Supabase
         let importedCount = 0;
@@ -143,47 +105,17 @@ export default async function handler(req: any, res: any) {
         }
 
         return res.status(200).json({
-            // ... existing code ...
-            console.log(`HTML Length: ${html.length}`);
-
-            // Try to find the drive data script
-            let driveData = null;
-            // ... (existing script parsing logic) ...
-
-            const filesToImport: any[] = [];
-
-            // Improved Regex to be more flexible with whitespace and potential JSON variations
-            // Look for pattern: "ID", "NAME", "application/pdf"
-            const pdfRegex = /"([^"]{10,100})"\s*,\s*"([^"]+)"\s*,\s*"application\/pdf"/g;
-
-            let match;
-            let matchCount = 0;
-
-            while((match = pdfRegex.exec(html)) !== null) {
-            matchCount++;
-            const [_, id, name] = match;
-            if (id.length > 15) {
-                filesToImport.push({ id, name, type: 'coloring', category: 'Geral' });
-            }
-        }
-
-        console.log(`Regex matches found: ${matchCount}`);
-
-        // Remove duplicates
-        // ... (existing duplicate removal) ...
-        const uniqueFiles = Array.from(new Map(filesToImport.map(item => [item.id, item])).values());
-        console.log(`Unique files to process: ${uniqueFiles.length}`);
-
-        // ... (existing insert loop) ...
-
-        return res.status(200).json({
             success: true,
             message: `Processado. Encontrados: ${matchCount}. Importados: ${importedCount}. Já existiam: ${skippedCount}. (HTML: ${html.length} bytes)`,
-            debug: { matches: matchCount, htmlLength: html.length, sample: html.substring(0, 500) }
+            debug: { matches: matchCount, htmlLength: html.length }
         });
 
     } catch (error: any) {
-        console.error('Import Error:', error);
-        return res.status(500).json({ error: error.message });
+        console.error('CRITICAL IMPORT ERROR:', error);
+        return res.status(200).json({
+            success: false,
+            error: error.message || 'Unknown error',
+            stack: error.stack
+        });
     }
 }
