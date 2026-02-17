@@ -35,6 +35,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Paywall from "./pages/Paywall";
 import SubscriptionGuard from "./components/SubscriptionGuard";
 import Admin from "./pages/admin/Admin";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,9 @@ const App = () => (
                 <Sonner />
                 <BrowserRouter>
                   <Routes>
+                    {/* Public Landing Page */}
+                    <Route path="/landing" element={<Landing />} />
+
                     <Route path="/" element={<Login />} />
                     <Route path="/paywall" element={<ProtectedRoute><Paywall /></ProtectedRoute>} />
                     <Route path="/home" element={<ProtectedRoute><SubscriptionGuard><Home /></SubscriptionGuard></ProtectedRoute>} />

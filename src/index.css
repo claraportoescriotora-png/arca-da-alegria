@@ -173,6 +173,11 @@
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
 
+  /* Soft shadow for landing page */
+  .shadow-soft {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
   /* Blob animation */
   .blob {
     animation: blob 7s infinite;
