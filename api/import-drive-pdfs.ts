@@ -107,7 +107,11 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({
             success: true,
             message: `Processado. Encontrados: ${matchCount}. Importados: ${importedCount}. Já existiam: ${skippedCount}. (HTML: ${html.length} bytes)`,
-            debug: { matches: matchCount, htmlLength: html.length }
+            debug: {
+                matches: matchCount,
+                htmlLength: html.length,
+                htmlSnippet: html.substring(0, 2000) // Log snippet to debug regex
+            }
         });
 
     } catch (error: any) {
