@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play, Check } from 'lucide-react';
 
 export default function Landing() {
     const [currentGameIndex, setCurrentGameIndex] = useState(0);
@@ -675,8 +675,8 @@ export default function Landing() {
                                                     key={idx}
                                                     onClick={() => setCurrentVideoIndex(idx)}
                                                     className={`w-3 h-3 rounded-full transition-all ${idx === currentVideoIndex
-                                                            ? 'bg-blue-600 w-8'
-                                                            : 'bg-gray-300 hover:bg-blue-300'
+                                                        ? 'bg-blue-600 w-8'
+                                                        : 'bg-gray-300 hover:bg-blue-300'
                                                         }`}
                                                     aria-label={`Ir para vídeo ${idx + 1}`}
                                                 />
@@ -807,44 +807,104 @@ export default function Landing() {
             </section>
 
             {/* Closing CTA */}
-            <section className="py-20 bg-gradient-to-br from-purple-200 via-pink-200 to-blue-200">
-                <div className="container max-w-5xl mx-auto px-6">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center space-y-6 shadow-xl border-2 border-white">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                            Acesso completo por um valor simbólico
-                        </h2>
-                        <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-                            Reunimos conteúdos, atividades e experiências que normalmente estariam espalhados… em um único lugar.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <span className="text-green-500 text-xl">✓</span>
-                                <span>Simples de usar</span>
+            <section className="py-20 bg-gradient-to-br from-purple-600 to-indigo-700 relative overflow-hidden">
+                {/* Background Decor */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 left-10 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="container max-w-6xl mx-auto px-6 relative z-10">
+                    <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-white/20">
+                        <div className="grid md:grid-cols-2 gap-0">
+                            {/* Product Image Side */}
+                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 md:p-12 flex items-center justify-center">
+                                <div className="relative group">
+                                    <div className="absolute inset-0 bg-purple-200 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+                                    <img
+                                        src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitotodososprodutos.webp"
+                                        alt="Pacote Completo Meu Amiguito"
+                                        className="relative w-full max-w-md mx-auto drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    <div className="absolute -bottom-6 -right-6 bg-yellow-400 text-purple-900 font-bold px-6 py-3 rounded-xl shadow-lg transform rotate-3 animate-bounce">
+                                        Oferta Especial!
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <span className="text-green-500 text-xl">✓</span>
-                                <span>Seguro</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <span className="text-green-500 text-xl">✓</span>
-                                <span>Feito para famílias</span>
+
+                            {/* Content Side */}
+                            <div className="p-8 md:p-12 md:pl-8 flex flex-col justify-center space-y-8">
+                                <div className="space-y-4">
+                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+                                        Dê agora o próximo passo e proteja o futuro dos seus filhos.
+                                    </h2>
+                                    <p className="text-lg text-gray-600 font-medium">
+                                        Veja só tudo o que você vai receber por apenas <span className="text-purple-600 font-bold">R$ 1,86 por semana</span>:
+                                    </p>
+                                </div>
+
+                                <ul className="space-y-3">
+                                    {[
+                                        "215+ vídeos escolhidos a dedo",
+                                        "70+ histórias bíblicas",
+                                        "Jogos que desenvolvem a mente",
+                                        "Missões de oração em família",
+                                        "Atividades para colorir",
+                                        "Zero ideologia, zero bagunça"
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-gray-700">
+                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                                <Check className="w-4 h-4 text-green-600" strokeWidth={3} />
+                                            </div>
+                                            <span className="font-medium">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div className="space-y-6 pt-4 border-t border-gray-100">
+                                    <div className="flex items-center gap-4 bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                        <div className="text-3xl">🛡️</div>
+                                        <div>
+                                            <p className="font-bold text-gray-900 text-sm">Garantia de 7 dias</p>
+                                            <p className="text-xs text-gray-600">Se não servir, devolvemos cada centavo. Sem perguntas.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-center md:text-left">
+                                        <div className="mb-4">
+                                            <span className="text-gray-500 text-lg line-through mr-3">De R$ 197,00</span>
+                                            <div className="inline-block">
+                                                <span className="text-sm text-gray-600 block">por apenas 12x de</span>
+                                                <span className="text-4xl font-bold text-purple-600">R$ 10,03</span>
+                                            </div>
+                                        </div>
+
+                                        <a
+                                            href="https://pay.kiwify.com.br/6UbyckE"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block w-full bg-green-500 hover:bg-green-600 text-white text-center px-8 py-5 rounded-xl text-xl font-bold transition-all shadow-lg hover:shadow-green-500/30 hover:-translate-y-1 group"
+                                        >
+                                            QUERO MEU FILHO PROTEGIDO
+                                        </a>
+                                        <p className="text-center text-xs text-gray-500 mt-3">
+                                            Compra 100% segura • Acesso imediato
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <button className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-5 rounded-full text-xl font-bold transition-colors shadow-lg flex items-center gap-3 mx-auto group">
-                            Quero começar agora
-                            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                        </button>
                     </div>
 
                     {/* Footer Illustration */}
-                    <div className="mt-12 flex items-center justify-center gap-8">
+                    <div className="mt-12 flex items-center justify-center gap-8 text-white/80">
                         <div className="text-center">
-                            <div className="text-6xl mb-2">👦</div>
-                            <p className="text-sm text-gray-700 font-semibold">Daniel</p>
+                            <div className="text-6xl mb-2 drop-shadow-lg">👦</div>
+                            <p className="text-sm font-semibold">Daniel</p>
                         </div>
                         <div className="text-center">
-                            <div className="text-6xl mb-2">🐑</div>
-                            <p className="text-sm text-gray-700 font-semibold">Amiguito</p>
+                            <div className="text-6xl mb-2 drop-shadow-lg">🐑</div>
+                            <p className="text-sm font-semibold">Amiguito</p>
                         </div>
                     </div>
                 </div>
