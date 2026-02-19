@@ -3,6 +3,7 @@ import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, Che
 
 export default function Landing() {
     const [currentGameIndex, setCurrentGameIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
     const games = [
         {
@@ -57,11 +58,13 @@ export default function Landing() {
     ];
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentGameIndex((prev) => (prev + 1) % games.length);
-        }, 5000);
-        return () => clearInterval(timer);
-    }, []);
+        if (!isPaused) {
+            const timer = setInterval(() => {
+                setCurrentGameIndex((prev) => (prev + 1) % games.length);
+            }, 5000);
+            return () => clearInterval(timer);
+        }
+    }, [isPaused, games.length]);
 
     const nextGame = () => setCurrentGameIndex((prev) => (prev + 1) % games.length);
     const prevGame = () => setCurrentGameIndex((prev) => (prev - 1 + games.length) % games.length);
@@ -463,7 +466,11 @@ export default function Landing() {
 
                     <div className="relative max-w-5xl mx-auto">
                         {/* Carousel Container */}
-                        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border-4 border-white relative overflow-hidden">
+                        <div
+                            className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border-4 border-white relative overflow-hidden"
+                            onMouseEnter={() => setIsPaused(true)}
+                            onMouseLeave={() => setIsPaused(false)}
+                        >
                             <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50 -mr-32 -mt-32"></div>
                             <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-100 rounded-full blur-3xl opacity-50 -ml-32 -mb-32"></div>
 
@@ -512,8 +519,8 @@ export default function Landing() {
                                                     key={idx}
                                                     onClick={() => setCurrentGameIndex(idx)}
                                                     className={`w-3 h-3 rounded-full transition-all ${idx === currentGameIndex
-                                                            ? 'bg-purple-600 w-8'
-                                                            : 'bg-gray-300 hover:bg-purple-300'
+                                                        ? 'bg-purple-600 w-8'
+                                                        : 'bg-gray-300 hover:bg-purple-300'
                                                         }`}
                                                     aria-label={`Ir para jogo ${idx + 1}`}
                                                 />
