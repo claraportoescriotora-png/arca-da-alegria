@@ -4,6 +4,8 @@ import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, Che
 export default function Landing() {
     const [currentGameIndex, setCurrentGameIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+    const [isVideoPaused, setIsVideoPaused] = useState(false);
 
     const games = [
         {
@@ -57,6 +59,51 @@ export default function Landing() {
         }
     ];
 
+    const videos = [
+        {
+            title: "Smilinguido",
+            description: "Clássico que marcou época. Aqui seu filho revive as histórias que você amou.",
+            tag: "Clássico",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/smiliguido.webp",
+            color: "bg-orange-100 text-orange-800"
+        },
+        {
+            title: "Midinho, o Pequeno Missionário",
+            description: "Missão e coragem. Aventuras que ensinam fé e propósito.",
+            tag: "Missão",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/filmemidinho.webp",
+            color: "bg-blue-100 text-blue-800"
+        },
+        {
+            title: "Curtas Premiados",
+            description: "Snowbear e outros títulos premiados. Arte de qualidade com valores cristãos.",
+            tag: "Arte",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/animaceospremiadas%20(1).webp",
+            color: "bg-purple-100 text-purple-800"
+        },
+        {
+            title: "Músicas Cristãs",
+            description: "Seleção de músicas infantis que alegram e ensinam a Palavra.",
+            tag: "Louvor",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/musicascristas.webp",
+            color: "bg-green-100 text-green-800"
+        },
+        {
+            title: "Vídeos Educativos",
+            description: "Conteúdo para aprender a ler, escrever e se desenvolver. Sem ideologias.",
+            tag: "Educação",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/conteudoeducativo%20(1).webp",
+            color: "bg-yellow-100 text-yellow-800"
+        },
+        {
+            title: "Catálogo Crescente",
+            description: "Mais de 215 conteúdos catalogados e organizados para você. Toda semana, novidades.",
+            tag: "Novidades",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/conteudoeducativo%20(1).webp",
+            color: "bg-pink-100 text-pink-800"
+        }
+    ];
+
     useEffect(() => {
         if (!isPaused) {
             const timer = setInterval(() => {
@@ -66,8 +113,20 @@ export default function Landing() {
         }
     }, [isPaused, games.length]);
 
+    useEffect(() => {
+        if (!isVideoPaused) {
+            const timer = setInterval(() => {
+                setCurrentVideoIndex((prev) => (prev + 1) % videos.length);
+            }, 5000);
+            return () => clearInterval(timer);
+        }
+    }, [isVideoPaused, videos.length]);
+
     const nextGame = () => setCurrentGameIndex((prev) => (prev + 1) % games.length);
     const prevGame = () => setCurrentGameIndex((prev) => (prev - 1 + games.length) % games.length);
+
+    const nextVideo = () => setCurrentVideoIndex((prev) => (prev + 1) % videos.length);
+    const prevVideo = () => setCurrentVideoIndex((prev) => (prev - 1 + videos.length) % videos.length);
 
     return (
         <div className="min-h-screen bg-[#FFF8F0] font-fredoka">
@@ -542,6 +601,103 @@ export default function Landing() {
                             <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
                                 <Play className="w-6 h-6 fill-current" />
                                 QUERO MEU FILHO MAIS INTELIGENTE E CONECTADO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Videos Section */}
+            <section className="py-20 bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 overflow-hidden">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            Vídeos, filmes e aprendizado seguro para seu filho.
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Mais de 215 vídeos escolhidos a dedo. Nada de ideologias, bagunça ou conteúdo vazio.
+                            Só valores cristãos e aprendizado de verdade. Enquanto o YouTube expõe, a gente protege.
+                        </p>
+                    </div>
+
+                    <div className="relative max-w-5xl mx-auto">
+                        {/* Carousel Container */}
+                        <div
+                            className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border-4 border-white relative overflow-hidden"
+                            onMouseEnter={() => setIsVideoPaused(true)}
+                            onMouseLeave={() => setIsVideoPaused(false)}
+                        >
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 -mr-32 -mt-32"></div>
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-50 -ml-32 -mb-32"></div>
+
+                            <div className="relative grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                                {/* Image Side */}
+                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group">
+                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                                    <img
+                                        src={videos[currentVideoIndex].image}
+                                        alt={videos[currentVideoIndex].title}
+                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute top-4 left-4">
+                                        <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm ${videos[currentVideoIndex].color}`}>
+                                            {videos[currentVideoIndex].tag}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Content Side */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Play className="w-6 h-6 text-blue-500 fill-current" />
+                                        <span className="text-sm font-bold text-blue-500 tracking-wider uppercase">EM CARTAZ</span>
+                                    </div>
+
+                                    <h3 className="text-3xl font-bold text-gray-900">
+                                        {videos[currentVideoIndex].title}
+                                    </h3>
+
+                                    <p className="text-gray-600 text-lg leading-relaxed">
+                                        {videos[currentVideoIndex].description}
+                                    </p>
+
+                                    <div className="flex gap-4 pt-4">
+                                        <button
+                                            onClick={prevVideo}
+                                            className="p-3 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 transition-all hover:scale-110"
+                                            aria-label="Vídeo anterior"
+                                        >
+                                            <ChevronLeft className="w-6 h-6" />
+                                        </button>
+                                        <div className="flex gap-2 items-center">
+                                            {videos.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentVideoIndex(idx)}
+                                                    className={`w-3 h-3 rounded-full transition-all ${idx === currentVideoIndex
+                                                            ? 'bg-blue-600 w-8'
+                                                            : 'bg-gray-300 hover:bg-blue-300'
+                                                        }`}
+                                                    aria-label={`Ir para vídeo ${idx + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <button
+                                            onClick={nextVideo}
+                                            className="p-3 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 transition-all hover:scale-110"
+                                            aria-label="Próximo vídeo"
+                                        >
+                                            <ChevronRight className="w-6 h-6" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-12 text-center">
+                            <button className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                                <Play className="w-6 h-6 fill-current" />
+                                QUERO PROTEGER MEU FILHO COM CONTEÚDO SEGURO
                             </button>
                         </div>
                     </div>
