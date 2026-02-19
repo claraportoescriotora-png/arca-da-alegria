@@ -128,6 +128,10 @@ export default function Landing() {
     const nextVideo = () => setCurrentVideoIndex((prev) => (prev + 1) % videos.length);
     const prevVideo = () => setCurrentVideoIndex((prev) => (prev - 1 + videos.length) % videos.length);
 
+    const scrollToOffer = () => {
+        document.getElementById('oferta')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     return (
         <div className="min-h-screen bg-[#FFF8F0] font-fredoka">
             {/* Header */}
@@ -140,7 +144,7 @@ export default function Landing() {
                             className="h-12 w-auto"
                         />
                     </div>
-                    <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-soft">
+                    <button onClick={scrollToOffer} className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-soft">
                         Quero acessar agora
                     </button>
                 </div>
@@ -183,7 +187,7 @@ export default function Landing() {
                                 <span className="text-gray-800">Experiências para viver juntos</span>
                             </div>
                         </div>
-                        <button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg flex items-center gap-2 group">
+                        <button onClick={scrollToOffer} className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg flex items-center gap-2 group">
                             Quero acessar agora
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
@@ -491,7 +495,7 @@ export default function Landing() {
                                 </div>
                             </div>
 
-                            <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
+                            <button onClick={scrollToOffer} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
                                 QUERO CRIAR ESSE PADRÃO NO MEU FILHO
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
@@ -598,7 +602,7 @@ export default function Landing() {
                         </div>
 
                         <div className="mt-12 text-center">
-                            <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                            <button onClick={scrollToOffer} className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
                                 <Play className="w-6 h-6 fill-current" />
                                 QUERO MEU FILHO MAIS INTELIGENTE E CONECTADO
                             </button>
@@ -695,7 +699,7 @@ export default function Landing() {
                         </div>
 
                         <div className="mt-12 text-center">
-                            <button className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                            <button onClick={scrollToOffer} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
                                 <Play className="w-6 h-6 fill-current" />
                                 QUERO PROTEGER MEU FILHO COM CONTEÚDO SEGURO
                             </button>
@@ -911,34 +915,20 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-purple-900 text-white py-12">
-                <div className="container max-w-6xl mx-auto px-6">
-                    <div className="grid md:grid-cols-3 gap-8 mb-8">
-                        <div>
-                            <h3 className="font-bold text-lg mb-4 text-purple-200">Meu Amiguito</h3>
-                            <p className="text-purple-300 text-sm">
-                                Um ambiente digital seguro e cheio de fé para o seu filho crescer.
-                            </p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-lg mb-4 text-purple-200">Links</h3>
-                            <ul className="space-y-2 text-sm text-purple-300">
-                                <li><a href="#" className="hover:text-white transition-colors">Sobre</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Termos de Uso</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-lg mb-4 text-purple-200">Contato</h3>
-                            <ul className="space-y-2 text-sm text-purple-300">
-                                <li>contato@meuamiguito.com</li>
-                                <li>WhatsApp: (XX) XXXXX-XXXX</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="border-t border-purple-700 pt-6 text-center text-sm text-purple-300">
-                        <p>© 2026 Meu Amiguito. Todos os direitos reservados.</p>
+            <footer className="bg-purple-900 text-white py-12 border-t border-purple-800">
+                <div className="container max-w-4xl mx-auto px-6 text-center space-y-6">
+                    <img
+                        src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
+                        alt="Meu Amiguito"
+                        className="h-10 w-auto mx-auto brightness-0 invert opacity-80"
+                    />
+                    <div className="text-purple-300 text-xs leading-relaxed space-y-4">
+                        <p>
+                            © 2026 Meu Amiguito. Todos os direitos reservados.
+                        </p>
+                        <p>
+                            O Meu Amiguito é uma plataforma de curadoria de conteúdo infantojuvenil. Os vídeos, episódios e músicas disponíveis são de propriedade de seus respectivos criadores e estão originalmente publicados em plataformas como YouTube, em acesso gratuito. O aplicativo mantém todas as atribuições, logomarcas e anúncios originais, garantindo que as visualizações sejam contabilizadas nos canais oficiais. Não nos responsabilizamos por indisponibilidade ou alteração de conteúdos de terceiros. Ao utilizar o aplicativo, você concorda que o serviço prestado é de curadoria e organização, e não de licenciamento das obras.
+                        </p>
                     </div>
                 </div>
             </footer>
