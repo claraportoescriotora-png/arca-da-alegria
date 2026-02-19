@@ -292,84 +292,93 @@ export default function Landing() {
             </section>
 
             {/* Daily Missions */}
-            <section className="py-20 bg-gradient-to-br from-green-100 to-green-200">
+            <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-100">
                 <div className="container max-w-6xl mx-auto px-6">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
-                        Missões diárias — O coração do Meu Amiguito
-                    </h2>
-                    <p className="text-center text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
-                        Antes de cada missão ser criada, ela nasce em oração. Buscando aquilo que pode gerar frutos reais
-                        na vida da criança e da família.
-                    </p>
-
-                    <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 border-2 border-green-200 mb-8">
-                        {/* Journey Visualization */}
-                        <div className="flex items-center justify-center gap-4 mb-8 overflow-x-auto pb-4">
-                            <div className="flex flex-col items-center min-w-[120px]">
-                                <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-pink-400 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                                    ❤️
-                                </div>
-                                <div className="text-sm font-bold mt-2 text-gray-800">Gratidão</div>
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        {/* Text Column */}
+                        <div className="space-y-8">
+                            <div className="space-y-4">
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+                                    Missões diárias — Crie um padrão de fé e ação no seu filho.
+                                </h2>
+                                <h3 className="text-xl text-green-800 font-medium">
+                                    Transforme seu filho em protagonista. Missões diárias sobre:
+                                    <br />
+                                    Cura • Amizade • Família • Gratidão • Propósito
+                                </h3>
                             </div>
 
-                            <div className="w-12 h-1 bg-green-300 rounded-full"></div>
-
-                            <div className="flex flex-col items-center min-w-[120px]">
-                                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                                    🙏
+                            <div className="space-y-6">
+                                <div className="bg-white/60 rounded-2xl p-6 shadow-sm border border-green-100">
+                                    <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                        <Zap className="w-5 h-5 text-yellow-500 fill-current" />
+                                        Benefícios Rápidos
+                                    </h4>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-start gap-3 text-gray-700 text-sm">
+                                            <div className="w-5 h-5 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <span className="text-green-700 text-xs">✓</span>
+                                            </div>
+                                            <span><strong>Cansado de ver seu filho sofrer?</strong> Dê a ele um propósito real.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-gray-700 text-sm">
+                                            <div className="w-5 h-5 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <span className="text-green-700 text-xs">✓</span>
+                                            </div>
+                                            <span><strong>Não é joguinho.</strong> São missões de oração que curam e restauram.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-gray-700 text-sm">
+                                            <div className="w-5 h-5 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <span className="text-green-700 text-xs">✓</span>
+                                            </div>
+                                            <span><strong>Seu filho vira protagonista.</strong> Guiado por Deus, ele ora e age. A família sente o impacto.</span>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <div className="text-sm font-bold mt-2 text-gray-800">Oração</div>
+
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs">?</span>
+                                        Como Funciona:
+                                    </h4>
+                                    <div className="grid gap-3">
+                                        <div className="flex items-center gap-3 bg-white/40 p-3 rounded-xl">
+                                            <div className="font-bold text-2xl text-green-300">1</div>
+                                            <div className="text-sm text-gray-800">
+                                                <strong>Escolha a batalha:</strong> Cura, emprego, gratidão ou restauração familiar.
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 bg-white/40 p-3 rounded-xl">
+                                            <div className="font-bold text-2xl text-green-300">2</div>
+                                            <div className="text-sm text-gray-800">
+                                                <strong>Receba a missão:</strong> Passos diários de oração e ação.
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 bg-white/40 p-3 rounded-xl">
+                                            <div className="font-bold text-2xl text-green-300">3</div>
+                                            <div className="text-sm text-gray-800">
+                                                <strong>Veja o milagre:</strong> A fé vira realidade. Seu filho nunca mais será o mesmo.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="w-12 h-1 bg-green-300 rounded-full"></div>
-
-                            <div className="flex flex-col items-center min-w-[120px]">
-                                <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                                    ⭐
-                                </div>
-                                <div className="text-sm font-bold mt-2 text-gray-800">Amor</div>
-                            </div>
-
-                            <div className="w-12 h-1 bg-gray-300 rounded-full opacity-50"></div>
-
-                            <div className="flex flex-col items-center min-w-[120px]">
-                                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-3xl">
-                                    🎯
-                                </div>
-                                <div className="text-sm font-bold mt-2 text-gray-500">Próxima</div>
-                            </div>
+                            <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
+                                QUERO CRIAR ESSE PADRÃO NO MEU FILHO
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-4 mt-8">
-                            <div className="bg-green-50 rounded-2xl p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xl">✔</span>
-                                    <span className="font-semibold text-gray-800">Missões de gratidão</span>
-                                </div>
-                            </div>
-                            <div className="bg-green-50 rounded-2xl p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xl">✔</span>
-                                    <span className="font-semibold text-gray-800">Campanhas de oração em família</span>
-                                </div>
-                            </div>
-                            <div className="bg-green-50 rounded-2xl p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xl">✔</span>
-                                    <span className="font-semibold text-gray-800">Atitudes práticas de amor</span>
-                                </div>
-                            </div>
-                            <div className="bg-green-50 rounded-2xl p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xl">✔</span>
-                                    <span className="font-semibold text-gray-800">Momentos guiados para viver a fé</span>
-                                </div>
-                            </div>
+                        {/* Image Column */}
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-green-200 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
+                            <img
+                                src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/mockupmissoes.webp"
+                                alt="Missões Diárias"
+                                className="relative w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                            />
                         </div>
-
-                        <p className="text-center text-lg font-bold text-gray-900 mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl py-4">
-                            Não é assistir. É <span className="text-green-600">participar.</span>
-                        </p>
                     </div>
                 </div>
             </section>
