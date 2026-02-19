@@ -147,7 +147,7 @@ export default function Landing() {
             </header>
 
             {/* Hero Section */}
-            <section className="bg-gradient-to-br from-purple-200 via-purple-300 to-lavender-200 py-20 relative overflow-hidden">
+            <section className="bg-gradient-to-br from-purple-200 via-purple-300 to-lavender-200 pt-20 pb-0 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10">
                     {/* Cloud decorations */}
                     <div className="absolute top-10 left-10 w-32 h-20 bg-white rounded-full"></div>
@@ -155,8 +155,8 @@ export default function Landing() {
                     <div className="absolute bottom-10 left-1/3 w-36 h-22 bg-white rounded-full"></div>
                 </div>
 
-                <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
-                    <div className="space-y-6">
+                <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-end relative z-10">
+                    <div className="space-y-6 pb-20">
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                             Um lugar seguro, alegre e cheio de fé para o seu filho crescer.
                         </h1>
@@ -190,11 +190,11 @@ export default function Landing() {
                     </div>
 
                     {/* Hero Illustration */}
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-end justify-center h-full">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daneil%20e%20a%20ovelhinha.webp"
-                            alt="Daniel e a ovelhinha"
-                            className="w-full max-w-md h-auto"
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daniamiguitoejesus.webp"
+                            alt="Daniel e Jesus"
+                            className="w-full max-w-md h-auto object-bottom"
                         />
                     </div>
                 </div>
