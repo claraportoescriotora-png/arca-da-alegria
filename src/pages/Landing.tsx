@@ -1,6 +1,71 @@
-import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 
 export default function Landing() {
+    const [currentGameIndex, setCurrentGameIndex] = useState(0);
+
+    const games = [
+        {
+            title: "Quebra-Cabeça Cristão",
+            description: "Foco e paciência. Montar cenas bíblicas desenvolve a concentração. Enquanto encaixa as peças, ele fixa a Palavra no coração.",
+            tag: "Raciocínio",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/quebracabecalp.webp",
+            color: "bg-blue-100 text-blue-800"
+        },
+        {
+            title: "Subindo ao Céu",
+            description: "Reflexos e propósito. Pular obstáculos nas nuvens até encontrar Jesus. Coordenação motora e espiritualidade no mesmo jogo.",
+            tag: "Coordenação",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/subindoaoceu.webp",
+            color: "bg-sky-100 text-sky-800"
+        },
+        {
+            title: "O Bom Pastor",
+            description: "Pensamento rápido. Guiar a ovelha desviando do lobo. Agilidade mental enquanto aprende sobre proteção e cuidado.",
+            tag: "Agilidade",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/obompastor.webp",
+            color: "bg-green-100 text-green-800"
+        },
+        {
+            title: "Sinais da Vida de Jesus",
+            description: "Memória afiada. Jogo da memória com os milagres de Jesus. A cada par encontrado, um sinal gravado na mente.",
+            tag: "Memória",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/sinais.webp",
+            color: "bg-purple-100 text-purple-800"
+        },
+        {
+            title: "Encontro com Jesus",
+            description: "Resolução de problemas. Labirinto até encontrar Jesus. Raciocínio lógico e busca espiritual em um só desafio.",
+            tag: "Lógica",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Encontre%20Jesus.webp",
+            color: "bg-yellow-100 text-yellow-800"
+        },
+        {
+            title: "No Ritmo do Céu",
+            description: "Coordenação e ritmo. Sequências de cores e sons. Desenvolvimento motor e musical enquanto louva.",
+            tag: "Musicalidade",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/noritimodoceu.webp",
+            color: "bg-pink-100 text-pink-800"
+        },
+        {
+            title: "Quem Estou Imitando?",
+            description: "Conexão familiar. Imitar e adivinhar. Riso, afeto e memória afetiva. Pai e filho juntos no mesmo propósito.",
+            tag: "Família",
+            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/quem%20estou%20imitando.webp",
+            color: "bg-orange-100 text-orange-800"
+        }
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentGameIndex((prev) => (prev + 1) % games.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const nextGame = () => setCurrentGameIndex((prev) => (prev + 1) % games.length);
+    const prevGame = () => setCurrentGameIndex((prev) => (prev - 1 + games.length) % games.length);
+
     return (
         <div className="min-h-screen bg-[#FFF8F0] font-fredoka">
             {/* Header */}
@@ -384,37 +449,94 @@ export default function Landing() {
             </section>
 
             {/* Games Section */}
-            <section className="py-20 bg-gradient-to-br from-yellow-100 via-orange-100 to-pink-100">
+            <section className="py-20 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 overflow-hidden">
                 <div className="container max-w-6xl mx-auto px-6">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
-                        Jogos que desenvolvem a mente — e unem pais e filhos
-                    </h2>
-                    <p className="text-center text-gray-700 mb-12 max-w-2xl mx-auto">
-                        Nada de jogos vazios. Aqui, brincar também ensina.
-                    </p>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                        {[
-                            { emoji: '🧩', name: 'Quebra-cabeça bíblico', color: 'from-blue-200 to-blue-300' },
-                            { emoji: '🐑', name: 'O Bom Pastor', color: 'from-green-200 to-green-300' },
-                            { emoji: '🧠', name: 'Jogo da memória', color: 'from-purple-200 to-purple-300' },
-                            { emoji: '🔑', name: 'Encontre Jesus', color: 'from-yellow-200 to-yellow-300' },
-                            { emoji: '🎵', name: 'No Ritmo do Céu', color: 'from-pink-200 to-pink-300' },
-                            { emoji: '👨‍👩‍👧', name: 'Quem Estou Imitando?', color: 'from-orange-200 to-orange-300' },
-                        ].map((game, i) => (
-                            <div key={i} className={`bg-gradient-to-br ${game.color} rounded-3xl p-6 text-center space-y-3 shadow-soft`}>
-                                <div className="text-5xl mb-2">{game.emoji}</div>
-                                <h3 className="font-bold text-sm text-gray-900">{game.name}</h3>
-                            </div>
-                        ))}
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            Seu filho mais inteligente enquanto se conecta com Deus.
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Chega de ansiedade. Nossos jogos treinam memória, raciocínio e coordenação.
+                            Enquanto ele joga, a mente e o espírito evoluem.
+                        </p>
                     </div>
 
-                    <div className="bg-orange-50 rounded-3xl p-8 border-2 border-orange-200">
-                        <p className="text-center text-gray-800 leading-relaxed">
-                            <strong className="text-orange-600 text-xl">👨‍👩‍👧 Especial:</strong><br />
-                            Um jogo feito para pais e filhos rirem juntos. Se olharem. Se reconectarem.<br />
-                            Porque <strong>fortalecer vínculos também é missão.</strong>
-                        </p>
+                    <div className="relative max-w-5xl mx-auto">
+                        {/* Carousel Container */}
+                        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border-4 border-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50 -mr-32 -mt-32"></div>
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-100 rounded-full blur-3xl opacity-50 -ml-32 -mb-32"></div>
+
+                            <div className="relative grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                                {/* Image Side */}
+                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group">
+                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                                    <img
+                                        src={games[currentGameIndex].image}
+                                        alt={games[currentGameIndex].title}
+                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute top-4 left-4">
+                                        <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm ${games[currentGameIndex].color}`}>
+                                            {games[currentGameIndex].tag}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Content Side */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Gamepad2 className="w-6 h-6 text-purple-500" />
+                                        <span className="text-sm font-bold text-purple-500 tracking-wider uppercase">JOGO EM DESTAQUE</span>
+                                    </div>
+
+                                    <h3 className="text-3xl font-bold text-gray-900">
+                                        {games[currentGameIndex].title}
+                                    </h3>
+
+                                    <p className="text-gray-600 text-lg leading-relaxed">
+                                        {games[currentGameIndex].description}
+                                    </p>
+
+                                    <div className="flex gap-4 pt-4">
+                                        <button
+                                            onClick={prevGame}
+                                            className="p-3 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600 transition-all hover:scale-110"
+                                            aria-label="Jogo anterior"
+                                        >
+                                            <ChevronLeft className="w-6 h-6" />
+                                        </button>
+                                        <div className="flex gap-2 items-center">
+                                            {games.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentGameIndex(idx)}
+                                                    className={`w-3 h-3 rounded-full transition-all ${idx === currentGameIndex
+                                                            ? 'bg-purple-600 w-8'
+                                                            : 'bg-gray-300 hover:bg-purple-300'
+                                                        }`}
+                                                    aria-label={`Ir para jogo ${idx + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <button
+                                            onClick={nextGame}
+                                            className="p-3 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600 transition-all hover:scale-110"
+                                            aria-label="Próximo jogo"
+                                        >
+                                            <ChevronRight className="w-6 h-6" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-12 text-center">
+                            <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                                <Play className="w-6 h-6 fill-current" />
+                                QUERO MEU FILHO MAIS INTELIGENTE E CONECTADO
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
