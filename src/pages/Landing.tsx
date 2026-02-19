@@ -235,36 +235,13 @@ export default function Landing() {
                             </div>
                         </div>
 
-                        {/* Phone Mockups */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-gray-100 rounded-3xl aspect-[9/16] p-4 flex flex-col items-center justify-center border-4 border-gray-300">
-                                <div className="bg-white rounded-2xl w-full h-full p-4 space-y-3">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="bg-purple-200 rounded-xl aspect-square flex items-center justify-center text-2xl">📖</div>
-                                        <div className="bg-blue-200 rounded-xl aspect-square flex items-center justify-center text-2xl">🎵</div>
-                                        <div className="bg-green-200 rounded-xl aspect-square flex items-center justify-center text-2xl">🎨</div>
-                                        <div className="bg-yellow-200 rounded-xl aspect-square flex items-center justify-center text-2xl">🎮</div>
-                                    </div>
-                                    <p className="text-[8px] text-center text-gray-500">Tela Principal</p>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-100 rounded-3xl aspect-[9/16] p-4 flex flex-col items-center justify-center border-4 border-gray-300">
-                                <div className="bg-white rounded-2xl w-full h-full p-4 space-y-2">
-                                    <div className="space-y-2">
-                                        <div className="bg-purple-100 rounded-xl p-2 text-[8px]">
-                                            <div className="font-bold">História 1</div>
-                                        </div>
-                                        <div className="bg-blue-100 rounded-xl p-2 text-[8px]">
-                                            <div className="font-bold">História 2</div>
-                                        </div>
-                                        <div className="bg-green-100 rounded-xl p-2 text-[8px]">
-                                            <div className="font-bold">História 3</div>
-                                        </div>
-                                    </div>
-                                    <p className="text-[8px] text-center text-gray-500">Biblioteca</p>
-                                </div>
-                            </div>
+                        {/* Phone Mockup */}
+                        <div className="flex items-center justify-center">
+                            <img
+                                src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/smartphonemockupamiguito.webp"
+                                alt="App Meu Amiguito"
+                                className="w-full max-w-md h-auto hover:scale-105 transition-transform duration-500"
+                            />
                         </div>
                     </div>
                 </div>
