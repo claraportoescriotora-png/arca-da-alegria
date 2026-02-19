@@ -259,10 +259,28 @@ export default function Landing() {
                     </p>
 
                     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 border-2 border-blue-200">
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-                            {[...Array(12)].map((_, i) => (
-                                <div key={i} className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl aspect-square flex items-center justify-center text-3xl shadow-soft">
-                                    📖
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                            {[
+                                { name: 'Zaqueu', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/zaqueunafigueira.webp' },
+                                { name: 'Pedro na Prisão', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pedronaprisao.webp' },
+                                { name: 'Paulo e Silas', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pauloesilas.webp' },
+                                { name: 'O Nascimento de Jesus', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/onascimentodejesus.webp' },
+                                { name: 'Jonas e o Grande Peixe', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/jonaseograndepeixe.webp' },
+                                { name: 'Isaque e Rebeca', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/isaqueerebeca.webp' },
+                                { name: 'O Filho Pródigo', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/filhoprodigo.webp' },
+                                { name: 'Eliseu e o Azeite', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/eliseueoazeite.webp' },
+                                { name: 'O Chamado de Abraão', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/chamadodeabraao.webp' },
+                                { name: 'A Criação do Mundo', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/acriacaodomundo.webp' }
+                            ].map((story, i) => (
+                                <div key={i} className="group relative aspect-square rounded-2xl overflow-hidden shadow-soft hover:scale-105 transition-transform duration-300">
+                                    <img
+                                        src={story.image}
+                                        alt={story.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-2">
+                                        <span className="text-white text-xs font-bold text-center">{story.name}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
