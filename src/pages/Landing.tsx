@@ -900,17 +900,6 @@ export default function Landing() {
                         </div>
                     </div>
 
-                    {/* Footer Illustration */}
-                    <div className="mt-12 flex items-center justify-center gap-8 text-white/80">
-                        <div className="text-center">
-                            <div className="text-6xl mb-2 drop-shadow-lg">👦</div>
-                            <p className="text-sm font-semibold">Daniel</p>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-6xl mb-2 drop-shadow-lg">🐑</div>
-                            <p className="text-sm font-semibold">Amiguito</p>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -920,7 +909,7 @@ export default function Landing() {
                     <img
                         src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
                         alt="Meu Amiguito"
-                        className="h-10 w-auto mx-auto brightness-0 invert opacity-80"
+                        className="h-10 w-auto mx-auto"
                     />
                     <div className="text-purple-300 text-xs leading-relaxed space-y-4">
                         <p>
