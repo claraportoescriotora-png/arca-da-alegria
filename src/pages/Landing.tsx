@@ -559,12 +559,20 @@ export default function Landing() {
                     </p>
 
                     <div className="grid md:grid-cols-3 gap-6">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-200">
-                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl aspect-[3/4] flex items-center justify-center text-6xl mb-4">
-                                    📄
+                        {[
+                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Biblia%20para%20Colorir%20A%20historia%20de%20jesus%20-%20Volume%201%20(2).webp", title: "A História de Jesus" },
+                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/bibliajeusnomar.webp", title: "Jesus acalma a tempestade" },
+                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pinturasnt.webp", title: "Milagres de Jesus" }
+                        ].map((item, i) => (
+                            <div key={i} className="bg-white rounded-3xl p-4 shadow-soft border-2 border-purple-200 group hover:-translate-y-2 transition-transform duration-300">
+                                <div className="rounded-2xl aspect-[3/4] overflow-hidden mb-4 shadow-md">
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
                                 </div>
-                                <p className="text-center text-sm text-gray-600">Página {i} - Para Colorir</p>
+                                <p className="text-center font-bold text-gray-800">{item.title}</p>
                             </div>
                         ))}
                     </div>
