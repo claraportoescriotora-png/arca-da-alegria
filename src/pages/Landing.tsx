@@ -144,9 +144,21 @@ export default function Landing() {
                             className="h-12 w-auto"
                         />
                     </div>
-                    <button onClick={scrollToOffer} className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-soft">
-                        Quero acessar agora
-                    </button>
+
+                    <div className="flex items-center gap-4">
+                        <a
+                            href="/"
+                            className="hidden sm:block text-purple-600 hover:text-purple-700 font-bold px-4 py-2 hover:bg-purple-50 rounded-full transition-all"
+                        >
+                            Já sou aluno
+                        </a>
+                        <button
+                            onClick={scrollToOffer}
+                            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-bold transition-all shadow-soft active:scale-95"
+                        >
+                            Assinar agora
+                        </button>
+                    </div>
                 </div>
             </header>
 
