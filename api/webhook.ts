@@ -12,8 +12,9 @@ export default async function handler(request: Request) {
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const webhookToken = process.env.KIWIFY_WEBHOOK_TOKEN;
+    const signatureSecret = process.env.KIWIFY_SIGNATURE_SECRET; // HMAC Secret
 
-    // 1. Security Check
+    // 1. Security Check (Token & Signature)
     const url = new URL(request.url);
     const tokenFromUrl = url.searchParams.get('token');
 
@@ -22,8 +23,43 @@ export default async function handler(request: Request) {
     }
 
     try {
-        const payload = await request.json();
+        const rawBody = await request.text();
+        const payload = JSON.parse(rawBody);
+
+        // Optional HMAC Validation if secret is provided
+        if (signatureSecret) {
+            const signature = request.headers.get('x-kiwify-signature');
+            if (signature) {
+                const crypto = await import('crypto');
+                const hmac = crypto.createHmac('sha256', signatureSecret);
+                hmac.update(rawBody);
+                const expectedSignature = hmac.digest('hex');
+
+                if (signature !== expectedSignature) {
+                    console.error('Invalid Kiwify signature');
+                    return new Response('Unauthorized - Invalid Signature', { status: 401 });
+                }
+            }
+        }
+
         console.log('Webhook payload:', JSON.stringify(payload, null, 2));
+
+        // 1.1 Idempotency Check (Prevent duplicate processing)
+        const transactionId = payload.order_id || payload.subscription_id || payload.id;
+        if (transactionId && supabaseUrl && supabaseServiceKey) {
+            const supabase = createClient(supabaseUrl, supabaseServiceKey);
+            const { data: existingEvent } = await supabase
+                .from('webhook_events')
+                .select('id')
+                .eq('payload->>order_id', transactionId)
+                .or(`payload->>subscription_id.eq.${transactionId},payload->>id.eq.${transactionId}`)
+                .maybeSingle();
+
+            if (existingEvent) {
+                console.log(`Webhook already processed: ${transactionId}`);
+                return new Response(JSON.stringify({ success: true, message: 'Already processed' }), { status: 200 });
+            }
+        }
 
         // 2. Parse Event & Customer Data
         const orderStatus = payload.order_status || payload.status;

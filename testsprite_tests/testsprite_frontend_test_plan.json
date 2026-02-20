@@ -1,0 +1,2204 @@
+[
+  {
+    "id": "TC001",
+    "title": "Landing page loads and displays key hero content",
+    "description": "Verifies the public landing page renders and shows core marketing hero messaging and primary CTA.",
+    "category": "Landing Page (Marketing & CTA)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Hero section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Amiguitos\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Jornada\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Primary call-to-action button\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Primary CTA scrolls user to the offer/pricing section",
+    "description": "Verifies clicking the main CTA on the landing page scrolls to the offer section without leaving the page.",
+    "category": "Landing Page (Marketing & CTA)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Primary call-to-action\" button in the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Offer section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Assinar\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/landing\""
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Games carousel allows navigation using arrows",
+    "description": "Verifies the games carousel can be navigated via next/previous arrows and the displayed game items update.",
+    "category": "Landing Page (Marketing & CTA)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the \"Games carousel\" section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Games carousel\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Next\" arrow in the games carousel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"A different game card\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Previous\" arrow in the games carousel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"The original game card\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Final purchase CTA initiates external payment flow (Kiwify)",
+    "description": "Verifies clicking the final purchase button takes the user to the external Kiwify payment page.",
+    "category": "Landing Page (Marketing & CTA)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom offer area containing the \"Final purchase\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Final purchase button\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Final purchase\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"kiwify\""
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Landing page remains usable after repeated CTA clicks (no broken state)",
+    "description": "Verifies repeated interactions with CTAs do not break the page state and user can still reach the offer section.",
+    "category": "Landing Page (Marketing & CTA)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Primary call-to-action\" button in the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Offer section\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll back to the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Hero section\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Primary call-to-action\" button in the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Offer section\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Paywall page loads and shows subscription options for an authenticated user",
+    "description": "Verifies that an authenticated user can open the paywall and see subscription options.",
+    "category": "Paywall & Subscription",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/paywall\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Subscription\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one subscription plan option is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Subscribe button is present and actionable from paywall",
+    "description": "Verifies the primary subscribe CTA is visible and can be initiated from the paywall.",
+    "category": "Paywall & Subscription",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the subscription plans section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a \"Subscribe\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Subscribe\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Paywall page retains plan visibility after refresh-like re-entry from landing CTA",
+    "description": "Verifies that entering the paywall via public landing CTAs still shows plans after authentication gating.",
+    "category": "Paywall & Subscription",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /landing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Amiguitos\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the primary \"Subscribe\" or \"Get started\" call-to-action button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/paywall\""
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Paywall communicates locked access and premium value proposition",
+    "description": "Verifies that the paywall clearly indicates premium access is required and explains benefits.",
+    "category": "Paywall & Subscription",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/paywall\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Unlock\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"premium\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one benefit item (e.g., stories, videos, games, missions) is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Open Bible Stories library from Home and view a story detail page",
+    "description": "Verifies an authenticated user can reach the Stories library, open a story, and see its detail content.",
+    "category": "Bible Stories (Library)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/stories\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible story card"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Story detail page shows readable story content",
+    "description": "Verifies that opening a story displays a visible title and story content on the detail page.",
+    "category": "Bible Stories (Library)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible story card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/story/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Story title\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Return from story detail back to Stories list",
+    "description": "Verifies the user can navigate back from a story detail page to the Stories library page.",
+    "category": "Bible Stories (Library)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible story card"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Back\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/stories\""
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Stories library renders a grid/list of story cards",
+    "description": "Verifies the Stories page loads and shows multiple story cards for browsing.",
+    "category": "Bible Stories (Library)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Stories\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Story card\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Scroll the Stories library and open a story further down the list",
+    "description": "Verifies browsing by scrolling works and a story can be opened after scrolling.",
+    "category": "Bible Stories (Library)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the stories list"
+      },
+      {
+        "type": "action",
+        "description": "Click on a visible story card near the bottom of the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/story/\""
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Access Videos page after login",
+    "description": "Verifies an authenticated user can reach the Videos listing page from the app after logging in.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/videos\""
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Browse video cards by category on Videos page",
+    "description": "Verifies the Videos page shows categories and allows browsing within the curated video hub.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Videos\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"category filter\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Play a selected video from the Videos listing",
+    "description": "Verifies selecting a video from the curated list opens a player and the selected video loads.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible video card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video player\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"player controls\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Switch category and ensure video list updates",
+    "description": "Verifies changing the category on the Videos page updates the displayed set of video cards.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Select a different option from the category dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video cards\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Handle video load error with retry control",
+    "description": "Verifies that when a video fails to load, the user sees an error state and a retry control is presented.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on a video card that indicates a load failure or shows an error state (if present)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Error\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Retry\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Retry video load after an error state is shown",
+    "description": "Verifies clicking Retry from the video load error state attempts to reload and returns to a usable player state.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on a video card that indicates a load failure or shows an error state (if present)"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Retry\" control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video player\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Empty state when no videos match a selected category (if applicable)",
+    "description": "Verifies the UI provides a clear empty state when filtering results in no available videos.",
+    "category": "Curated Videos (Secure Media Hub)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Videos\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Select a category option that results in no videos (if available)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"No videos\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"video list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Access Games page from Home after login",
+    "description": "Verifies an authenticated user can reach the Games listing page and see available games.",
+    "category": "Educational Games",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/games\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Games\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Browse available games list and open a game details/start screen",
+    "description": "Verifies the Games page loads a list/grid of games and a user can open one game to start playing.",
+    "category": "Educational Games",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Puzzle\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Puzzle\" game card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Start\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Start Puzzle game and verify the game UI loads",
+    "description": "Verifies selecting Puzzle launches the game experience and shows interactive controls on-screen.",
+    "category": "Educational Games",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Puzzle\" game card"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Start\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Score\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Complete a game session and see a completion or score screen",
+    "description": "Verifies the user can finish a game flow and a completion/score state becomes visible.",
+    "category": "Educational Games",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Signs\" game card"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Start\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Completed\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "Verify in-game controls respond (pause/restart) without leaving the game",
+    "description": "Verifies a user can use common game controls and remains within the game experience.",
+    "category": "Educational Games",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sky Jump\" game card"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Start\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Pause\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Resume\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "Open Charades game and verify family-play prompt is shown",
+    "description": "Verifies the Charades game launches and shows its expected prompt/instructions for family play.",
+    "category": "Educational Games",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Games\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Charades\" game card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"How to play\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Start\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "Browse missions list and open a mission detail",
+    "description": "Verifies an authenticated user can view the missions list and open a mission’s detail page.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/missions\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the first mission in the missions list"
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "Complete one mission step and see progress update",
+    "description": "Verifies a user can mark a mission step as completed and see progress reflected on the mission detail page.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first mission in the missions list"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first incomplete mission step checkbox/button to mark it complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Completed\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "Complete multiple steps and verify progress increases",
+    "description": "Verifies mission progress updates as multiple steps are completed within the same mission.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first mission in the missions list"
+      },
+      {
+        "type": "action",
+        "description": "Click on a mission step checkbox/button to mark it complete"
+      },
+      {
+        "type": "action",
+        "description": "Click on another mission step checkbox/button to mark it complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"2\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "Mission detail shows steps list and progress indicator",
+    "description": "Verifies the mission detail page displays a visible list of steps and a visible progress indicator.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first mission in the missions list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Mission steps\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Progress\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Missions list page loads and shows available missions",
+    "description": "Verifies the missions list page renders a visible list of missions after login.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/missions\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Missions list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Mission\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Paywall handling when accessing Missions without an active subscription",
+    "description": "Verifies a logged-in non-subscribed user is redirected to the paywall when trying to access Missions.",
+    "category": "Daily Missions (Family Tasks)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Missions\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/paywall\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Subscription\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Access Devotional from Home and view daily prayer",
+    "description": "Verifies an authenticated user can open the Devotional page and see the daily prayer content.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Prayer\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a prayer text block is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "View verse of the day on Devotional page",
+    "description": "Verifies the Devotional page shows a verse of the day section and verse content is visible.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Verse\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a verse text block is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Navigate between devotional sections (forward navigation)",
+    "description": "Verifies the user can move to the next devotional section and see the section content change.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Devotional section title\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Next\" section button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Devotional section title\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "Navigate between devotional sections (back navigation)",
+    "description": "Verifies the user can return to a previous devotional section and see expected navigation controls.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Next\" section button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Previous\" section button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Devotional section content\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC038",
+    "title": "Devotional page renders key content areas without missing states",
+    "description": "Verifies the Devotional page displays the primary devotional areas (prayer and verse) on initial load.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Prayer\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Verse\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Login failure prevents access to Devotional content",
+    "description": "Verifies invalid login credentials do not grant access to protected devotional content.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"fake_user@example.com\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"wrong-password-123\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Invalid\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC040",
+    "title": "Devotional section navigation remains usable after scrolling",
+    "description": "Verifies that after scrolling the Devotional page, the user can still navigate to another devotional section.",
+    "category": "Devotional (Daily Prayer & Verses)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Devotional\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the Devotional page"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Next\" section button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Devotional section content\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Generate a personalized AI story and view the generated story detail",
+    "description": "Verifies a parent can generate a personalized story from the Stories page and reach the generated story detail view.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/stories\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Complete the personalization form and generate a story successfully",
+    "description": "Verifies the personalization form can be filled and generation succeeds, resulting in a visible story on a detail view.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Lia\" into the child name field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Generate\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "Generated story renders with readable content on the story detail page",
+    "description": "Verifies that after generation, the user sees a story detail view with visible story text content.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Generate\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/story/\""
+      }
+    ]
+  },
+  {
+    "id": "TC044",
+    "title": "Save a generated story to Favorites from the story detail page",
+    "description": "Verifies a user can save the generated story to Favorites and confirm it appears in the Favorites list.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Generate\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save to Favorites\""
+      }
+    ]
+  },
+  {
+    "id": "TC045",
+    "title": "Verify saved AI story is visible in Favorites list",
+    "description": "Verifies the Favorites page shows the saved story after the user saves it from the story detail view.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Generate\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save to Favorites\""
+      }
+    ]
+  },
+  {
+    "id": "TC046",
+    "title": "Prevent generation when required fields are empty",
+    "description": "Verifies validation prevents generation when required personalization inputs (e.g., child name) are missing and shows a visible validation message.",
+    "category": "Narrativas Inteligentes (Storyteller AI)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" / \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Stories\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Create Personalized Story\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Generate\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC047",
+    "title": "Admin can access admin panel entry and see admin landing UI",
+    "description": "Verifies an authenticated user can reach the Admin area and sees core admin navigation/landing elements.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Admin\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC048",
+    "title": "Admin sidebar navigation switches between content sections",
+    "description": "Verifies the admin sidebar can be used to navigate between different content management sections and the correct section content is shown.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Admin sidebar\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Stories\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC049",
+    "title": "Create a new content item from admin and see it listed",
+    "description": "Verifies an admin can create a new content item and the created item appears in the admin listing after save.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"New\" or \"Create\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Create\" or \"New Story\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC050",
+    "title": "Cancel creating a new content item does not add it to the list",
+    "description": "Verifies that backing out of the create form does not create a new item in the admin list.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"New\" or \"Create\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" or \"Back\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"New Story\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC051",
+    "title": "Edit an existing content item and see changes reflected in admin list/detail",
+    "description": "Verifies an admin can open an existing item, edit key fields, save, and see updated values reflected on screen.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first item in the stories list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Edit\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC052",
+    "title": "Toggle visibility/published state of a content item from admin list",
+    "description": "Verifies an admin can toggle a story's visibility/published state and sees an immediate visible state change in the UI.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Visibility\" or \"Published\" control is visible for a listed item"
+      },
+      {
+        "type": "action",
+        "description": "Click the visibility/published toggle for the first listed item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Published\" or \"Hidden\" is visible for that item"
+      }
+    ]
+  },
+  {
+    "id": "TC053",
+    "title": "Delete a content item from admin and verify it is removed from the list",
+    "description": "Verifies an admin can delete an item and it no longer appears in the admin list after confirmation.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Stories\" in the admin sidebar"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first item in the stories list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Delete\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Confirm\" or \"Are you sure\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC054",
+    "title": "Non-admin user is denied access to /admin (redirect or access denied)",
+    "description": "Verifies a non-admin authenticated user cannot access the Admin area and is redirected or shown an access denied message.",
+    "category": "Admin Panel (Content Management)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/home\" or \"/paywall\" or \"/landing\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Access denied\" or \"Not authorized\" is visible"
+      }
+    ]
+  }
+]

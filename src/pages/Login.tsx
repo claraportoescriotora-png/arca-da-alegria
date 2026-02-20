@@ -101,7 +101,7 @@ const Login = () => {
               className={`w-full h-full object-contain drop-shadow-md transition-opacity duration-300 ${logoUrl ? 'opacity-100' : 'opacity-0'}`}
             />
           </div>
-          <h1 className="text-2xl font-bold text-blue-600 text-center">Bem-vindo ao Meu Amiguito!</h1>
+          <a href="https://www.meuamiguito.com.br/landing" className="text-2xl font-bold text-blue-600 text-center hover:underline">Bem-vindo ao Meu Amiguito!</a>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -113,7 +113,6 @@ const Login = () => {
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onChange={(e) => setEmail(e.target.value)}
                 className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
               />
             </div>
@@ -124,7 +123,6 @@ const Login = () => {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 onChange={(e) => setPassword(e.target.value)}
                 className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
               />

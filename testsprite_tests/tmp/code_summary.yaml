@@ -1,0 +1,265 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - React 18
+  - Vite
+  - Tailwind CSS
+  - Supabase (Auth + Database + Storage)
+  - React Router v6
+  - Radix UI
+  - Lucide React Icons
+  - TanStack React Query
+routes:
+  - path: /
+    file: src/pages/Login.tsx
+    auth_required: false
+    description: User login page with Supabase Auth
+  - path: /landing
+    file: src/pages/Landing.tsx
+    auth_required: false
+    description: Public landing/sales page with product info and CTA buttons
+  - path: /paywall
+    file: src/pages/Paywall.tsx
+    auth_required: true
+    description: Subscription paywall for non-subscribers
+  - path: /home
+    file: src/pages/Home.tsx
+    auth_required: true
+    description: Main home dashboard showing all content categories
+  - path: /stories
+    file: src/pages/Stories.tsx
+    auth_required: true
+    description: Bible stories listing page
+  - path: /story/:id
+    file: src/pages/StoryDetail.tsx
+    auth_required: true
+    description: Individual bible story detail page
+  - path: /videos
+    file: src/pages/Videos.tsx
+    auth_required: true
+    description: Curated Christian videos listing page
+  - path: /games
+    file: src/pages/Games.tsx
+    auth_required: true
+    description: Educational games listing page
+  - path: /games/puzzle/:id
+    file: src/pages/games/PuzzleGame.tsx
+    auth_required: true
+    description: Biblical puzzle game
+  - path: /games/shepherd/:id
+    file: src/pages/games/ShepherdGame.tsx
+    auth_required: true
+    description: Good Shepherd sheep guiding game
+  - path: /games/sky-jump/:id
+    file: src/pages/games/SkyJumpGame.tsx
+    auth_required: true
+    description: Sky jump obstacle game
+  - path: /games/signs/:id
+    file: src/pages/games/SignsGame.tsx
+    auth_required: true
+    description: Signs of Jesus memory game
+  - path: /games/find-jesus/:id
+    file: src/pages/games/FindJesusGame.tsx
+    auth_required: true
+    description: Find Jesus maze game
+  - path: /games/rhythm/:id
+    file: src/pages/games/RhythmGame.tsx
+    auth_required: true
+    description: Rhythm and music game
+  - path: /games/charades/:id
+    file: src/pages/games/CharadesGame.tsx
+    auth_required: true
+    description: Charades family game
+  - path: /activities
+    file: src/pages/Activities.tsx
+    auth_required: true
+    description: Coloring and printable activities page
+  - path: /missions
+    file: src/pages/Missions.tsx
+    auth_required: true
+    description: Daily spiritual missions listing
+  - path: /missions/:id
+    file: src/pages/MissionDetail.tsx
+    auth_required: true
+    description: Individual mission detail and progress
+  - path: /devotional
+    file: src/pages/Devotional.tsx
+    auth_required: true
+    description: Daily devotional with prayers and verses
+  - path: /profile
+    file: src/pages/Profile.tsx
+    auth_required: true
+    description: User profile settings
+  - path: /favorites
+    file: src/pages/Favorites.tsx
+    auth_required: true
+    description: User favorite content list
+  - path: /notifications
+    file: src/pages/Notifications.tsx
+    auth_required: true
+    description: User notifications page
+  - path: /privacy
+    file: src/pages/Privacy.tsx
+    auth_required: true
+    description: Privacy policy page
+  - path: /help
+    file: src/pages/Help.tsx
+    auth_required: true
+    description: Help and support page
+  - path: /admin/*
+    file: src/pages/admin/Admin.tsx
+    auth_required: true
+    description: Admin dashboard with content management
+features:
+  - name: User Authentication
+    description: Login with email/password via Supabase Auth
+    files:
+      - src/pages/Login.tsx
+      - src/components/ProtectedRoute.tsx
+    entry_route: /
+    user_interactions:
+      - Fill email input field
+      - Fill password input field
+      - Click login button
+      - See error message on invalid credentials
+      - Redirect to /home on success
+    api_calls:
+      - method: POST
+        endpoint: supabase.auth.signInWithPassword
+    auth_required: false
+  - name: Landing Page
+    description: Public sales page with product info, carousels, and CTA buttons that scroll to offer
+    files:
+      - src/pages/Landing.tsx
+    entry_route: /landing
+    user_interactions:
+      - View hero section with product info
+      - Click CTA buttons to scroll to offer section
+      - Browse games carousel with navigation arrows
+      - Browse videos carousel with navigation arrows
+      - Click final purchase button to go to Kiwify payment page
+    api_calls: []
+    auth_required: false
+  - name: Bible Stories
+    description: Browse and read 70+ illustrated bible stories for children
+    files:
+      - src/pages/Stories.tsx
+      - src/pages/StoryDetail.tsx
+    entry_route: /stories
+    user_interactions:
+      - Browse story cards
+      - Click on a story to view details
+      - Read story content
+      - Navigate back to stories list
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('stories').select()
+    auth_required: true
+  - name: Curated Videos
+    description: Browse 215+ curated Christian videos for children
+    files:
+      - src/pages/Videos.tsx
+    entry_route: /videos
+    user_interactions:
+      - Browse video cards by category
+      - Click to watch a video
+      - Filter or search videos
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('videos').select()
+    auth_required: true
+  - name: Educational Games
+    description: 7 different educational games with biblical themes
+    files:
+      - src/pages/Games.tsx
+      - src/pages/games/PuzzleGame.tsx
+      - src/pages/games/ShepherdGame.tsx
+      - src/pages/games/SkyJumpGame.tsx
+      - src/pages/games/SignsGame.tsx
+      - src/pages/games/FindJesusGame.tsx
+      - src/pages/games/RhythmGame.tsx
+      - src/pages/games/CharadesGame.tsx
+    entry_route: /games
+    user_interactions:
+      - Browse available games
+      - Select and play a game
+      - Interact with game controls
+      - View score or completion
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('games').select()
+    auth_required: true
+  - name: Daily Missions
+    description: Spiritual missions for family prayer and action
+    files:
+      - src/pages/Missions.tsx
+      - src/pages/MissionDetail.tsx
+    entry_route: /missions
+    user_interactions:
+      - Browse available missions
+      - Select a mission to view details
+      - Mark mission steps as completed
+      - Track mission progress
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('missions').select()
+    auth_required: true
+  - name: Activities
+    description: Printable coloring activities for children
+    files:
+      - src/pages/Activities.tsx
+      - src/components/ActivityCard.tsx
+    entry_route: /activities
+    user_interactions:
+      - Browse activity cards
+      - Download or view activity PDFs
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('activities').select()
+    auth_required: true
+  - name: Devotional
+    description: Daily devotional with guided prayers and bible verses
+    files:
+      - src/pages/Devotional.tsx
+    entry_route: /devotional
+    user_interactions:
+      - View daily prayer
+      - Read verse of the day
+      - Navigate between devotional sections
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('devotionals').select()
+    auth_required: true
+  - name: Admin Panel
+    description: Content management for stories, videos, games, missions, and downloads
+    files:
+      - src/pages/admin/Admin.tsx
+      - src/pages/admin/AdminStories.tsx
+      - src/pages/admin/AdminVideos.tsx
+      - src/pages/admin/AdminGames.tsx
+      - src/pages/admin/AdminMissions.tsx
+      - src/pages/admin/AdminDownloads.tsx
+      - src/pages/admin/AdminAgent.tsx
+    entry_route: /admin
+    user_interactions:
+      - Navigate admin sidebar
+      - Create new content items
+      - Edit existing content
+      - Delete content items
+      - Toggle content visibility
+    api_calls:
+      - method: POST
+        endpoint: supabase.from('stories').insert()
+      - method: PATCH
+        endpoint: supabase.from('stories').update()
+      - method: DELETE
+        endpoint: supabase.from('stories').delete()
+    auth_required: true
+known_limitations:
+  - issue: App requires Supabase backend connection for authentication and data
+    location: src/lib/supabase.ts
+    impact: All protected routes need valid Supabase credentials and active connection
+  - issue: Subscription check guards most routes
+    location: src/components/SubscriptionGuard.tsx
+    impact: Non-subscribed users are redirected to /paywall even if authenticated

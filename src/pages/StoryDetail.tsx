@@ -227,29 +227,29 @@ export default function StoryDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between">
+        <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between pointer-events-none">
           <button
             onClick={() => {
               window.speechSynthesis.cancel();
               navigate(-1);
             }}
-            className="p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors"
+            className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all pointer-events-auto active:scale-95"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6 text-slate-700" />
           </button>
 
-          <div className="flex gap-2">
-            <button className="p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors">
-              <Share2 className="w-5 h-5" />
+          <div className="flex gap-3 pointer-events-auto">
+            <button className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all active:scale-95">
+              <Share2 className="w-6 h-6 text-slate-700" />
             </button>
             <button
               onClick={() => toggleFavorite(story.id, 'story')}
-              className={`p-2 rounded-full transition-colors ${favorite
+              className={`p-3 rounded-full shadow-lg transition-all active:scale-95 ${favorite
                 ? 'bg-danger text-white'
-                : 'bg-card/80 backdrop-blur-sm hover:bg-card'
+                : 'bg-white/90 backdrop-blur-md hover:bg-white text-slate-700'
                 }`}
             >
-              <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} />
+              <Heart className={`w-6 h-6 ${favorite ? 'fill-current' : ''}`} />
             </button>
           </div>
         </div>

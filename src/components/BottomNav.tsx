@@ -14,7 +14,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed bottom-6 left-1/2 z-50 flex h-16 w-[calc(100%-3rem)] max-w-md -translate-x-1/2 items-center justify-between rounded-full bg-[hsl(var(--bottom-nav))] px-6 shadow-2xl"
+      className="fixed bottom-0 left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-[hsl(var(--bottom-nav))] px-8 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] border-t border-border/50"
     >
       {navItems.map(({ path, icon, label }) => {
         const isActive = location.pathname === path;

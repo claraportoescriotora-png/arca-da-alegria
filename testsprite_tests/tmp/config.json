@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8080",
+  "executionArgs": {
+    "projectName": "Arca da Alegria - Aplicativo Infantil Cristão",
+    "projectPath": "c:\\Users\\Braga\\Desktop\\Arca da Alegria - Aplicativo Infantil Cristão",
+    "testIds": [],
+    "additionalInstruction": "IMPORTANT: The app is now deployed at https://arca-da-alegria.vercel.app (NOT localhost). Use the production URL for all tests. For login/authentication, use these REAL credentials: Email: teste@testsprite.com / Password: Teste123! — The login page is at the root path /. The landing/sales page is at /landing. After successful login with an active subscription, the user is redirected to /home. The app uses Portuguese (Brazilian). The login button text is \"Entrar\" and input placeholders are \"seu@email.com\" and \"Sua senha\".",
+    "envs": {
+      "API_KEY": "sk-user-SDUr6nJMx0Vz1SmF_USoNLa5RrpR8X0u9HJvObnc30V7BQUiJUIln45R1MJnvLrusmQiRFRyP_jtPNylHZjiDjE4xMB7MGt-9Ut5rNFMSjN98M0W1VN8DVA7i7JSa_e_rBg"
+    }
+  },
+  "serverPort": 60012,
+  "proxy": "http://9a30a03e-9260-48af-aaa3-23289b1708d4:n5N8AJxHyz18Vk4yxtS86wfyaICzAAmb@tun.testsprite.com:8080"
+}

@@ -45,12 +45,35 @@ const categories = [
 export default function Devotional() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [selectedStart, setSelectedStart] = useState("");
   const [selectedMiddle, setSelectedMiddle] = useState("");
   const [selectedEnd, setSelectedEnd] = useState("");
   const [showPrayerModal, setShowPrayerModal] = useState(false);
-  const [currentPrayer, setCurrentPrayer] = useState<{title: string, text: string} | null>(null);
+  const [currentPrayer, setCurrentPrayer] = useState<{ title: string, text: string } | null>(null);
+  const [dailyVerse, setDailyVerse] = useState<{ text: string, ref: string } | null>(null);
+
+  useEffect(() => {
+    fetchDailyVerse();
+  }, []);
+
+  const fetchDailyVerse = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('daily_verses')
+        .select('verse_text, reference')
+        .order('active_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setDailyVerse({ text: data.verse_text, ref: data.reference });
+      }
+    } catch (err) {
+      console.error('Error fetching verse:', err);
+    }
+  };
 
   const handleCreatePrayer = () => {
     if (!selectedStart || !selectedMiddle || !selectedEnd) {
@@ -61,11 +84,11 @@ export default function Devotional() {
       });
       return;
     }
-    
+
     const fullPrayer = `${selectedStart} ${selectedMiddle} ${selectedEnd}`;
     setCurrentPrayer({ title: "Sua Oração Especial", text: fullPrayer });
     setShowPrayerModal(true);
-    
+
     // Confetti effect or success sound could go here
     toast({
       title: "Que lindo! ✨",
@@ -79,12 +102,12 @@ export default function Devotional() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <header className="sticky top-0 z-40 glass border-b border-border">
         <div className="container max-w-md mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="p-2 rounded-full bg-card hover:bg-muted transition-colors"
             >
@@ -96,7 +119,28 @@ export default function Devotional() {
       </header>
 
       <main className="container max-w-md mx-auto px-4 py-6 space-y-8">
-        
+
+        {/* Seção 0: Versículo do Dia */}
+        {dailyVerse && (
+          <section className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 shadow-xl text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-white/20 rounded-lg">
+                  <Sparkles className="w-4 h-4 text-yellow-300" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest text-white/80">Versículo do Dia</span>
+              </div>
+              <p className="text-lg font-medium italic mb-4 leading-relaxed">
+                "{dailyVerse.text}"
+              </p>
+              <p className="text-sm font-bold text-right text-indigo-100">
+                — {dailyVerse.ref}
+              </p>
+            </div>
+          </section>
+        )}
+
         {/* Seção 1: Monte Sua Oração */}
         <section className="bg-card rounded-3xl p-6 shadow-sm border-2 border-primary/10">
           <div className="flex items-center gap-2 mb-4">
@@ -114,11 +158,10 @@ export default function Devotional() {
                   <button
                     key={text}
                     onClick={() => setSelectedStart(text)}
-                    className={`p-3 rounded-xl text-left text-sm transition-all ${
-                      selectedStart === text 
-                        ? 'bg-primary text-white shadow-md scale-[1.02]' 
+                    className={`p-3 rounded-xl text-left text-sm transition-all ${selectedStart === text
+                        ? 'bg-primary text-white shadow-md scale-[1.02]'
                         : 'bg-muted/50 hover:bg-muted text-foreground'
-                    }`}
+                      }`}
                   >
                     {text}
                   </button>
@@ -134,11 +177,10 @@ export default function Devotional() {
                   <button
                     key={text}
                     onClick={() => setSelectedMiddle(text)}
-                    className={`p-3 rounded-xl text-left text-sm transition-all ${
-                      selectedMiddle === text 
-                        ? 'bg-secondary text-white shadow-md scale-[1.02]' 
+                    className={`p-3 rounded-xl text-left text-sm transition-all ${selectedMiddle === text
+                        ? 'bg-secondary text-white shadow-md scale-[1.02]'
                         : 'bg-muted/50 hover:bg-muted text-foreground'
-                    }`}
+                      }`}
                   >
                     {text}
                   </button>
@@ -154,11 +196,10 @@ export default function Devotional() {
                   <button
                     key={text}
                     onClick={() => setSelectedEnd(text)}
-                    className={`p-3 rounded-xl text-left text-sm transition-all ${
-                      selectedEnd === text 
-                        ? 'bg-accent text-white shadow-md scale-[1.02]' 
+                    className={`p-3 rounded-xl text-left text-sm transition-all ${selectedEnd === text
+                        ? 'bg-accent text-white shadow-md scale-[1.02]'
                         : 'bg-muted/50 hover:bg-muted text-foreground'
-                    }`}
+                      }`}
                   >
                     {text}
                   </button>
@@ -167,7 +208,7 @@ export default function Devotional() {
             </div>
           </div>
 
-          <Button 
+          <Button
             onClick={handleCreatePrayer}
             className="w-full mt-8 h-12 text-lg font-fredoka bg-gradient-to-r from-primary to-purple-500 hover:opacity-90 transition-opacity rounded-xl shadow-lg"
           >

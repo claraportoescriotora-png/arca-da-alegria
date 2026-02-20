@@ -243,21 +243,28 @@ export default function SignsGame() {
                     <div className="w-full max-w-lg">
                         {/* HUD */}
                         <div className="flex items-center justify-between mb-6 px-4">
-                            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm text-slate-700 font-bold">
-                                <span>🔄 {moves}</span>
+                            <div className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-2xl shadow-sm text-slate-700 font-bold border border-slate-100">
+                                <span className="text-indigo-500">🔄</span>
+                                <span>{moves}</span>
                             </div>
-                            {getConfig(difficulty).timeLimit > 0 && (
-                                <div className={cn("flex items-center gap-2 px-4 py-2 rounded-full shadow-sm font-bold transition-colors",
-                                    timer < 10 ? "bg-red-100 text-red-600" : "bg-white text-slate-700")}>
-                                    <Clock className="w-4 h-4" />
-                                    <span>{Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
-                                </div>
-                            )}
+
+                            <button
+                                onClick={() => setGameState('menu')}
+                                className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-2xl shadow-sm text-slate-700 font-bold border border-slate-100 hover:bg-slate-50 transition-colors"
+                            >
+                                ⏸️ Pause
+                            </button>
+
+                            <div className={cn("flex items-center gap-2 px-5 py-2.5 rounded-2xl shadow-sm font-bold border transition-all",
+                                timer < 10 && timer > 0 ? "bg-red-50 text-red-600 border-red-200 animate-pulse" : "bg-white text-slate-700 border-slate-100")}>
+                                <Clock className="w-4 h-4 text-indigo-500" />
+                                <span>{Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
+                            </div>
                         </div>
 
                         {/* Grid */}
                         <div
-                            className="grid gap-3 mx-auto px-2"
+                            className="grid gap-3 mx-auto px-2 perspective-1000"
                             style={{
                                 gridTemplateColumns: `repeat(${getConfig(difficulty).cols}, 1fr)`,
                             }}
@@ -267,7 +274,7 @@ export default function SignsGame() {
                                     key={card.id + '-' + index}
                                     onClick={() => handleCardClick(index)}
                                     className={cn(
-                                        "aspect-[3/4] rounded-xl shadow-sm transition-all duration-500 transform perspective-1000 relative preserve-3d",
+                                        "aspect-[3/4] rounded-xl shadow-sm transition-all duration-500 transform relative preserve-3d",
                                         "hover:scale-[1.02] active:scale-95 focus:outline-none",
                                         card.isFlipped || card.isMatched ? "rotate-y-180" : ""
                                     )}
