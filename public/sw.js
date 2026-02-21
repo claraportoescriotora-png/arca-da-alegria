@@ -1,40 +1,15 @@
 
-const CACHE_NAME = 'amiguitos-v3'; // Increased to force update for PWA asset fixes
+const CACHE_NAME = 'amiguitos-v4'; // Increased to v4 for media fix
 
 // Asset types to cache
 const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/manifest.json',
-    '/logo/meu-amiguito.webp',
     '/favicon.svg'
 ];
 
-// Install Event
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(PRECACHE_ASSETS);
-        })
-    );
-    self.skipWaiting();
-});
-
-// Activate Event
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        return caches.delete(cache);
-                    }
-                })
-            );
-        })
-    );
-    return self.clients.claim();
-});
+// ... (install/activate same)
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
@@ -47,16 +22,12 @@ self.addEventListener('fetch', (event) => {
         url.hostname.includes('supabase.co') ||
         event.request.method !== 'GET'
     ) {
-        return; // Always network for these
+        return; // Always network
     }
 
-    // Bypass SW for external media and Supabase Storage to avoid CORS/Cache issues on mobile
-    const isExternalMedia = url.hostname.includes('ytimg.com') ||
-        url.hostname.includes('unsplash.com') ||
-        url.hostname.includes('supabase.co');
-
-    if (isExternalMedia) {
-        console.log('SW: Bypassing cache for external media:', url.href);
+    // Bypass SW for YouTube thumbnails to avoid opaque response caching issues
+    const isYouTubeThumb = url.hostname.includes('ytimg.com');
+    if (isYouTubeThumb) {
         return; // Let browser handle normally
     }
 

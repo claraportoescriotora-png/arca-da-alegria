@@ -45,25 +45,26 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
 
   // PRIORITY: Always use YouTube's own thumbnails for videos to keep the app light.
   // We ignore the 'thumbnail' prop if it's a video and we have a videoId.
-  const primaryThumbnail = videoId
+  // IMPROVEMENT: If videoId exists, we generate the YouTube URL immediately to avoid flashes.
+  const [imageSrc, setImageSrc] = useState(videoId
     ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-    : (thumbnail || '');
+    : (thumbnail || ''));
+  const [isImageFinal, setIsImageFinal] = useState(false);
 
   const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
-    const currentId = videoId;
-    if (!currentId) return;
+    if (!videoId) return;
 
     // Progressive fallback: hqdefault -> mqdefault -> sddefault -> default
     if (target.src.includes('hqdefault')) {
-      target.src = `https://img.youtube.com/vi/${currentId}/mqdefault.jpg`;
+      setImageSrc(`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`);
     } else if (target.src.includes('mqdefault')) {
-      target.src = `https://img.youtube.com/vi/${currentId}/sddefault.jpg`;
+      setImageSrc(`https://img.youtube.com/vi/${videoId}/sddefault.jpg`);
     } else if (target.src.includes('sddefault')) {
-      target.src = `https://img.youtube.com/vi/${currentId}/default.jpg`;
+      setImageSrc(`https://img.youtube.com/vi/${videoId}/default.jpg`);
     } else {
       // Last resort: standard biblically themed fallback
-      target.src = 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp';
+      setImageSrc('https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp');
     }
   };
 
@@ -73,11 +74,12 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
         <div
           className="relative bg-card rounded-2xl overflow-hidden shadow-md card-hover cursor-pointer group"
         >
-          <div className="aspect-video overflow-hidden relative">
+          <div className="aspect-video overflow-hidden relative bg-muted animate-pulse">
             <img
-              src={primaryThumbnail}
+              src={imageSrc}
               alt={title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onLoad={() => setIsImageFinal(true)}
+              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${isImageFinal ? 'opacity-100' : 'opacity-0'}`}
               onError={handleThumbnailError}
             />
 
