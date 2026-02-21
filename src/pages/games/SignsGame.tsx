@@ -10,8 +10,6 @@ type SymbolType = 'cross' | 'dove' | 'heart' | 'star' | 'rainbow' | 'light' | 'b
 interface Card {
     id: number;
     symbol: SymbolType;
-    isFlipped: boolean;
-    isMatched: boolean;
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -33,8 +31,10 @@ export default function SignsGame() {
     const [countdown, setCountdown] = useState<number | null>(null);
     const [timer, setTimer] = useState(0);
     const [moves, setMoves] = useState(0);
-    const [flippedCards, setFlippedCards] = useState<number[]>([]);
+    const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
+    const [matchedIndices, setMatchedIndices] = useState<Set<number>>(new Set());
     const [isChecking, setIsChecking] = useState(false);
+    const [isPreview, setIsPreview] = useState(false);
 
     // Config based on difficulty
     const getConfig = (diff: Difficulty) => {
@@ -62,16 +62,16 @@ export default function SignsGame() {
 
         const newCards = deck.map((symbol, index) => ({
             id: index,
-            symbol,
-            isFlipped: true, // Start flipped for preview
-            isMatched: false
+            symbol
         }));
 
         setCards(newCards);
-        setGameState('preview');
+        setGameState('playing'); // Set to playing to show HUD
+        setIsPreview(true); // Flag for preview mode
         setTimer(config.timeLimit > 0 ? config.timeLimit : 0);
         setMoves(0);
-        setFlippedCards([]);
+        setFlippedIndices([]);
+        setMatchedIndices(new Set());
         setCountdown(3);
         setIsChecking(false);
 
@@ -80,11 +80,9 @@ export default function SignsGame() {
             setCountdown(prev => {
                 if (prev === null || prev <= 1) {
                     clearInterval(countdownInterval);
-                    // Start Game after countdown
                     setTimeout(() => {
                         setCountdown(null);
-                        setCards(curr => curr.map(c => ({ ...c, isFlipped: false })));
-                        setGameState('playing');
+                        setIsPreview(false); // Hide all cards
                     }, 1000);
                     return prev !== null ? 0 : null;
                 }
@@ -93,87 +91,52 @@ export default function SignsGame() {
         }, 1000);
     };
 
-    // --- Game Logic ---
-    useEffect(() => {
-        if (gameState !== 'playing') return;
+    const handleCardClick = (index: number) => {
+        // Prevents: clicks during preview, checking, or when card is already flipped/matched
+        if (gameState !== 'playing' || isPreview || isChecking) return;
+        if (matchedIndices.has(index) || flippedIndices.includes(index)) return;
+        if (flippedIndices.length >= 2) return;
 
-        // Timer
-        const config = getConfig(difficulty);
-        if (config.timeLimit > 0) {
-            const interval = setInterval(() => {
-                setTimer(t => {
-                    if (t <= 1) {
-                        clearInterval(interval);
-                        setGameState('gameover');
-                        return 0;
-                    }
-                    return t - 1;
-                });
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [gameState, difficulty]);
+        // 1. Flip card immediately
+        const newFlipped = [...flippedIndices, index];
+        setFlippedIndices(newFlipped);
 
-    // NEW Match Logic Effect
-    useEffect(() => {
-        if (flippedCards.length !== 2 || isChecking) return;
-
-        const handleMatch = async () => {
+        // 2. Check match if two cards are flipped
+        if (newFlipped.length === 2) {
             setIsChecking(true);
             setMoves(m => m + 1);
 
-            const [firstIndex, secondIndex] = flippedCards;
+            const [firstIndex, secondIndex] = newFlipped;
             const firstCard = cards[firstIndex];
             const secondCard = cards[secondIndex];
 
             if (firstCard.symbol === secondCard.symbol) {
-                // Match!
-                setCards(prev => prev.map((c, i) =>
-                    (i === firstIndex || i === secondIndex) ? { ...c, isMatched: true, isFlipped: true } : c
-                ));
-                setFlippedCards([]);
-                setIsChecking(false);
-
-                // Check Win Logic relocated to check cards state after update
-            } else {
-                // No match - Wait 1s then unflip
+                // MATCH FOUND
                 setTimeout(() => {
-                    setCards(prev => prev.map((c, i) => {
-                        if (i === firstIndex || i === secondIndex) {
-                            return { ...c, isFlipped: false };
+                    setMatchedIndices(prev => {
+                        const next = new Set(prev);
+                        next.add(firstIndex);
+                        next.add(secondIndex);
+
+                        // Check Victory within the state update to be accurate
+                        if (next.size === cards.length) {
+                            setGameState('victory');
+                            addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
                         }
-                        return c;
-                    }));
-                    setFlippedCards([]);
+
+                        return next;
+                    });
+                    setFlippedIndices([]);
                     setIsChecking(false);
-                }, 1000);
+                }, 500); // Small pause to show the second card
+            } else {
+                // NO MATCH
+                setTimeout(() => {
+                    setFlippedIndices([]);
+                    setIsChecking(false);
+                }, 1000); // 1s to memorize
             }
-        };
-
-        handleMatch();
-    }, [flippedCards, cards, isChecking]);
-
-    // Win check effect
-    useEffect(() => {
-        if (gameState === 'playing' && cards.length > 0 && cards.every(c => c.isMatched)) {
-            setTimeout(() => {
-                setGameState('victory');
-                addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
-            }, 500);
         }
-    }, [cards, gameState, difficulty, addXp]);
-
-    const handleCardClick = (index: number) => {
-        if (gameState !== 'playing' || isChecking) return;
-        if (cards[index].isMatched || cards[index].isFlipped) return;
-        if (flippedCards.length >= 2) return;
-
-        // Flip card immediately for visual responsiveness
-        setCards(curr => curr.map((c, i) =>
-            i === index ? { ...c, isFlipped: true } : c
-        ));
-
-        setFlippedCards(prev => [...prev, index]);
     };
 
     // --- Render Helpers ---
@@ -335,14 +298,14 @@ export default function SignsGame() {
                                     className={cn(
                                         "aspect-square rounded-xl shadow-sm transition-all duration-500 transform relative preserve-3d max-h-24",
                                         "hover:scale-[1.02] active:scale-95 focus:outline-none",
-                                        card.isFlipped || card.isMatched ? "rotate-y-180" : ""
+                                        (isPreview || flippedIndices.includes(index) || matchedIndices.has(index)) ? "rotate-y-180" : ""
                                     )}
                                 >
                                     {/* Front (Symbol) - content is flipped 180 */}
                                     <div
                                         className={cn(
                                             "absolute inset-0 backface-hidden rounded-xl flex items-center justify-center border-2",
-                                            card.isMatched ? "bg-green-50 border-green-200 shadow-green-100" : "bg-white border-white",
+                                            matchedIndices.has(index) ? "bg-green-50 border-green-200 shadow-green-100" : "bg-white border-white",
                                             "rotate-y-180"
                                         )}
                                         style={{ transform: "rotateY(180deg)" }}
