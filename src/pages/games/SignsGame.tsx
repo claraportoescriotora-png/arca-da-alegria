@@ -29,11 +29,12 @@ export default function SignsGame() {
     // Game State
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
     const [cards, setCards] = useState<Card[]>([]);
-    const [gameState, setGameState] = useState<'menu' | 'preview' | 'playing' | 'gameover' | 'victory'>('menu');
+    const [gameState, setGameState] = useState<'menu' | 'preview' | 'playing' | 'gameover' | 'victory' | 'paused'>('menu');
     const [countdown, setCountdown] = useState<number | null>(null);
     const [timer, setTimer] = useState(0);
     const [moves, setMoves] = useState(0);
     const [flippedCards, setFlippedCards] = useState<number[]>([]);
+    const [isChecking, setIsChecking] = useState(false);
 
     // Config based on difficulty
     const getConfig = (diff: Difficulty) => {
@@ -72,6 +73,7 @@ export default function SignsGame() {
         setMoves(0);
         setFlippedCards([]);
         setCountdown(3);
+        setIsChecking(false);
 
         // Countdown logic
         const countdownInterval = setInterval(() => {
@@ -112,25 +114,17 @@ export default function SignsGame() {
         }
     }, [gameState, difficulty]);
 
-    const handleCardClick = (index: number) => {
-        if (gameState !== 'playing') return;
-        if (cards[index].isMatched || cards[index].isFlipped) return;
-        if (flippedCards.length >= 2) return;
+    // NEW Match Logic Effect
+    useEffect(() => {
+        if (flippedCards.length !== 2 || isChecking) return;
 
-        // Flip card
-        setCards(curr => curr.map((c, i) =>
-            i === index ? { ...c, isFlipped: true } : c
-        ));
-
-        const newFlipped = [...flippedCards, index];
-        setFlippedCards(newFlipped);
-
-        // Check match
-        if (newFlipped.length === 2) {
+        const handleMatch = async () => {
+            setIsChecking(true);
             setMoves(m => m + 1);
-            const [firstIndex, secondIndex] = newFlipped;
+
+            const [firstIndex, secondIndex] = flippedCards;
             const firstCard = cards[firstIndex];
-            const secondCard = cards[index]; // Use current index for second card
+            const secondCard = cards[secondIndex];
 
             if (firstCard.symbol === secondCard.symbol) {
                 // Match!
@@ -138,18 +132,11 @@ export default function SignsGame() {
                     (i === firstIndex || i === secondIndex) ? { ...c, isMatched: true, isFlipped: true } : c
                 ));
                 setFlippedCards([]);
+                setIsChecking(false);
 
-                // Play sound effect (optional/future)
-
-                // Check Win
-                if (newCards.every(c => c.isMatched)) {
-                    setTimeout(() => {
-                        setGameState('victory');
-                        addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
-                    }, 500);
-                }
+                // Check Win Logic relocated to check cards state after update
             } else {
-                // No match
+                // No match - Wait 1s then unflip
                 setTimeout(() => {
                     setCards(prev => prev.map((c, i) => {
                         if (i === firstIndex || i === secondIndex) {
@@ -158,9 +145,35 @@ export default function SignsGame() {
                         return c;
                     }));
                     setFlippedCards([]);
+                    setIsChecking(false);
                 }, 1000);
             }
+        };
+
+        handleMatch();
+    }, [flippedCards, cards, isChecking]);
+
+    // Win check effect
+    useEffect(() => {
+        if (gameState === 'playing' && cards.length > 0 && cards.every(c => c.isMatched)) {
+            setTimeout(() => {
+                setGameState('victory');
+                addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
+            }, 500);
         }
+    }, [cards, gameState, difficulty, addXp]);
+
+    const handleCardClick = (index: number) => {
+        if (gameState !== 'playing' || isChecking) return;
+        if (cards[index].isMatched || cards[index].isFlipped) return;
+        if (flippedCards.length >= 2) return;
+
+        // Flip card immediately for visual responsiveness
+        setCards(curr => curr.map((c, i) =>
+            i === index ? { ...c, isFlipped: true } : c
+        ));
+
+        setFlippedCards(prev => [...prev, index]);
     };
 
     // --- Render Helpers ---
@@ -292,10 +305,10 @@ export default function SignsGame() {
                             </div>
 
                             <button
-                                onClick={() => setGameState('menu')}
+                                onClick={() => setGameState('paused')}
                                 className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-2xl shadow-sm text-slate-700 font-bold border border-slate-100 hover:bg-slate-50 transition-colors"
                             >
-                                ⏸️ Pause
+                                ⏸️ Pausar
                             </button>
 
                             <div className={cn("flex items-center gap-2 px-5 py-2.5 rounded-2xl shadow-sm font-bold border transition-all",
@@ -377,6 +390,28 @@ export default function SignsGame() {
                         <button onClick={() => setGameState('menu')} className="w-full py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl shadow-md transition-transform active:scale-95 text-lg">
                             Tentar Novamente
                         </button>
+                    </div>
+                )}
+
+                {/* Pause Overlay */}
+                {gameState === 'paused' && (
+                    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-sm w-full animate-in zoom-in-95">
+                            <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl">⏸️</span>
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-2 font-fredoka">Jogo Pausado</h2>
+                            <p className="text-slate-500 mb-8 font-medium">Deseja continuar brincando?</p>
+
+                            <div className="space-y-3">
+                                <button onClick={() => setGameState('playing')} className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-md transition-transform active:scale-95 text-lg">
+                                    Continuar
+                                </button>
+                                <button onClick={() => setGameState('menu')} className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl shadow-md transition-transform active:scale-95 text-lg">
+                                    Sair do Jogo
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 
