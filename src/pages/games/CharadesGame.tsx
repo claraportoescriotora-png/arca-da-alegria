@@ -14,9 +14,13 @@ interface CardData {
     id: number;
     category: 'animals' | 'people' | 'objects' | 'fruits';
     text: string;
+    icon?: string;
     isSpecial?: boolean;
     specialAction?: string;
 }
+
+// --- Types ---
+type Category = 'animals' | 'people' | 'objects' | 'fruits';
 
 const CARDS: CardData[] = [
     // --- ANIMALS (40) ---

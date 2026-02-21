@@ -147,30 +147,23 @@ export default function FindJesusGame() {
         if (level > 1) {
             for (let y = 1; y < size - 1; y += 2) {
                 for (let x = 1; x < size - 1; x += 2) {
-                    if (newGrid[y][x].type === 'path') {
-                        let pathNeighbors = 0;
-                        for (const { dx, dy } of directions) {
-                            if (newGrid[y + dy / 2]?.[x + dx / 2]?.type !== 'wall') pathNeighbors++;
-                        }
-                        // If dead end or just random (for difficulty)
-                        const chance = level > 5 ? 0.3 : 0.1;
-                        if (pathNeighbors === 1 || Math.random() < chance) {
-                            const potentialBreaks = directions.filter(({ dx, dy }) => {
-                                const nx = x + dx;
-                                const ny = y + dy;
-                                return nx > 0 && nx < size - 1 && ny > 0 && ny < size - 1 && newGrid[ny][nx].type === 'path';
-                            });
-                            if (potentialBreaks.length > 0) {
-                                const brk = potentialBreaks[Math.floor(Math.random() * potentialBreaks.length)];
-                                newGrid[y + brk.dy / 2][x + brk.dx / 2].type = 'path';
-                            }
+                    const chance = level > 5 ? 0.3 : 0.1;
+                    if (Math.random() < chance) {
+                        const potentialBreaks = directions.filter(({ dx, dy }) => {
+                            const nx = x + dx;
+                            const ny = y + dy;
+                            return nx > 0 && nx < size - 1 && ny > 0 && ny < size - 1 && newGrid[ny][nx].type === 'wall';
+                        });
+                        if (potentialBreaks.length > 0) {
+                            const brk = potentialBreaks[Math.floor(Math.random() * potentialBreaks.length)];
+                            newGrid[y + brk.dy / 2][x + brk.dx / 2].type = 'path';
                         }
                     }
                 }
             }
         }
 
-        // 4. Place End
+        // 4. Place End and ensure basic path
         let endX = size - 2;
         let endY = size - 2;
         while (newGrid[endY][endX].type !== 'path') {
@@ -178,77 +171,67 @@ export default function FindJesusGame() {
             if (endX < 1) { endX = size - 2; endY--; }
         }
         newGrid[endY][endX].type = 'end';
+        newGrid[1][1].type = 'start';
 
-        // 5. Place Traps (Sin) - INTERCEPTING THE PATH
-        if (level >= 3) {
-            // Calculate solution path first
-            let pathToEnd = getPath(newGrid, { x: 1, y: 1 }, 'end');
+        // 5. Place Key and Door on the main path
+        let pathToEnd = getPath(newGrid, { x: 1, y: 1 }, 'end');
 
-            if (pathToEnd && pathToEnd.length > 5) {
-                // Determine number of traps based on level
-                const trapCount = Math.floor(level / 2);
+        if (level >= 5 && pathToEnd && pathToEnd.length > 10) {
+            // Place Door as a bottleneck near the end
+            const doorIdx = Math.floor(pathToEnd.length * 0.7);
+            const doorPos = pathToEnd[doorIdx];
+            newGrid[doorPos.y][doorPos.x].type = 'door';
+            newGrid[doorPos.y][doorPos.x].open = false;
 
-                for (let i = 0; i < trapCount; i++) {
-                    // Recalculate path each time because config changes
-                    pathToEnd = getPath(newGrid, { x: 1, y: 1 }, 'end');
-                    if (!pathToEnd) break;
-
-                    // Pick a spot in the middle 50% of the path
-                    const pathIdx = Math.floor(pathToEnd.length * (0.3 + Math.random() * 0.4));
-                    const trapPos = pathToEnd[pathIdx];
-
-                    // Don't place trap on start/end/neighbors of start
-                    if (trapPos && trapPos.x + trapPos.y > 4) {
-                        newGrid[trapPos.y][trapPos.x].type = 'sin';
-
-                        // CRITICAL: ENSURE BYPASS
-                        // Check if still solvable. If not, carve a detour.
-                        if (!getPath(newGrid, { x: 1, y: 1 }, 'end')) {
-                            // Carve detour: Find neighbors of trapPos that are walls, turn one into path connecting to existing path
-                            // Simple: Blast clear neighbors
-                            const neighbors = [
-                                { x: trapPos.x + 1, y: trapPos.y }, { x: trapPos.x - 1, y: trapPos.y },
-                                { x: trapPos.x, y: trapPos.y + 1 }, { x: trapPos.x, y: trapPos.y - 1 }
-                            ];
-                            for (const n of neighbors) {
-                                if (n.x > 0 && n.x < size - 1 && n.y > 0 && n.y < size - 1 && newGrid[n.y][n.x].type === 'wall') {
-                                    newGrid[n.y][n.x].type = 'path';
-                                    // Just opening one might not be enough if it leads to sealed area, 
-                                    // but with braided loops it usually works. 
-                                    // To be safe, we open diagonals too? No, let's keep it simple.
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 6. Keys and Doors
-        if (level >= 5) { // Moved to level 5 for better difficulty curve
-            // ... logic same as before but ensured persistence
-            // For now simplified logic
+            // Place Key: MUST be reachable from start WITHOUT passing through the door
+            // We verify reachability after placing
             let keyPlaced = false;
-            while (!keyPlaced) {
+            let attempts = 0;
+            while (!keyPlaced && attempts < 100) {
                 const kx = Math.floor(Math.random() * (size - 2)) + 1;
                 const ky = Math.floor(Math.random() * (size - 2)) + 1;
-                if (newGrid[ky][kx].type === 'path') {
+                if (newGrid[ky][kx].type === 'path' && (kx + ky > 6) && (kx !== doorPos.x || ky !== doorPos.y)) {
+                    const originalType = newGrid[ky][kx].type;
                     newGrid[ky][kx].type = 'key';
-                    keyPlaced = true;
+
+                    // Logic check: Is key reachable from [1,1]?
+                    // We temporarily treat door as wall for this check
+                    const tempGrid = newGrid.map(row => row.map(c => ({ ...c })));
+                    tempGrid[doorPos.y][doorPos.x].type = 'wall';
+                    if (getPath(tempGrid, { x: 1, y: 1 }, 'key')) {
+                        keyPlaced = true;
+                    } else {
+                        newGrid[ky][kx].type = originalType;
+                    }
                 }
-            }
-            // Door near end
-            const endNeighbors = [{ x: endX - 1, y: endY }, { x: endX, y: endY - 1 }];
-            for (const n of endNeighbors) { // simplified check
-                if (newGrid[n.y]?.[n.x]?.type === 'path') {
-                    newGrid[n.y][n.x].type = 'door';
-                    newGrid[n.y][n.x].open = false;
-                    break;
-                }
+                attempts++;
             }
         }
 
-        newGrid[1][1].type = 'start';
+        // 6. Place Traps (Sin)
+        if (level >= 3) {
+            const trapCount = Math.floor(level / 2);
+            let trapsPlaced = 0;
+            let attempts = 0;
+            while (trapsPlaced < trapCount && attempts < 100) {
+                const tx = Math.floor(Math.random() * (size - 2)) + 1;
+                const ty = Math.floor(Math.random() * (size - 2)) + 1;
+                if (newGrid[ty][tx].type === 'path' && (tx + ty > 8)) {
+                    const originalType = newGrid[ty][tx].type;
+                    newGrid[ty][tx].type = 'sin';
+
+                    // Verify that game is still solvable
+                    // If level >= 5, must be able to reach key THEN end
+                    const stillSolvable = getPath(newGrid, { x: 1, y: 1 }, 'end');
+                    if (stillSolvable) {
+                        trapsPlaced++;
+                    } else {
+                        newGrid[ty][tx].type = originalType;
+                    }
+                }
+                attempts++;
+            }
+        }
 
         setGrid(newGrid);
         setPlayerPos({ x: 1, y: 1 });

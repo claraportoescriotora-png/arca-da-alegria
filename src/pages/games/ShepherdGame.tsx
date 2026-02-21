@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 // --- Game Constants ---
 const GRID_SIZE = 15; // 15x15 Grid
-const INITIAL_SPEED = 200;
+const INITIAL_SPEED = 400;
 const MIN_SPEED = 100;
 const WOLF_MOVE_INTERVAL = 20; // Moves every 20 ticks
 
@@ -87,15 +87,17 @@ export default function ShepherdGame() {
             y: snake[0].y + nextDirection.y
         };
 
-        // 1. Wall Collision -> Wrap Around or Die? Let's doing "Die" for simple classic rules, or "Stop" as requested to be non-punitive.
-        // Spec says: "Punição severa não". Let's try simple "Game Over" but with a gentle "Tente denovo".
+        // 1. Check if moving OUTSIDE grid
         if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
             handleGameOver();
             return;
         }
 
-        // 2. Self Collision
-        if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+        // 2. Check if moving INTO itself (Self-Collision)
+        // Forgiveness: Only die if it's NOT the tail (which will move). 
+        // Actually standard snake dies on body. But let's check carefully.
+        const bodyCollision = snake.slice(0, -1).some(segment => segment.x === newHead.x && segment.y === newHead.y);
+        if (bodyCollision) {
             handleGameOver();
             return;
         }
@@ -286,23 +288,21 @@ export default function ShepherdGame() {
                 >
                     {/* Overlay if Not Playing */}
                     {!isPlaying && (
-                        <div className="absolute inset-0 z-10 bg-black/20 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-6">
+                        <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
                             {isGameOver ? (
-                                <div className="bg-white p-6 rounded-2xl shadow-2xl animate-in zoom-in-95">
-                                    <h2 className="text-2xl font-bold text-slate-800 mb-2">Fim de Jogo!</h2>
-                                    <p className="text-slate-600 mb-2">Você guiou {score} ovelhinhas!</p>
-                                    {score >= highScore && score > 0 && (
-                                        <p className="text-amber-500 font-bold mb-4 animate-bounce">Novo Recorde! 🏆</p>
-                                    )}
-                                    <button onClick={startGame} className="bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-green-600 transition-transform active:scale-95">
+                                <div className="bg-white p-6 rounded-3xl shadow-2xl animate-in zoom-in-95 max-w-[280px] w-full text-center">
+                                    <h2 className="text-2xl font-bold text-slate-800 mb-2 font-fredoka">Ops!</h2>
+                                    <p className="text-slate-600 mb-2">O pastor tropeçou, mas ele pode tentar de novo!</p>
+                                    <p className="text-slate-500 mb-4 text-sm font-bold">Ovelhinhas salvas: {score}</p>
+                                    <button onClick={startGame} className="w-full bg-green-500 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 active:scale-95 transition-all">
                                         Tentar Novamente
                                     </button>
                                 </div>
                             ) : (
-                                <div className="bg-white p-6 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4">
-                                    <h2 className="text-2xl font-bold text-slate-800 mb-2">Vamos começar?</h2>
-                                    <p className="text-slate-600 mb-4 text-sm">Use as setas para guiar o pastor e juntar as ovelhinhas. Cuidado com o lobo! 🐺</p>
-                                    <button onClick={startGame} className="bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-blue-600 transition-transform active:scale-95 animate-pulse">
+                                <div className="bg-white p-6 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 max-w-[280px] w-full text-center">
+                                    <h2 className="text-2xl font-bold text-slate-800 mb-2 font-fredoka">Vamos começar?</h2>
+                                    <p className="text-slate-600 mb-6 text-sm">Use as setas para guiar o pastor e juntar as ovelhinhas. Cuidado com o lobo! 🐺</p>
+                                    <button onClick={startGame} className="w-full bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 active:scale-95 transition-all animate-pulse">
                                         Começar
                                     </button>
                                 </div>
@@ -330,33 +330,33 @@ export default function ShepherdGame() {
                 </div>
 
                 {/* Mobile Controls */}
-                <div className="mt-8 grid grid-cols-3 gap-2 w-full max-w-[200px] opacity-80">
+                <div className="mt-4 grid grid-cols-3 gap-3 w-full max-w-[220px] relative z-20 pb-8">
                     <div />
                     <button
-                        className="h-14 bg-white/80 rounded-xl shadow-sm flex items-center justify-center active:bg-blue-100 active:scale-95 transition-all"
+                        className="h-16 bg-white rounded-2xl shadow-md border-b-4 border-slate-200 flex items-center justify-center active:bg-blue-50 active:translate-y-1 transition-all"
                         onPointerDown={(e) => { e.preventDefault(); if (direction.y === 0) setNextDirection({ x: 0, y: -1 }); }}
                     >
-                        <ArrowUp className="w-8 h-8 text-slate-600" />
+                        <ArrowUp className="w-10 h-10 text-slate-600" />
                     </button>
                     <div />
 
                     <button
-                        className="h-14 bg-white/80 rounded-xl shadow-sm flex items-center justify-center active:bg-blue-100 active:scale-95 transition-all"
+                        className="h-16 bg-white rounded-2xl shadow-md border-b-4 border-slate-200 flex items-center justify-center active:bg-blue-100 active:translate-y-1 transition-all"
                         onPointerDown={(e) => { e.preventDefault(); if (direction.x === 0) setNextDirection({ x: -1, y: 0 }); }}
                     >
-                        <ArrowLeftIcon className="w-8 h-8 text-slate-600" />
+                        <ArrowLeftIcon className="w-10 h-10 text-slate-600" />
                     </button>
                     <button
-                        className="h-14 bg-white/80 rounded-xl shadow-sm flex items-center justify-center active:bg-blue-100 active:scale-95 transition-all"
+                        className="h-16 bg-white rounded-2xl shadow-md border-b-4 border-slate-200 flex items-center justify-center active:bg-blue-100 active:translate-y-1 transition-all"
                         onPointerDown={(e) => { e.preventDefault(); if (direction.y === 0) setNextDirection({ x: 0, y: 1 }); }}
                     >
-                        <ArrowDown className="w-8 h-8 text-slate-600" />
+                        <ArrowDown className="w-10 h-10 text-slate-600" />
                     </button>
                     <button
-                        className="h-14 bg-white/80 rounded-xl shadow-sm flex items-center justify-center active:bg-blue-100 active:scale-95 transition-all"
+                        className="h-16 bg-white rounded-2xl shadow-md border-b-4 border-slate-200 flex items-center justify-center active:bg-blue-100 active:translate-y-1 transition-all"
                         onPointerDown={(e) => { e.preventDefault(); if (direction.x === 0) setNextDirection({ x: 1, y: 0 }); }}
                     >
-                        <ArrowRight className="w-8 h-8 text-slate-600" />
+                        <ArrowRight className="w-10 h-10 text-slate-600" />
                     </button>
                 </div>
 
