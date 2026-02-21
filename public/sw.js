@@ -77,12 +77,14 @@ self.addEventListener('fetch', (event) => {
                     if (!response || response.status !== 200 || response.type !== 'basic' && response.type !== 'cors') {
                         return response;
                     }
-                    const resClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+                    if (url.protocol === 'http:' || url.protocol === 'https:') {
+                        const resClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+                    }
                     return response;
                 }).catch((err) => {
                     console.error('SW: Fetch error for image/font', url.pathname, err);
-                    // Fail silently or return a placeholder for images if desirable
+                    // Return a 404 for missing images rather than a network error, helping the app's onError triggers
                     return new Response('', { status: 404 });
                 });
             })

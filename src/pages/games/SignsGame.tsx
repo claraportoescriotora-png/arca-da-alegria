@@ -277,7 +277,10 @@ export default function SignsGame() {
 
                         {/* Grid */}
                         <div
-                            className="grid gap-2 mx-auto px-2 perspective-1000 max-h-[60vh] overflow-visible"
+                            className={cn(
+                                "grid mx-auto px-2 perspective-1000 max-h-[65vh] overflow-visible",
+                                difficulty === 'easy' ? "gap-3" : "gap-1.5"
+                            )}
                             style={{
                                 gridTemplateColumns: `repeat(${getConfig(difficulty).cols}, 1fr)`,
                             }}
