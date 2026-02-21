@@ -134,8 +134,15 @@ export default async function handler(req: any, res: any) {
 
                 if (!createError && newUser) {
                     // Generate Login Link
-                    // Prioritize origin from payload (frontend browser origin)
-                    const origin = payload.origin || (req.headers['host'] ? `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['host']}` : 'https://www.meuamiguito.com.br');
+                    // Aggressive Production Origin Enforcement
+                    let origin = payload.origin || 'https://www.meuamiguito.com.br';
+
+                    // Force production domain if anything looks like local or is missing
+                    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+                        origin = 'https://www.meuamiguito.com.br';
+                    }
+
+                    console.log(`Using redirect origin: ${origin} for email to ${email}`);
 
                     const { data: linkData } = await supabase.auth.admin.generateLink({
                         type: 'magiclink',
