@@ -5,7 +5,7 @@ import { useUser } from '@/contexts/UserContext';
 import { cn } from "@/lib/utils";
 
 // --- Types ---
-type SymbolType = 'cross' | 'dove' | 'heart' | 'star' | 'rainbow' | 'light' | 'bread' | 'fish' | 'cloud' | 'sun' | 'leaf' | 'mountain' | 'path' | 'crown';
+type SymbolType = 'cross' | 'dove' | 'heart' | 'star' | 'rainbow' | 'light' | 'bread' | 'fish' | 'cloud' | 'sun' | 'leaf' | 'mountain' | 'path' | 'crown' | 'cup' | 'fire' | 'water' | 'music' | 'book' | 'anchor';
 
 interface Card {
     id: number;
