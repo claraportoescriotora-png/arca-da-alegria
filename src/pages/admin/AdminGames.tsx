@@ -144,6 +144,8 @@ export function AdminGames() {
             const finalUrlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
 
             // 4. Update Game Config and Image URL
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log('Current Session User ID:', session?.user?.id);
             console.log('Update target ID:', selectedGame.id);
             console.log('New image URL:', finalUrlWithCacheBuster);
 
