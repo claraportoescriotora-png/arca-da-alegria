@@ -90,14 +90,17 @@ export function AdminGames() {
 
         setCreating(true);
         try {
+            // Default Biblical Image to avoid empty/broken state, but NO Vecteezy/Unsplash hardcoding
+            const defaultImage = 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp';
+
             const { error } = await supabase
                 .from('games')
                 .insert({
                     title: newGameTitle,
                     type: newGameType,
                     status: 'available',
-                    image_url: newGameType === 'puzzle' ? 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800' : null,
-                    config: newGameType === 'puzzle' ? { image: 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800' } : {},
+                    image_url: newGameType === 'puzzle' ? defaultImage : null,
+                    config: newGameType === 'puzzle' ? { image: defaultImage, pieces: 9 } : {},
                     is_active: true
                 });
 
@@ -121,7 +124,7 @@ export function AdminGames() {
 
         setUploading(true);
         try {
-            // 1. Upload file to 'activities' bucket (using 'games' folder convention)
+            // 1. Upload file to 'activities' bucket
             const fileExt = puzzleImageFile.name.split('.').pop();
             const fileName = `puzzle-${selectedGame.id}-${Date.now()}.${fileExt}`;
             const filePath = `games/${fileName}`;
@@ -137,25 +140,32 @@ export function AdminGames() {
                 .from('activities')
                 .getPublicUrl(filePath);
 
-            // 3. Update Game Config and Image URL
-            const newConfig = { ...selectedGame.config, image: publicUrl };
+            // 3. Add Cache Buster to force UI refresh everywhere
+            const finalUrlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
+
+            // 4. Update Game Config and Image URL
+            const newConfig = { ...selectedGame.config, image: finalUrlWithCacheBuster };
             const { error: updateError } = await supabase
                 .from('games')
                 .update({
                     config: newConfig,
-                    image_url: publicUrl // Update the main image_url for the admin list
+                    image_url: finalUrlWithCacheBuster // Aggressive sync
                 })
                 .eq('id', selectedGame.id);
 
             if (updateError) throw updateError;
 
-            toast({ title: "Imagem atualizada!", description: "A nova imagem do quebra-cabeça foi salva." });
+            toast({ title: "Imagem salva com sucesso!", description: "O quebra-cabeça foi atualizado." });
+
+            // Clean up state and force reload
+            setPuzzleImageFile(null);
             setIsConfigOpen(false);
+            setSelectedGame(null);
             fetchGames();
 
         } catch (error: any) {
             console.error(error);
-            toast({ variant: "destructive", title: "Erro no upload", description: error.message });
+            toast({ variant: "destructive", title: "Erro no salvamento", description: error.message });
         } finally {
             setUploading(false);
         }

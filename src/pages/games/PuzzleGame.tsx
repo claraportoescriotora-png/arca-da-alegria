@@ -48,13 +48,9 @@ export default function PuzzleGame() {
       initializePuzzle(gridSize);
     };
     img.onerror = () => {
-      // If the image fails, try a safe Biblical fallback from Unsplash
-      const fallback = 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800';
-      if (imageUrl !== fallback) {
-        setImageUrl(fallback);
-      } else {
-        setImageLoadError(true);
-      }
+      // If the image fails, but we HAVE a URL, don't show a random fallback.
+      // Just mark it as an error so the user knows they need to check the image.
+      setImageLoadError(true);
     };
     img.src = imageUrl;
   }, [imageUrl]);
