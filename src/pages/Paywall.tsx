@@ -69,7 +69,7 @@ const Paywall = () => {
                 <CardFooter className="flex flex-col gap-3">
                     <Button
                         className="w-full bg-green-600 hover:bg-green-700 text-white text-lg h-12 rounded-xl shadow-lg transform transition hover:scale-105"
-                        onClick={() => window.open('https://pay.kiwify.com.br/P002gO8', '_blank')}
+                        onClick={() => window.open('https://www.meuamiguito.com.br/landing', '_blank')}
                     >
                         Assinar Agora
                     </Button>

@@ -122,9 +122,9 @@ export default async function handler(req: any, res: any) {
 
             // Check if user exists
             const { data: authData } = await supabase.auth.admin.listUsers();
-            const existingUser = authData?.users?.find(u => u.email === email);
+            let userId = authData?.users?.find(u => u.email === email)?.id;
 
-            if (!existingUser) {
+            if (!userId) {
                 console.log(`Creating user record for ${email}`);
                 const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
                     email,
@@ -132,17 +132,12 @@ export default async function handler(req: any, res: any) {
                     user_metadata: { source: 'kiwify', is_test: isInternalTest }
                 });
 
-                if (!createError && newUser) {
+                if (createError) {
+                    console.error('Error creating user:', createError);
+                } else if (newUser?.user) {
+                    userId = newUser.user.id;
                     // Generate Login Link
-                    // Aggressive Production Origin Enforcement
-                    let origin = payload.origin || 'https://www.meuamiguito.com.br';
-
-                    // Force production domain if anything looks like local or is missing
-                    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
-                        origin = 'https://www.meuamiguito.com.br';
-                    }
-
-                    console.log(`Using redirect origin: ${origin} for email to ${email}`);
+                    const origin = payload.origin || 'https://www.meuamiguito.com.br';
 
                     const { data: linkData } = await supabase.auth.admin.generateLink({
                         type: 'magiclink',
@@ -161,11 +156,24 @@ export default async function handler(req: any, res: any) {
             }
 
             // Update Profile Status (Always do this to ensure access)
-            await supabase.from('profiles').upsert({
-                email: email,
-                subscription_status: 'active',
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'email' });
+            if (userId) {
+                console.log(`Updating profile for user ${userId} (${email}) to active`);
+                const { error: upsertError } = await supabase.from('profiles').upsert({
+                    id: userId,
+                    email: email,
+                    subscription_status: 'active',
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'id' });
+
+                if (upsertError) {
+                    console.error('Error upserting profile:', upsertError);
+                    // Fallback to email update if id-based upsert fails (e.g. if id is not the primary key)
+                    await supabase.from('profiles').update({
+                        subscription_status: 'active',
+                        updated_at: new Date().toISOString()
+                    }).eq('email', email);
+                }
+            }
 
         } else if (['refunded', 'chargedback', 'subscription_canceled'].includes(orderStatus)) {
             // Cancel subscription
