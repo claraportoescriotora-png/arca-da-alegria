@@ -316,30 +316,31 @@ export default function SignsGame() {
                                 <button
                                     key={card.id + '-' + index}
                                     onClick={() => handleCardClick(index)}
-                                    className={cn(
-                                        "aspect-square rounded-xl shadow-sm transition-all duration-500 transform relative preserve-3d max-h-24",
-                                        "hover:scale-[1.02] active:scale-95 focus:outline-none",
-                                        (isPreview || flippedIndices.includes(index) || matchedIndices.has(index)) ? "rotate-y-180" : ""
-                                    )}
+                                    className="aspect-square w-full max-h-24 relative focus:outline-none group"
                                 >
-                                    {/* Front (Symbol) - content is flipped 180 */}
-                                    <div
-                                        className={cn(
-                                            "absolute inset-0 backface-hidden rounded-xl flex items-center justify-center border-2",
-                                            matchedIndices.has(index) ? "bg-green-50 border-green-200 shadow-green-100" : "bg-white border-white",
-                                            "rotate-y-180"
-                                        )}
-                                        style={{ transform: "rotateY(180deg)" }}
-                                    >
-                                        <svg viewBox="0 0 24 24" className="w-2/3 h-2/3">
-                                            {renderSymbol(card.symbol)}
-                                        </svg>
-                                    </div>
+                                    <div className={cn(
+                                        "w-full h-full relative transition-all duration-500 preserve-3d transform-gpu shadow-sm rounded-xl",
+                                        "group-hover:scale-[1.02] group-active:scale-95",
+                                        (isPreview || flippedIndices.includes(index) || matchedIndices.has(index)) ? "rotate-y-180" : ""
+                                    )}>
+                                        {/* Front (Symbol) - This is what shows when face up */}
+                                        <div
+                                            className={cn(
+                                                "absolute inset-0 backface-hidden rounded-xl flex items-center justify-center border-2 rotate-y-180",
+                                                matchedIndices.has(index) ? "bg-green-50 border-green-200 shadow-green-100" : "bg-white border-white"
+                                            )}
+                                            style={{ transform: "rotateY(180deg)" }}
+                                        >
+                                            <svg viewBox="0 0 24 24" className="w-2/3 h-2/3">
+                                                {renderSymbol(card.symbol)}
+                                            </svg>
+                                        </div>
 
-                                    {/* Back (Pattern) */}
-                                    <div className="absolute inset-0 backface-hidden bg-indigo-500 rounded-xl flex items-center justify-center border-b-4 border-indigo-700">
-                                        <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '12px 12px' }} />
-                                        <span className="text-white opacity-50 absolute font-bold text-xl">?</span>
+                                        {/* Back (Pattern) - This is the initial face-down state */}
+                                        <div className="absolute inset-0 backface-hidden bg-indigo-500 rounded-xl flex items-center justify-center border-b-4 border-indigo-700 overflow-hidden">
+                                            <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '12px 12px' }} />
+                                            <span className="text-white opacity-50 absolute font-bold text-xl">?</span>
+                                        </div>
                                     </div>
                                 </button>
                             ))}
