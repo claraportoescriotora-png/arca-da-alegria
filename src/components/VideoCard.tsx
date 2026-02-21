@@ -23,10 +23,11 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
   const getYouTubeId = (url: string) => {
     if (!url) return '';
     try {
-      // Support for standard, embed, shorts, and youtu.be links
-      const regExp = /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+      // Support for standard, embed, shorts, youtu.be, and playlist links
+      const regExp = /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/|live\/)([^#&?]*).*/;
       const match = url.match(regExp);
-      return (match && match[1].length === 11) ? match[1] : '';
+      const id = (match && match[1].length === 11) ? match[1] : '';
+      return id;
     } catch (e) {
       console.error('Error extracting YouTube ID:', e);
       return '';
@@ -36,9 +37,10 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
   const videoId = getYouTubeId(videoUrl || '');
 
   // Helper to get embed URL from YouTube link
-  const getEmbedUrl = (id: string) => {
+  const getEmbedUrl = (url: string) => {
+    const id = getYouTubeId(url);
     if (!id) return '';
-    return `https://www.youtube.com/embed/${id}?autoplay=1`;
+    return `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
   };
 
   // PRIORITY: Always use YouTube's own thumbnails for videos to keep the app light.
@@ -49,17 +51,19 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
 
   const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
-    const currentId = getYouTubeId(videoUrl || '');
+    const currentId = videoId;
     if (!currentId) return;
 
-    // Progressive fallback: hqdefault -> mqdefault -> default
+    // Progressive fallback: hqdefault -> mqdefault -> sddefault -> default
     if (target.src.includes('hqdefault')) {
       target.src = `https://img.youtube.com/vi/${currentId}/mqdefault.jpg`;
     } else if (target.src.includes('mqdefault')) {
+      target.src = `https://img.youtube.com/vi/${currentId}/sddefault.jpg`;
+    } else if (target.src.includes('sddefault')) {
       target.src = `https://img.youtube.com/vi/${currentId}/default.jpg`;
     } else {
-      // If it's some other broken URL, force it to YouTube hqdefault
-      target.src = `https://img.youtube.com/vi/${currentId}/hqdefault.jpg`;
+      // Last resort: standard biblically themed fallback
+      target.src = 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp';
     }
   };
 
