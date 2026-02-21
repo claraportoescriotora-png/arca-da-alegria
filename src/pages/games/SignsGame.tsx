@@ -118,9 +118,9 @@ export default function SignsGame() {
         if (flippedCards.length >= 2) return;
 
         // Flip card
-        const newCards = [...cards];
-        newCards[index].isFlipped = true;
-        setCards(newCards);
+        setCards(curr => curr.map((c, i) =>
+            i === index ? { ...c, isFlipped: true } : c
+        ));
 
         const newFlipped = [...flippedCards, index];
         setFlippedCards(newFlipped);
@@ -130,14 +130,13 @@ export default function SignsGame() {
             setMoves(m => m + 1);
             const [firstIndex, secondIndex] = newFlipped;
             const firstCard = cards[firstIndex];
-            const secondCard = cards[secondIndex]; // Note: using 'cards' here might be stale if strict mode, but logic holds for simple state
+            const secondCard = cards[index]; // Use current index for second card
 
-            // Actually need to reference the modified array for consistency
-            if (newCards[firstIndex].symbol === newCards[secondIndex].symbol) {
+            if (firstCard.symbol === secondCard.symbol) {
                 // Match!
-                newCards[firstIndex].isMatched = true;
-                newCards[secondIndex].isMatched = true;
-                setCards(newCards);
+                setCards(prev => prev.map((c, i) =>
+                    (i === firstIndex || i === secondIndex) ? { ...c, isMatched: true, isFlipped: true } : c
+                ));
                 setFlippedCards([]);
 
                 // Play sound effect (optional/future)

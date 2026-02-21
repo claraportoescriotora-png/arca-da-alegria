@@ -22,9 +22,15 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
   // Robust YouTube ID extraction
   const getYouTubeId = (url: string) => {
     if (!url) return '';
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : '';
+    try {
+      // Support for standard, embed, shorts, and youtu.be links
+      const regExp = /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[1].length === 11) ? match[1] : '';
+    } catch (e) {
+      console.error('Error extracting YouTube ID:', e);
+      return '';
+    }
   };
 
   const videoId = getYouTubeId(videoUrl || '');
@@ -35,9 +41,11 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
     return `https://www.youtube.com/embed/${id}?autoplay=1`;
   };
 
-  // PRIORITY: Use stored thumbnail_url first (already hqdefault from import).
-  // Only generate from videoId if no thumbnail is stored.
-  const primaryThumbnail = thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
+  // PRIORITY: Always use YouTube's own thumbnails for videos to keep the app light.
+  // We ignore the 'thumbnail' prop if it's a video and we have a videoId.
+  const primaryThumbnail = videoId
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : (thumbnail || '');
 
   const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;

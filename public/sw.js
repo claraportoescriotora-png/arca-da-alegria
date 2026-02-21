@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'amiguitos-v2'; // Increment version to force update
+const CACHE_NAME = 'amiguitos-v3'; // Increased to force update for PWA asset fixes
 
 // Asset types to cache
 const PRECACHE_ASSETS = [
