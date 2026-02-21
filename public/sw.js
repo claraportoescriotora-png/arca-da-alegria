@@ -57,8 +57,12 @@ self.addEventListener('fetch', (event) => {
     if (isImage || isFont) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse;
+                if (cachedResponse) {
+                    console.log('SW: Cache hit for', url.pathname);
+                    return cachedResponse;
+                }
 
+                console.log('SW: Cache miss for', url.pathname, '- Fetching from network');
                 return fetch(event.request).then((response) => {
                     if (!response || response.status !== 200 || response.type !== 'basic' && response.type !== 'cors') {
                         return response;
@@ -66,7 +70,8 @@ self.addEventListener('fetch', (event) => {
                     const resClone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
                     return response;
-                }).catch(() => {
+                }).catch((err) => {
+                    console.error('SW: Fetch error for image/font', url.pathname, err);
                     // Fail silently or return a placeholder for images if desirable
                     return new Response('', { status: 404 });
                 });

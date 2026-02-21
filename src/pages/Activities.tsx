@@ -98,7 +98,15 @@ export default function Activities() {
                 .map(activity => (
                   <div key={activity.id} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border flex flex-col">
                     <div className="aspect-square relative overflow-hidden bg-muted">
-                      <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
+                      <img
+                        src={activity.image}
+                        alt={activity.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800';
+                        }}
+                      />
                       <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 bg-white/90 rounded-full shadow-sm text-foreground uppercase tracking-wide">
                         {activity.type}
                       </span>
@@ -142,8 +150,8 @@ export default function Activities() {
                         <button
                           onClick={() => setCurrentPage(page)}
                           className={`w-10 h-10 rounded-lg font-medium text-sm transition-colors ${currentPage === page
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-card border border-border hover:bg-muted'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-card border border-border hover:bg-muted'
                             }`}
                         >
                           {page}

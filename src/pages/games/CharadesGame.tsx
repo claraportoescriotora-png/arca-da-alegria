@@ -1,55 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Smile, Users, Heart, Star, Sparkles, User, Apple, Box, CheckCircle } from 'lucide-react';
-import { cn } from "@/lib/utils";
-
-// --- Data ---
-type Category = 'animals' | 'people' | 'objects' | 'fruits';
-
-interface CardData {
-    id: string;
-    text: string;
-    icon: string; // Emoji
-    category: Category;
-    isSpecial?: boolean;
-    specialAction?: string;
-}
-
-const CARDS: CardData[] = [
-    // Animals
-    { id: 'Lion', text: 'Leão', icon: '🦁', category: 'animals' },
-    { id: 'Sheep', text: 'Ovelha', icon: '🐑', category: 'animals' },
-    { id: 'Fish', text: 'Peixe', icon: '🐟', category: 'animals' },
-    { id: 'Dove', text: 'Pomba', icon: '🕊️', category: 'animals' },
-    { id: 'Dog', text: 'Cachorro', icon: '🐶', category: 'animals' },
-    { id: 'Cat', text: 'Gato', icon: '🐱', category: 'animals' },
-    { id: 'Monkey', text: 'Macaco', icon: '🐵', category: 'animals' },
-    { id: 'Elephant', text: 'Elefante', icon: '🐘', category: 'animals' },
-
-    // People
-    { id: 'Dad', text: 'Papai', icon: '👨', category: 'people', isSpecial: true, specialAction: 'Dê um abraço nele e diga porque você o ama!' },
-    { id: 'Mom', text: 'Mamãe', icon: '👩', category: 'people', isSpecial: true, specialAction: 'Dê um abraço apertado e diga o que mais ama nela!' },
-    { id: 'Baby', text: 'Bebê', icon: '👶', category: 'people' },
-    { id: 'Grandma', text: 'Vovó', icon: '👵', category: 'people' },
-    { id: 'Pastor', text: 'Pastor', icon: '👔', category: 'people' },
-    { id: 'Teacher', text: 'Professor(a)', icon: '📚', category: 'people' },
-
-    // Objects
-    { id: 'Ball', text: 'Bola', icon: '⚽', category: 'objects' },
-    { id: 'Phone', text: 'Celular', icon: '📱', category: 'objects' },
-    { id: 'Toothbrush', text: 'Escova de Dentes', icon: '🪥', category: 'objects' },
-    { id: 'Bible', text: 'Bíblia', icon: '📖', category: 'objects' },
-    { id: 'Guitar', text: 'Violão', icon: '🎸', category: 'objects' },
-    { id: 'Mic', text: 'Microfone', icon: '🎤', category: 'objects' },
-
-    // Fruits
-    { id: 'Banana', text: 'Banana', icon: '🍌', category: 'fruits' },
-    { id: 'Apple', text: 'Maçã', icon: '🍎', category: 'fruits' },
-    { id: 'Grape', text: 'Uva', icon: '🍇', category: 'fruits' },
-    { id: 'Watermelon', text: 'Melancia', icon: '🍉', category: 'fruits' },
-];
-
 import { ArrowLeft, RefreshCw, Smile, Users, Heart, Star, Sparkles, User, Apple, Box, CheckCircle, PawPrint } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
     { id: 'animals', label: 'Animais', icon: <PawPrint className="w-6 h-6" />, color: 'bg-orange-100 text-orange-600 border-orange-200' },
