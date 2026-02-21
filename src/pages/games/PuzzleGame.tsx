@@ -32,6 +32,7 @@ export default function PuzzleGame() {
   const [isComplete, setIsComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
   const [gridSize, setGridSize] = useState(3); // Default 3x3
 
@@ -45,6 +46,7 @@ export default function PuzzleGame() {
     // IMAGE LOADING LOGIC
     const img = new Image();
     img.onload = () => {
+      setImageLoaded(true);
       setImageLoadError(false);
       initializePuzzle(gridSize);
     };
@@ -259,6 +261,7 @@ export default function PuzzleGame() {
             className="grid gap-1 bg-card p-2 rounded-xl shadow-lg border relative select-none"
             style={{
               gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              gridTemplateRows: `repeat(${gridSize}, 1fr)`,
               aspectRatio: '1/1',
               width: '100%',
               maxWidth: '400px',
@@ -269,7 +272,7 @@ export default function PuzzleGame() {
                 key={index}
                 onClick={() => handlePieceClick(index)}
                 className={cn(
-                  "relative cursor-pointer transition-all duration-200 rounded-md overflow-hidden bg-muted",
+                  "relative cursor-pointer transition-all duration-200 rounded-md overflow-hidden bg-muted aspect-square",
                   selectedPiece === index ? "ring-4 ring-primary z-10 scale-95 shadow-xl" : "hover:brightness-110",
                   isComplete ? "ring-0" : ""
                 )}
