@@ -37,7 +37,7 @@ export default function SignsGame() {
     // Config based on difficulty
     const getConfig = (diff: Difficulty) => {
         switch (diff) {
-            case 'easy': return { rows: 4, cols: 3, pairs: 6, timeLimit: 0 }; // 3x4 grid
+            case 'easy': return { rows: 4, cols: 3, pairs: 6, timeLimit: 60 }; // 3x4 grid
             case 'medium': return { rows: 5, cols: 4, pairs: 10, timeLimit: 180 }; // 4x5 grid
             case 'hard': return { rows: 6, cols: 5, pairs: 15, timeLimit: 300 }; // 5x6 grid
         }
@@ -277,7 +277,7 @@ export default function SignsGame() {
 
                         {/* Grid */}
                         <div
-                            className="grid gap-3 mx-auto px-2 perspective-1000"
+                            className="grid gap-2 mx-auto px-2 perspective-1000 max-h-[60vh] overflow-visible"
                             style={{
                                 gridTemplateColumns: `repeat(${getConfig(difficulty).cols}, 1fr)`,
                             }}
@@ -287,7 +287,7 @@ export default function SignsGame() {
                                     key={card.id + '-' + index}
                                     onClick={() => handleCardClick(index)}
                                     className={cn(
-                                        "aspect-[3/4] rounded-xl shadow-sm transition-all duration-500 transform relative preserve-3d",
+                                        "aspect-square rounded-xl shadow-sm transition-all duration-500 transform relative preserve-3d max-h-24",
                                         "hover:scale-[1.02] active:scale-95 focus:outline-none",
                                         card.isFlipped || card.isMatched ? "rotate-y-180" : ""
                                     )}

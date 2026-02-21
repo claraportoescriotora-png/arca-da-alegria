@@ -50,8 +50,18 @@ self.addEventListener('fetch', (event) => {
         return; // Always network for these
     }
 
+    // Bypass SW for external media and Supabase Storage to avoid CORS/Cache issues on mobile
+    const isExternalMedia = url.hostname.includes('ytimg.com') ||
+        url.hostname.includes('unsplash.com') ||
+        url.hostname.includes('supabase.co');
+
+    if (isExternalMedia) {
+        console.log('SW: Bypassing cache for external media:', url.href);
+        return; // Let browser handle normally
+    }
+
     // 2. Cache-First Strategy for Images and Assets
-    const isImage = event.request.destination === 'image' || url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/) || url.hostname.includes('googleapis.com');
+    const isImage = event.request.destination === 'image' || /\.(png|jpg|jpeg|gif|svg|webp)$/.test(url.pathname) || url.hostname.includes('googleapis.com');
     const isFont = event.request.destination === 'font' || url.hostname.includes('gstatic.com');
 
     if (isImage || isFont) {
