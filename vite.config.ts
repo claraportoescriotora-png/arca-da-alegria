@@ -49,7 +49,8 @@ export default defineConfig(({ mode }) => {
               // The handler in flow.ts expects (req, res) Node style
               // But we can ALSO try to call it standard style if it returns a Response
               // To fix the "Expected 2 arguments" error, we provide an empty mock for res if needed
-              const webRes = await (handler.length > 1 ? handler(webReq, res) : handler(webReq));
+              const handlerFn = handler as any;
+              const webRes = await (handlerFn.length > 1 ? handlerFn(webReq, res) : handlerFn(webReq));
 
               // If handler already handled the response (Node style), webRes might be undefined
               if (!webRes) return;
