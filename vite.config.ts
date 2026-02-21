@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
               return;
             }
 
-            const chunks = [];
+            const chunks: any[] = [];
             for await (const chunk of req) {
               chunks.push(chunk);
             }
@@ -46,11 +46,17 @@ export default defineConfig(({ mode }) => {
                 body: bodyText
               });
 
-              const webRes = await handler(webReq);
+              // The handler in flow.ts expects (req, res) Node style
+              // But we can ALSO try to call it standard style if it returns a Response
+              // To fix the "Expected 2 arguments" error, we provide an empty mock for res if needed
+              const webRes = await (handler.length > 1 ? handler(webReq, res) : handler(webReq));
 
-              // Mock Response
+              // If handler already handled the response (Node style), webRes might be undefined
+              if (!webRes) return;
+
+              // Mock Response (Fetch Style)
               res.statusCode = webRes.status;
-              webRes.headers.forEach((val, key) => res.setHeader(key, val));
+              (webRes.headers as Headers).forEach((val: string, key: string) => res.setHeader(key, val));
               const responseText = await webRes.text();
               res.end(responseText);
 

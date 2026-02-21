@@ -48,7 +48,7 @@ export function AdminTestSuite() {
                 product: { product_id: "amiguito_anual" }
             };
 
-            const bypassSecret = import.meta.env.VITE_INTERNAL_API_SECRET || 'meu-amiguito-secret-2024';
+            const bypassSecret = import.meta.env.VITE_INTERNAL_API_SECRET || 'Amiguitos_Segredo_2026_!_';
 
             const response = await fetch('/api/webhook', {
                 method: 'POST',
