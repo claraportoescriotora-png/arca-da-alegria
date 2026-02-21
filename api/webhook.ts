@@ -134,9 +134,8 @@ export default async function handler(req: any, res: any) {
 
                 if (!createError && newUser) {
                     // Generate Login Link
-                    const host = req.headers['host'] || 'www.meuamiguito.com.br';
-                    const protocol = req.headers['x-forwarded-proto'] || 'https';
-                    const origin = `${protocol}://${host}`;
+                    // Prioritize origin from payload (frontend browser origin)
+                    const origin = payload.origin || (req.headers['host'] ? `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['host']}` : 'https://www.meuamiguito.com.br');
 
                     const { data: linkData } = await supabase.auth.admin.generateLink({
                         type: 'magiclink',
