@@ -1,93 +1,140 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { sendWelcomeEmail } from './lib/resend'; // Removed .js, more compatible with TS builders
+import { Resend } from 'resend';
+import crypto from 'crypto';
 
+// Combined Configuration
+export const config = {
+    runtime: 'nodejs',
+};
+
+// --- Email Logic (Merged from lib/resend to avoid path issues on production) ---
+const PWA_INSTRUCTIONS = `
+  <div style="margin-top: 24px; padding: 16px; background-color: #f0f4ff; border-radius: 8px; font-size: 14px; border: 1px dashed #4f46e5;">
+    <p style="margin: 0 0 8px 0; font-weight: bold; color: #4338ca;">💡 Dica: Instale o App no seu telemóvel!</p>
+    <p style="margin: 0;">Para uma experiência completa, abra este link no seu iPhone (Safari) ou Android (Chrome), clique no botão de <strong>Compartilhar</strong> e selecione <strong>"Adicionar à Tela de Início"</strong>.</p>
+  </div>
+`;
+
+async function sendWelcomeEmail(email: string, magicLink: string) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+        console.error('RESEND_API_KEY missing');
+        return null;
+    }
+    const resend = new Resend(apiKey);
+    return await resend.emails.send({
+        from: 'Meu Amiguito <nao-responda@meuamiguito.com.br>',
+        to: email,
+        subject: 'Bem-vindo ao Meu Amiguito! ✨',
+        html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e7ff; border-radius: 12px; overflow: hidden;">
+                <div style="background-color: #4f46e5; padding: 24px; text-align: center;">
+                    <h1 style="color: white; margin: 0;">Meu Amiguito</h1>
+                </div>
+                <div style="padding: 24px; color: #1e1e1e; line-height: 1.6;">
+                    <h2 style="color: #4338ca;">Olá!</h2>
+                    <p>Sua assinatura foi confirmada com sucesso. Estamos muito felizes em ter você e sua família conosco!</p>
+                    <p>Para confirmar seu e-mail e entrar no app pela primeira vez, clique no botão abaixo:</p>
+                    <div style="text-align: center; margin: 32px 0;">
+                        <a href="${magicLink}" style="background-color: #eab308; color: #1e1b4b; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px;">Confirmar E-mail e Entrar</a>
+                    </div>
+                    ${PWA_INSTRUCTIONS}
+                </div>
+                <div style="background-color: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af;">
+                    &copy; 2026 Arca da Alegria - Meu Amiguito
+                </div>
+            </div>
+        `
+    });
+}
+
+// --- Main Webhook Handler ---
 export default async function handler(req: any, res: any) {
-    console.log('--- Kiwify Webhook: Request Received ---');
+    // 1. Diagnostics (GET request to check if it's alive)
+    if (req.method === 'GET') {
+        return res.status(200).json({
+            status: 'online',
+            service: 'Kiwify Webhook',
+            timestamp: new Date().toISOString()
+        });
+    }
 
-    // Basic catch-all to prevent 500 FUNCTION_INVOCATION_FAILED
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     try {
-        if (req.method !== 'POST') {
-            return res.status(405).json({ error: 'Method not allowed' });
-        }
-
-        // Configuration (Moved inside handler for safety)
-        const supabaseUrl = process.env.VITE_SUPABASE_URL;
+        // Essential Env Vars
+        const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://gypzrzsmxgjtkidznstd.supabase.co';
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const internalSecret = process.env.INTERNAL_API_SECRET;
         const signatureSecret = process.env.KIWIFY_SIGNATURE_SECRET;
 
-        if (!supabaseUrl || !supabaseServiceKey) {
-            console.error('CRITICAL: Server is missing Supabase environment variables');
-            return res.status(500).json({
-                error: 'Server Config Error',
-                message: 'Chaves do Supabase não encontradas no ambiente do servidor.'
-            });
+        if (!supabaseServiceKey) {
+            return res.status(500).json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY' });
         }
 
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        // Body parsing (Vercel Node.js sometimes doesn't parse body automatically if content-type is missing or specific)
+        // Body Parsing
         let payload = req.body;
         if (typeof payload === 'string') {
-            try { payload = JSON.parse(payload); } catch (e) { /* ignore */ }
+            try { payload = JSON.parse(payload); } catch (e) { /* silent */ }
         }
 
         if (!payload || Object.keys(payload).length === 0) {
-            // Backup: Read raw body if req.body is empty/not-parsed
-            // Note: This is a simplified fallback for standard Node.js
-            console.log('Payload empty, checking body readability...');
+            return res.status(400).json({ error: 'Payload body is empty or invalid' });
         }
 
-        // HMAC Validation or Internal Bypass
+        // Bypass / Security Check
         const bypassKey = req.headers['x-test-bypass'];
         const isInternalTest = internalSecret && bypassKey === internalSecret;
 
         if (signatureSecret && !isInternalTest) {
             const signature = req.headers['x-kiwify-signature'];
             if (signature) {
-                const crypto = await import('crypto');
                 const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
                 const hmac = crypto.createHmac('sha256', signatureSecret);
                 hmac.update(rawBody);
                 const expectedSignature = hmac.digest('hex');
 
                 if (signature !== expectedSignature) {
-                    return res.status(401).send('Unauthorized - Invalid Signature');
+                    return res.status(401).json({ error: 'Invalid HMAC Signature' });
                 }
             }
         }
 
+        // Extract Customer Data
         const orderStatus = payload.order_status || payload.status;
         const eventType = payload.webhook_event_type || payload.event_type || orderStatus;
-        const customer = (payload.Customer || payload.customer || {});
+        const customer = payload.Customer || payload.customer || {};
         const email = customer.email || payload.email;
 
         if (!email) {
-            console.error('Payload missing email:', JSON.stringify(payload).substring(0, 200));
-            return res.status(400).json({ error: 'No email found in data' });
+            return res.status(400).json({ error: 'No email found in payload' });
         }
 
-        console.log(`Event: ${eventType}, Status: ${orderStatus}, Target: ${email}`);
+        console.log(`Webhook Event: ${eventType} for ${email} (Test: ${!!isInternalTest})`);
 
-        // 1. Process Order
+        // A. Handle Successful Payments / Renewals
         if (orderStatus === 'paid' || eventType === 'order_approved' || eventType === 'subscription_renewed') {
 
-            // Check existing user
+            // Check if user exists
             const { data: authData } = await supabase.auth.admin.listUsers();
-            const existingUser = authData?.users.find(u => u.email === email);
+            const existingUser = authData?.users?.find(u => u.email === email);
 
             if (!existingUser) {
-                console.log(`Creating user: ${email}`);
+                console.log(`Creating user record for ${email}`);
                 const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
                     email,
                     email_confirm: true,
-                    user_metadata: { source: 'kiwify', test: isInternalTest }
+                    user_metadata: { source: 'kiwify', is_test: isInternalTest }
                 });
 
                 if (!createError && newUser) {
-                    // Magic Link
-                    const host = req.headers['host'] || 'meuamiguito.com.br';
+                    // Generate Login Link
+                    const host = req.headers['host'] || 'www.meuamiguito.com.br';
                     const protocol = req.headers['x-forwarded-proto'] || 'https';
                     const origin = `${protocol}://${host}`;
 
@@ -98,44 +145,40 @@ export default async function handler(req: any, res: any) {
                     });
 
                     if (linkData?.properties?.action_link) {
-                        await sendWelcomeEmail(email, linkData.properties.action_link);
+                        try {
+                            await sendWelcomeEmail(email, linkData.properties.action_link);
+                        } catch (e) {
+                            console.error('Email failed but user created:', e);
+                        }
                     }
                 }
             }
 
-            // Always update/upsert profile status
+            // Update Profile Status (Always do this to ensure access)
             await supabase.from('profiles').upsert({
                 email: email,
                 subscription_status: 'active',
                 updated_at: new Date().toISOString()
             }, { onConflict: 'email' });
 
-        } else if (['refunded', 'chargedback', 'subscription_canceled', 'subscription_late'].includes(orderStatus)) {
+        } else if (['refunded', 'chargedback', 'subscription_canceled'].includes(orderStatus)) {
+            // Cancel subscription
             await supabase.from('profiles').update({ subscription_status: 'canceled' }).eq('email', email);
         }
 
-        // 2. Persistent Logging (Optional, don't crash if fails)
+        // Final Logging (Non-blocking)
         try {
             await supabase.from('webhook_events').insert({
                 event_type: eventType,
                 user_email: email,
                 payload: payload
             });
-        } catch (e) {
-            console.warn('Logging skipped:', (e as Error).message);
-        }
+        } catch (e) { /* ignore */ }
 
-        return res.status(200).json({
-            success: true,
-            simulation: !!isInternalTest
-        });
+        return res.status(200).json({ success: true, processed: true });
 
     } catch (err: any) {
-        console.error('Global Webhook Error:', err);
-        return res.status(500).json({
-            error: 'Internal Server Error',
-            message: err.message,
-            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-        });
+        console.error('Catastrophic Webhook Failure:', err);
+        return res.status(500).json({ error: 'Internal Server Error', detail: err.message });
     }
 }
