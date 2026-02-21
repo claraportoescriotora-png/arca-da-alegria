@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'amiguitos-v4'; // Increased to v4 for media fix
+const CACHE_NAME = 'amiguitos-v5'; // v5: Broad media bypass
 
 // Asset types to cache
 const PRECACHE_ASSETS = [
@@ -25,10 +25,15 @@ self.addEventListener('fetch', (event) => {
         return; // Always network
     }
 
-    // Bypass SW for YouTube thumbnails to avoid opaque response caching issues
-    const isYouTubeThumb = url.hostname.includes('ytimg.com');
-    if (isYouTubeThumb) {
-        return; // Let browser handle normally
+    // Bypass SW for all external media to avoid opaque response caching issues in PWA
+    const isExternalMedia =
+        url.hostname.includes('ytimg.com') ||
+        url.hostname.includes('unsplash.com') ||
+        url.hostname.includes('supabase.co') ||
+        url.hostname.includes('googleusercontent.com');
+
+    if (isExternalMedia) {
+        return; // Let browser handle natively
     }
 
     // 2. Cache-First Strategy for Images and Assets

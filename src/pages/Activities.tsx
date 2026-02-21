@@ -36,7 +36,11 @@ export default function Activities() {
       const formattedActivities: Activity[] = (data || []).map(a => ({
         id: a.id,
         title: a.title,
-        image: a.image_url || 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
+        // Only use placeholder if the URL is strictly missing.
+        // Also add a light cache-buster for mobile PWA stability.
+        image: a.image_url
+          ? (a.image_url.includes('?') ? a.image_url : `${a.image_url}?t=${Date.now()}`)
+          : 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
         pdfUrl: a.pdf_url,
         type: a.type === 'coloring' ? 'Colorir' :
           a.type === 'cutting' ? 'Recortar' :
