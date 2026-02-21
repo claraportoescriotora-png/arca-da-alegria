@@ -28,11 +28,16 @@ export default async function handler(request: Request) {
 
     try {
         // Generate a magic link via admin API
+        let origin = new URL(request.url).origin;
+        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+            origin = 'https://www.meuamiguito.com.br';
+        }
+
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'magiclink',
             email: email,
             options: {
-                redirectTo: `${new URL(request.url).origin}/home`
+                redirectTo: `${origin}/home`
             }
         });
 
