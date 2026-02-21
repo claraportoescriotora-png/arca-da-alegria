@@ -14,6 +14,7 @@ interface Video {
   thumbnail: string; // Mapped from thumbnail_url
   duration: string;
   category: string;
+  videoUrl: string;
 }
 
 const categories = ['Todos', 'Músicas', 'Histórias', 'Aprendizado'];
@@ -28,19 +29,34 @@ export default function Videos() {
   // Pagination
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+  }, [currentPage, search, activeCategory]);
 
   const fetchVideos = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*');
+
+      // 1. Build Query
+      let query = supabase.from('videos').select('*', { count: 'exact' });
+
+      if (search) {
+        query = query.ilike('title', `%${search}%`);
+      }
+
+      if (activeCategory !== 'Todos') {
+        query = query.eq('category', activeCategory);
+      }
+
+      // Add Range
+      query = query.range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
+      if (count !== null) setTotalItems(count);
 
       const formattedVideos: Video[] = (data || []).map(v => ({
         id: v.id,
@@ -48,7 +64,7 @@ export default function Videos() {
         thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
         duration: v.duration || '0:00',
         category: v.category || 'Músicas',
-        videoUrl: v.video_url || '' // Map from DB
+        videoUrl: v.video_url || ''
       }));
 
       setVideos(formattedVideos);
@@ -58,12 +74,6 @@ export default function Videos() {
       setLoading(false);
     }
   };
-
-  const filteredVideos = videos.filter(video => {
-    const matchesSearch = video.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === 'Todos' || video.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -96,14 +106,20 @@ export default function Videos() {
           onCategoryChange={setActiveCategory}
         />
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-4">
-              {filteredVideos.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(video => (
+        <div className="grid grid-cols-1 gap-4">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm flex flex-col">
+                <div className="w-full aspect-video bg-muted animate-pulse" />
+                <div className="p-4 space-y-2">
+                  <div className="h-5 w-3/4 bg-muted animate-pulse rounded-md" />
+                  <div className="h-4 w-1/4 bg-muted animate-pulse rounded-md" />
+                </div>
+              </div>
+            ))
+          ) : (
+            <>
+              {videos.map(video => (
                 <VideoCard
                   key={video.id}
                   id={video.id}
@@ -114,19 +130,24 @@ export default function Videos() {
                   videoUrl={video.videoUrl}
                 />
               ))}
-            </div>
+            </>
+          )}
+        </div>
+
+        {!loading && (
+          <>
             <Pagination
               currentPage={currentPage}
-              totalPages={Math.ceil(filteredVideos.length / ITEMS_PER_PAGE)}
+              totalPages={Math.ceil(totalItems / ITEMS_PER_PAGE)}
               onPageChange={setCurrentPage}
             />
-          </>
-        )}
 
-        {!loading && filteredVideos.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Nenhum vídeo encontrado</p>
-          </div>
+            {videos.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Nenhum vídeo encontrado</p>
+              </div>
+            )}
+          </>
         )}
       </main>
 

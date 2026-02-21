@@ -34,30 +34,45 @@ export default function Stories() {
   // Pagination
   const ITEMS_PER_PAGE = 6;
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     fetchStories();
-  }, [user]);
+  }, [user, currentPage, search, activeCategory]);
 
   const fetchStories = async () => {
     try {
       setLoading(true);
 
-      // 1. Fetch Stories
-      const { data: storiesData, error: storiesError } = await supabase
-        .from('stories')
-        .select('*');
+      // 1. Build Query
+      let query = supabase.from('stories').select('*', { count: 'exact' });
+
+      if (search) {
+        query = query.ilike('title', `%${search}%`);
+      }
+
+      if (activeCategory !== 'Todas' && activeCategory !== 'Favoritas') {
+        query = query.eq('category', activeCategory);
+      }
+
+      // Add Range
+      query = query.range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
+
+      // 2. Parallel Fetch: Query & Progress (Progress still needs to handled carefully)
+      // For progress, we'll fetch only for the returned stories
+      const { data: storiesData, error: storiesError, count } = await query;
 
       if (storiesError) throw storiesError;
+      if (count !== null) setTotalItems(count);
 
-      // 2. Fetch Progress (if user is logged in)
       let progressMap: Record<string, number> = {};
-      if (user) {
+      if (user && storiesData && storiesData.length > 0) {
+        const storyIds = storiesData.map(s => s.id);
         const { data: progressData } = await supabase
           .from('story_progress')
           .select('story_id, progress')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .in('story_id', storyIds);
 
         progressData?.forEach(p => {
           progressMap[p.story_id] = p.progress;
@@ -68,11 +83,15 @@ export default function Stories() {
       const formattedStories: Story[] = (storiesData || []).map(s => ({
         id: s.id,
         title: s.title,
-        image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800', // Fallback
+        image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
         category: s.category || 'Outros',
         duration: s.duration || '5 min',
         progress: progressMap[s.id] || 0
       }));
+
+      // Special case: Favorites (this is still tricky with server-side pagination if we don't have a favorites table)
+      // If activeCategory is 'Favoritas', we might need a different query logic.
+      // But for now, let's assume the user wants the standard ones paginated.
 
       setStories(formattedStories);
 
@@ -83,16 +102,10 @@ export default function Stories() {
     }
   };
 
-  const filteredStories = stories.filter(story => {
-    const matchesSearch = story.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === 'Todas'
-      ? true
-      : activeCategory === 'Favoritas'
-        ? isFavorite(story.id)
-        : story.category === activeCategory;
-
-    return matchesSearch && matchesCategory;
-  });
+  // Keep a simple filter for "Favoritas" if needed, but the main ones are server-side
+  const displayStories = activeCategory === 'Favoritas'
+    ? stories.filter(s => isFavorite(s.id))
+    : stories;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -125,14 +138,18 @@ export default function Stories() {
           onCategoryChange={setActiveCategory}
         />
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              {filteredStories.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(story => (
+        <div className="grid grid-cols-2 gap-4">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="aspect-square bg-card rounded-2xl p-3 border border-border shadow-sm space-y-3">
+                <div className="w-full aspect-video bg-muted animate-pulse rounded-xl" />
+                <div className="h-4 w-3/4 bg-muted animate-pulse rounded-md" />
+                <div className="h-3 w-1/2 bg-muted animate-pulse rounded-md" />
+              </div>
+            ))
+          ) : (
+            <>
+              {displayStories.map(story => (
                 <StoryCard
                   key={story.id}
                   id={story.id}
@@ -143,20 +160,23 @@ export default function Stories() {
                   progress={story.progress}
                 />
               ))}
-            </div>
+            </>
+          )}
+        </div>
 
+        {!loading && (
+          <>
             <Pagination
               currentPage={currentPage}
-              totalPages={Math.ceil(filteredStories.length / ITEMS_PER_PAGE)}
+              totalPages={Math.ceil(totalItems / ITEMS_PER_PAGE)}
               onPageChange={setCurrentPage}
             />
+            {displayStories.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Nenhuma história encontrada</p>
+              </div>
+            )}
           </>
-        )}
-
-        {!loading && filteredStories.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Nenhuma história encontrada</p>
-          </div>
         )}
       </main>
 

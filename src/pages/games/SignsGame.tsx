@@ -29,9 +29,7 @@ export default function SignsGame() {
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
     const [cards, setCards] = useState<Card[]>([]);
     const [gameState, setGameState] = useState<'menu' | 'preview' | 'playing' | 'gameover' | 'victory'>('menu');
-    const [flippedCards, setFlippedCards] = useState<number[]>([]); // indexes of currently flipped cards
-    const [timer, setTimer] = useState(0);
-    const [moves, setMoves] = useState(0);
+    const [countdown, setCountdown] = useState<number | null>(null);
 
     // Config based on difficulty
     const getConfig = (diff: Difficulty) => {
@@ -69,12 +67,24 @@ export default function SignsGame() {
         setTimer(config.timeLimit > 0 ? config.timeLimit : 0);
         setMoves(0);
         setFlippedCards([]);
+        setCountdown(3);
 
-        // Preview for 2 seconds
-        setTimeout(() => {
-            setCards(prev => prev.map(c => ({ ...c, isFlipped: false })));
-            setGameState('playing');
-        }, 2000);
+        // Countdown logic
+        const countdownInterval = setInterval(() => {
+            setCountdown(prev => {
+                if (prev === null || prev <= 1) {
+                    clearInterval(countdownInterval);
+                    // Start Game after countdown
+                    setTimeout(() => {
+                        setCountdown(null);
+                        setCards(curr => curr.map(c => ({ ...c, isFlipped: false })));
+                        setGameState('playing');
+                    }, 1000);
+                    return prev !== null ? 0 : null;
+                }
+                return prev - 1;
+            });
+        }, 1000);
     };
 
     // --- Game Logic ---
@@ -331,6 +341,20 @@ export default function SignsGame() {
                         <button onClick={() => setGameState('menu')} className="w-full py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl shadow-md transition-transform active:scale-95 text-lg">
                             Tentar Novamente
                         </button>
+                    </div>
+                )}
+
+                {/* Countdown Overlay */}
+                {countdown !== null && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+                        <div className="text-center animate-in zoom-in duration-500">
+                            <div className="text-8xl font-fredoka font-bold text-white drop-shadow-lg scale-110 animate-pulse">
+                                {countdown > 0 ? countdown : "JÁ!"}
+                            </div>
+                            <p className="text-white text-xl font-bold mt-4 drop-shadow-md">
+                                Prepare-se...
+                            </p>
+                        </div>
                     </div>
                 )}
             </main>

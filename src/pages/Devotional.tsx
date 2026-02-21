@@ -1,10 +1,11 @@
 import { ArrowLeft, Sparkles, Send, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { BottomNav } from '@/components/BottomNav';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Imagens dos ícones
 import morningIcon from '@/assets/morning-icon.jpg';
@@ -159,8 +160,8 @@ export default function Devotional() {
                     key={text}
                     onClick={() => setSelectedStart(text)}
                     className={`p-3 rounded-xl text-left text-sm transition-all ${selectedStart === text
-                        ? 'bg-primary text-white shadow-md scale-[1.02]'
-                        : 'bg-muted/50 hover:bg-muted text-foreground'
+                      ? 'bg-primary text-white shadow-md scale-[1.02]'
+                      : 'bg-muted/50 hover:bg-muted text-foreground'
                       }`}
                   >
                     {text}
@@ -178,8 +179,8 @@ export default function Devotional() {
                     key={text}
                     onClick={() => setSelectedMiddle(text)}
                     className={`p-3 rounded-xl text-left text-sm transition-all ${selectedMiddle === text
-                        ? 'bg-secondary text-white shadow-md scale-[1.02]'
-                        : 'bg-muted/50 hover:bg-muted text-foreground'
+                      ? 'bg-secondary text-white shadow-md scale-[1.02]'
+                      : 'bg-muted/50 hover:bg-muted text-foreground'
                       }`}
                   >
                     {text}
@@ -197,8 +198,8 @@ export default function Devotional() {
                     key={text}
                     onClick={() => setSelectedEnd(text)}
                     className={`p-3 rounded-xl text-left text-sm transition-all ${selectedEnd === text
-                        ? 'bg-accent text-white shadow-md scale-[1.02]'
-                        : 'bg-muted/50 hover:bg-muted text-foreground'
+                      ? 'bg-accent text-white shadow-md scale-[1.02]'
+                      : 'bg-muted/50 hover:bg-muted text-foreground'
                       }`}
                   >
                     {text}
@@ -247,6 +248,9 @@ export default function Devotional() {
             <DialogTitle className="text-center font-fredoka text-2xl text-primary flex items-center justify-center gap-2">
               <Heart className="fill-current" /> {currentPrayer?.title}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Visualize sua oração especial.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-6 text-center">
             <p className="text-xl leading-relaxed font-medium text-foreground">

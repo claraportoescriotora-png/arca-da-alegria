@@ -46,35 +46,6 @@ const Login = () => {
     }
   };
 
-  const handleSignUp = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: email.split('@')[0], // Default name
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Conta criada!",
-        description: "Verifique seu e-mail para confirmar (ou entre se já confirmou).",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao criar conta",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4 relative overflow-hidden">
@@ -123,8 +94,10 @@ const Login = () => {
                 <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="seu@email.com"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
@@ -134,8 +107,10 @@ const Login = () => {
                 <Label htmlFor="password">Senha</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="rounded-xl border-blue-200 focus:border-blue-400 bg-blue-50/50 text-gray-900 placeholder:text-gray-400"
@@ -153,7 +128,7 @@ const Login = () => {
                   type="button"
                   variant="outline"
                   disabled={loading}
-                  onClick={handleSignUp}
+                  onClick={() => window.location.href = "https://www.meuamiguito.com.br/landing"}
                   className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
                 >
                   Criar Conta

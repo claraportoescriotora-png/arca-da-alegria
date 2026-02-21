@@ -1,22 +1,23 @@
 {
-    "name": "Amiguitos - Arca da Alegria",
+    "name": "Amiguitos - App Infantil Cristão",
     "short_name": "Amiguitos",
-    "description": "Aplicativo Infantil Cristão com Histórias Bíblicas, Jogos e Missões.",
+    "description": "O aplicativo cristão que seu filho ama.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#6366F1",
     "icons": [
         {
-            "src": "/icon-192x192.png",
-            "sizes": "192x192",
+            "src": "/logo/arca-logo-2.png",
+            "sizes": "192x192 512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
-            "src": "/icon-512x512.png",
+            "src": "/logo/arca-logo-2.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ],
     "orientation": "portrait",

@@ -2,7 +2,7 @@ import { Play, Heart, X } from 'lucide-react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 
 interface VideoCardProps {
   id: string;
@@ -56,8 +56,8 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
               toggleFavorite(id, 'video');
             }}
             className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 z-10 ${favorite
-                ? 'bg-danger text-danger-foreground'
-                : 'bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-danger'
+              ? 'bg-danger text-danger-foreground'
+              : 'bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-danger'
               }`}
           >
             <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} />
@@ -76,6 +76,10 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-3xl p-0 bg-black border-none overflow-hidden rounded-xl aspect-video">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>Assistir ao vídeo: {title}</DialogDescription>
+        </DialogHeader>
         <div className="relative w-full h-full">
           <DialogClose className="absolute top-2 right-2 z-50 p-2 bg-black/50 rounded-full text-white hover:bg-black/70">
             <X className="w-4 h-4" />

@@ -22,28 +22,27 @@ export default function Missions() {
     // Pagination
     const ITEMS_PER_PAGE = 5;
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = Math.ceil(packs.length / ITEMS_PER_PAGE);
-    const currentPacks = packs.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+    const [totalItems, setTotalItems] = useState(0);
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
     const [enrolledPackIds, setEnrolledPackIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         fetchPacksAndEnrollments();
-    }, []);
+    }, [currentPage]);
 
     const fetchPacksAndEnrollments = async () => {
         try {
             setLoading(true);
-            const { data: packsData, error: packsError } = await supabase
+            const { data: packsData, error: packsError, count } = await supabase
                 .from('mission_packs')
-                .select('*')
-                .eq('is_active', true);
+                .select('*', { count: 'exact' })
+                .eq('is_active', true)
+                .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
 
             if (packsError) throw packsError;
             setPacks(packsData || []);
+            if (count !== null) setTotalItems(count);
 
             const { data: user } = await supabase.auth.getUser();
             if (user.user) {
@@ -84,75 +83,87 @@ export default function Missions() {
                     <p className="text-white/90">Escolha uma missão e comece sua aventura diária!</p>
                 </div>
 
-                {loading ? (
-                    <div className="flex justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {currentPacks.map(pack => {
-                            const isEnrolled = enrolledPackIds.has(pack.id);
-                            return (
-                                <div
-                                    key={pack.id}
-                                    onClick={() => navigate(`/missions/${pack.id}`)}
-                                    className={cn(
-                                        "group bg-card hover:bg-muted/50 transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
-                                        isEnrolled ? "border-primary/50 bg-primary/5" : "border-border"
-                                    )}
-                                >
-                                    <div className="flex gap-4">
-                                        <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 relative">
-                                            <img
-                                                src={pack.cover_url || 'https://images.unsplash.com/photo-1615714652285-d72b2576dd20?w=200'}
-                                                alt={pack.title}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                            />
-                                            {isEnrolled && (
-                                                <div className="absolute bottom-0 w-full bg-green-500/90 text-white text-[10px] font-bold text-center py-0.5">
-                                                    ATIVO
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-lg text-foreground mb-1 truncate">{pack.title}</h3>
-                                            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                                {pack.description}
-                                            </p>
-                                            <div className="flex items-center gap-3 text-xs font-medium">
-                                                <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md">
-                                                    <Calendar className="w-3 h-3" />
-                                                    {pack.total_days} Dias
-                                                </span>
-                                                <span className="flex items-center gap-1 text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-md">
-                                                    <Star className="w-3 h-3 fill-current" />
-                                                    Premium
-                                                </span>
+                <div className="space-y-4">
+                    {loading ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="bg-card rounded-2xl p-4 border border-border shadow-sm flex gap-4">
+                                <div className="w-20 h-20 rounded-xl bg-muted animate-pulse shrink-0" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-6 w-3/4 bg-muted animate-pulse rounded-md" />
+                                    <div className="h-4 w-full bg-muted animate-pulse rounded-md" />
+                                    <div className="flex gap-2">
+                                        <div className="h-6 w-16 bg-muted animate-pulse rounded-md" />
+                                        <div className="h-6 w-16 bg-muted animate-pulse rounded-md" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <>
+                            {packs.map(pack => {
+                                const isEnrolled = enrolledPackIds.has(pack.id);
+                                return (
+                                    <div
+                                        key={pack.id}
+                                        onClick={() => navigate(`/missions/${pack.id}`)}
+                                        className={cn(
+                                            "group bg-card hover:bg-muted/50 transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
+                                            isEnrolled ? "border-primary/50 bg-primary/5" : "border-border"
+                                        )}
+                                    >
+                                        <div className="flex gap-4">
+                                            <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 relative">
+                                                <img
+                                                    src={pack.cover_url || 'https://images.unsplash.com/photo-1615714652285-d72b2576dd20?w=200'}
+                                                    alt={pack.title}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                                {isEnrolled && (
+                                                    <div className="absolute bottom-0 w-full bg-green-500/90 text-white text-[10px] font-bold text-center py-0.5">
+                                                        ATIVO
+                                                    </div>
+                                                )}
                                             </div>
-                                        </div>
-                                        <div className="self-center">
-                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                                <ArrowRight className="w-4 h-4" />
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-lg text-foreground mb-1 truncate">{pack.title}</h3>
+                                                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                                    {pack.description}
+                                                </p>
+                                                <div className="flex items-center gap-3 text-xs font-medium">
+                                                    <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md">
+                                                        <Calendar className="w-3 h-3" />
+                                                        {pack.total_days} Dias
+                                                    </span>
+                                                    <span className="flex items-center gap-1 text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-md">
+                                                        <Star className="w-3 h-3 fill-current" />
+                                                        Premium
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="self-center">
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                                    <ArrowRight className="w-4 h-4" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                );
+                            })}
+
+                            {packs.length === 0 && (
+                                <div className="text-center py-12 bg-card rounded-3xl border border-dashed border-border">
+                                    <p className="text-muted-foreground">Nenhuma missão disponível no momento.</p>
                                 </div>
-                            );
-                        })}
+                            )}
 
-                        {packs.length === 0 && (
-                            <div className="text-center py-12 bg-card rounded-3xl border border-dashed border-border">
-                                <p className="text-muted-foreground">Nenhuma missão disponível no momento.</p>
-                            </div>
-                        )}
-
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
-                    </div>
-                )}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        </>
+                    )}
+                </div>
             </main>
 
             <BottomNav />

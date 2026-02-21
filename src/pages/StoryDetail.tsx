@@ -4,7 +4,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { BottomNav } from '@/components/BottomNav';
 import { supabase } from '@/lib/supabase';
@@ -227,30 +227,32 @@ export default function StoryDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between pointer-events-none">
-          <button
-            onClick={() => {
-              window.speechSynthesis.cancel();
-              navigate(-1);
-            }}
-            className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all pointer-events-auto active:scale-95"
-          >
-            <ArrowLeft className="w-6 h-6 text-slate-700" />
-          </button>
-
-          <div className="flex gap-3 pointer-events-auto">
-            <button className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all active:scale-95">
-              <Share2 className="w-6 h-6 text-slate-700" />
-            </button>
+        <div className="absolute top-0 left-0 right-0 p-6 z-20 pointer-events-none">
+          <div className="container max-w-md mx-auto flex items-center justify-between pointer-events-none">
             <button
-              onClick={() => toggleFavorite(story.id, 'story')}
-              className={`p-3 rounded-full shadow-lg transition-all active:scale-95 ${favorite
-                ? 'bg-danger text-white'
-                : 'bg-white/90 backdrop-blur-md hover:bg-white text-slate-700'
-                }`}
+              onClick={() => {
+                window.speechSynthesis.cancel();
+                navigate(-1);
+              }}
+              className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all pointer-events-auto active:scale-95"
             >
-              <Heart className={`w-6 h-6 ${favorite ? 'fill-current' : ''}`} />
+              <ArrowLeft className="w-6 h-6 text-slate-700" />
             </button>
+
+            <div className="flex gap-3 pointer-events-auto">
+              <button className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-white transition-all active:scale-95">
+                <Share2 className="w-6 h-6 text-slate-700" />
+              </button>
+              <button
+                onClick={() => toggleFavorite(story.id, 'story')}
+                className={`p-3 rounded-full shadow-lg transition-all active:scale-95 ${favorite
+                  ? 'bg-danger text-white border-2 border-white'
+                  : 'bg-white/90 backdrop-blur-md hover:bg-white text-slate-700'
+                  }`}
+              >
+                <Heart className={`w-6 h-6 ${favorite ? 'fill-current' : ''}`} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -310,6 +312,9 @@ export default function StoryDetail() {
               <DialogContent className="rounded-3xl sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Quiz: {story.title}</DialogTitle>
+                  <DialogDescription>
+                    Teste seus conhecimentos sobre esta história!
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="py-4">

@@ -126,8 +126,8 @@ export default async function handler(req: any, res: any) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${openrouterKey}`,
-                        'HTTP-Referer': 'https://arcadaalegria.com.br',
-                        'X-Title': 'Arca da Alegria Agent'
+                        'HTTP-Referer': 'https://meuamiguito.com.br',
+                        'X-Title': 'Amiguitos Agent'
                     },
                     body: JSON.stringify({
                         model: selectedModel,

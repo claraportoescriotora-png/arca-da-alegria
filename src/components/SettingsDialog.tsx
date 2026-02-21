@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Settings, User, Check, Camera } from "lucide-react";
 import { useUser, AVATARS } from "@/contexts/UserContext";
 import { Label } from "@/components/ui/label";
@@ -52,6 +52,9 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
             <Settings className="w-5 h-5" />
             Configurações
           </DialogTitle>
+          <DialogDescription>
+            Personalize seu perfil e escolha seu avatar favorito.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -59,9 +62,10 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
             <Label htmlFor="name">Seu Nome</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                id="name" 
-                value={tempName} 
+              <Input
+                id="name"
+                name="name"
+                value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 className="pl-9"
                 placeholder="Como você quer ser chamado?"
@@ -74,23 +78,22 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
             <div className="flex flex-col gap-4">
               {/* Custom Upload Button - Big Circle */}
               <div className="flex justify-center">
-                 <input 
-                  type="file" 
-                  id="settings-photo-upload" 
-                  accept="image/*" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  id="settings-photo-upload"
+                  accept="image/*"
+                  className="hidden"
                   onChange={handleFileChange}
                 />
                 <button
                   onClick={handlePhotoUpload}
-                  className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center bg-gray-100 overflow-hidden transition-all ${
-                    tempAvatar === 'custom' ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center bg-gray-100 overflow-hidden transition-all ${tempAvatar === 'custom' ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   {customAvatar ? (
-                     <img src={customAvatar} alt="Custom" className="w-full h-full object-cover" />
+                    <img src={customAvatar} alt="Custom" className="w-full h-full object-cover" />
                   ) : (
-                     <Camera className="w-8 h-8 text-gray-400" />
+                    <Camera className="w-8 h-8 text-gray-400" />
                   )}
                 </button>
               </div>
@@ -101,11 +104,10 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
                   <button
                     key={key}
                     onClick={() => setTempAvatar(key)}
-                    className={`relative p-1 rounded-full transition-all ${
-                      tempAvatar === key 
-                        ? 'ring-2 ring-primary ring-offset-2 scale-110' 
+                    className={`relative p-1 rounded-full transition-all ${tempAvatar === key
+                        ? 'ring-2 ring-primary ring-offset-2 scale-110'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     <UserAvatar avatarId={key} className="w-12 h-12" />
                     {tempAvatar === key && (
