@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://gypzrzsmxgjtkidznstd.supabase.co';
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const internalSecret = process.env.INTERNAL_API_SECRET || 'Amiguitos_Segredo_2026_!_';
+    const internalSecret = process.env.INTERNAL_API_SECRET;
     const signatureSecret = process.env.KIWIFY_SIGNATURE_SECRET;
 
     if (!supabaseServiceKey) {
@@ -145,7 +145,11 @@ export default async function handler(req: any, res: any) {
             console.error('Webhook logging skipped (table might be missing):', logErr);
         }
 
-        return res.status(200).json({ success: true, mode: isInternalTest ? 'test' : 'production' });
+        return res.status(200).json({
+            success: true,
+            mode: isInternalTest ? 'test' : 'production',
+            message: isInternalTest ? 'Simulação concluída' : 'Evento processado'
+        });
 
     } catch (err: any) {
         console.error('Runtime Webhook Error:', err.message);

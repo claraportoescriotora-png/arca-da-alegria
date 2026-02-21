@@ -48,7 +48,11 @@ export function AdminTestSuite() {
                 product: { product_id: "amiguito_anual" }
             };
 
-            const bypassSecret = import.meta.env.VITE_INTERNAL_API_SECRET || 'Amiguitos_Segredo_2026_!_';
+            const bypassSecret = import.meta.env.VITE_INTERNAL_API_SECRET;
+
+            if (!bypassSecret) {
+                throw new Error('Chave de simulação (VITE_INTERNAL_API_SECRET) não configurada no ambiente.');
+            }
 
             const response = await fetch('/api/webhook', {
                 method: 'POST',
