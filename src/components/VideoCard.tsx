@@ -26,8 +26,22 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
     return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
   };
 
+  // Extract video ID for fallback thumbnail generation
   const videoId = videoUrl?.split('v=')[1]?.split('&')[0] || videoUrl?.split('/').pop();
-  const ytThumbnail = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : thumbnail;
+  // PRIORITY: Use stored thumbnail_url first (already hqdefault from import).
+  // Only generate from videoId if no thumbnail is stored.
+  const primaryThumbnail = thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
+
+  const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    if (!videoId) return;
+    // Progressive fallback: hqdefault -> mqdefault -> default
+    if (target.src.includes('hqdefault')) {
+      target.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+    } else if (target.src.includes('mqdefault')) {
+      target.src = `https://img.youtube.com/vi/${videoId}/default.jpg`;
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -37,15 +51,10 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
         >
           <div className="aspect-video overflow-hidden relative">
             <img
-              src={ytThumbnail || thumbnail}
+              src={primaryThumbnail}
               alt={title}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                if (videoId && target.src.includes('maxresdefault')) {
-                  target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                }
-              }}
+              onError={handleThumbnailError}
             />
 
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

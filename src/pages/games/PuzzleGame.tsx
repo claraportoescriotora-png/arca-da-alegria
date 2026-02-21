@@ -32,17 +32,32 @@ export default function PuzzleGame() {
   const [isComplete, setIsComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageLoadError, setImageLoadError] = useState(false);
   const [gridSize, setGridSize] = useState(3); // Default 3x3
 
   useEffect(() => {
     if (id) fetchGameConfig();
   }, [id]);
 
+  // Preload image and detect errors before starting the puzzle
   useEffect(() => {
-    if (imageUrl) {
+    if (!imageUrl) return;
+    const img = new Image();
+    img.onload = () => {
+      setImageLoadError(false);
+      initializePuzzle(gridSize);
+    };
+    img.onerror = () => {
+      setImageLoadError(true);
+    };
+    img.src = imageUrl;
+  }, [imageUrl]);
+
+  useEffect(() => {
+    if (imageUrl && !imageLoadError) {
       initializePuzzle(gridSize);
     }
-  }, [gridSize, imageUrl]);
+  }, [gridSize]);
 
   const fetchGameConfig = async () => {
     try {
@@ -152,6 +167,17 @@ export default function PuzzleGame() {
   };
 
   if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
+
+  if (imageLoadError) return (
+    <div className="flex flex-col justify-center items-center h-screen gap-4 p-8 text-center">
+      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+        <ImageIcon className="w-10 h-10 text-muted-foreground" />
+      </div>
+      <h2 className="text-xl font-fredoka font-bold text-foreground">Imagem não encontrada</h2>
+      <p className="text-muted-foreground text-sm max-w-xs">A imagem deste quebra-cabeça não pôde ser carregada. Verifique as configurações no painel de administração.</p>
+      <button onClick={() => navigate('/games')} className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-bold">Voltar aos Jogos</button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
