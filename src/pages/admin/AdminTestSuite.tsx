@@ -40,6 +40,7 @@ export function AdminTestSuite() {
             // 1. Trigger internal webhook call
             const payload = {
                 order_status: "paid",
+                origin: window.location.origin,
                 customer: {
                     full_name: name,
                     email: email,
