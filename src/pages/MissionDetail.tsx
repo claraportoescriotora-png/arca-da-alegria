@@ -228,7 +228,7 @@ export default function MissionDetail() {
                     {!enrolledAt ? (
                         <button
                             onClick={handleStartMission}
-                            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:scale-105 transition w-full justify-center md:w-auto"
+                            className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:scale-105 transition w-full justify-center md:w-fit mx-auto"
                         >
                             <Play className="fill-current w-5 h-5" /> Iniciar Missão Agora
                         </button>

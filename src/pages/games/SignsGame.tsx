@@ -30,6 +30,9 @@ export default function SignsGame() {
     const [cards, setCards] = useState<Card[]>([]);
     const [gameState, setGameState] = useState<'menu' | 'preview' | 'playing' | 'gameover' | 'victory'>('menu');
     const [countdown, setCountdown] = useState<number | null>(null);
+    const [timer, setTimer] = useState(0);
+    const [moves, setMoves] = useState(0);
+    const [flippedCards, setFlippedCards] = useState<number[]>([]);
 
     // Config based on difficulty
     const getConfig = (diff: Difficulty) => {
