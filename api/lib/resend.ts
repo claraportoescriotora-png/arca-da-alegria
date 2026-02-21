@@ -1,7 +1,6 @@
-
 import { Resend } from 'resend';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// No top-level initialization to avoid boot-time crashes if env is missing
 
 const PWA_INSTRUCTIONS = `
   <div style="margin-top: 24px; padding: 16px; background-color: #f0f4ff; border-radius: 8px; font-size: 14px; border: 1px dashed #4f46e5;">
@@ -11,6 +10,13 @@ const PWA_INSTRUCTIONS = `
 `;
 
 export const sendWelcomeEmail = async (email: string, magicLink: string) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('RESEND_API_KEY is not defined in environment variables');
+    return null;
+  }
+
+  const resend = new Resend(apiKey);
   return await resend.emails.send({
     from: 'Meu Amiguito <nao-responda@meuamiguito.com.br>',
     to: email,
@@ -39,6 +45,13 @@ export const sendWelcomeEmail = async (email: string, magicLink: string) => {
 };
 
 export const sendMagicLinkEmail = async (email: string, magicLink: string) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('RESEND_API_KEY is not defined in environment variables');
+    return null;
+  }
+
+  const resend = new Resend(apiKey);
   return await resend.emails.send({
     from: 'Meu Amiguito <nao-responda@meuamiguito.com.br>',
     to: email,
