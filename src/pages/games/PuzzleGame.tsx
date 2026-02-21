@@ -45,9 +45,8 @@ export default function PuzzleGame() {
     // IMAGE LOADING LOGIC
     const img = new Image();
     img.onload = () => {
-      setImageLoaded(true);
       setImageLoadError(false);
-      initializePuzzle(gridSize); // Changed from initializeGame(img) to initializePuzzle(gridSize) to match existing logic
+      initializePuzzle(gridSize);
     };
     img.onerror = () => {
       console.error('Puzzle image load failed:', imageUrl);
