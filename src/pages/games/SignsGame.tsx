@@ -33,8 +33,6 @@ export default function SignsGame() {
     const [countdown, setCountdown] = useState<number | null>(null);
     const [timer, setTimer] = useState(0);
     const [moves, setMoves] = useState(0);
-    const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
-    const [matchedIndices, setMatchedIndices] = useState<Set<number>>(new Set());
     const [isChecking, setIsChecking] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
 
@@ -116,51 +114,53 @@ export default function SignsGame() {
     }, [gameState, difficulty, isPreview]);
 
     const handleCardClick = (index: number) => {
-        // Prevents: clicks during preview, checking, or when card is already flipped/matched
         if (gameState !== 'playing' || isPreview || isChecking) return;
-        if (matchedIndices.has(index) || flippedIndices.includes(index)) return;
-        if (flippedIndices.length >= 2) return;
+        if (cards[index].isMatched || cards[index].isFlipped) return;
 
-        // 1. Flip card immediately
-        const newFlipped = [...flippedIndices, index];
-        setFlippedIndices(newFlipped);
+        // 1. ATOMIC UPDATE: Flip card and calculate next state in one go
+        setCards(prevCards => {
+            const nextCards = [...prevCards];
+            nextCards[index] = { ...nextCards[index], isFlipped: true };
 
-        // 2. Check match if two cards are flipped
-        if (newFlipped.length === 2) {
-            setIsChecking(true);
-            setMoves(m => m + 1);
+            const currentlyFlipped = nextCards.filter(c => c.isFlipped && !c.isMatched);
 
-            const [firstIndex, secondIndex] = newFlipped;
-            const firstCard = cards[firstIndex];
-            const secondCard = cards[secondIndex];
+            if (currentlyFlipped.length === 2) {
+                // LOCK UI
+                setIsChecking(true);
+                setMoves(m => m + 1);
 
-            if (firstCard.symbol === secondCard.symbol) {
-                // MATCH FOUND
-                setTimeout(() => {
-                    setMatchedIndices(prev => {
-                        const next = new Set(prev);
-                        next.add(firstIndex);
-                        next.add(secondIndex);
+                const [card1, card2] = currentlyFlipped;
 
-                        // Check Victory within the state update to be accurate
-                        if (next.size === cards.length) {
-                            setGameState('victory');
-                            addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
-                        }
+                if (card1.symbol === card2.symbol) {
+                    // MATCH - Resolve after a small visual delay
+                    setTimeout(() => {
+                        setCards(finalCards => {
+                            const matched = finalCards.map(c =>
+                                (c.id === card1.id || c.id === card2.id) ? { ...c, isMatched: true } : c
+                            );
 
-                        return next;
-                    });
-                    setFlippedIndices([]);
-                    setIsChecking(false);
-                }, 500); // Small pause to show the second card
-            } else {
-                // NO MATCH
-                setTimeout(() => {
-                    setFlippedIndices([]);
-                    setIsChecking(false);
-                }, 1000); // 1s to memorize
+                            // Check Win immediately
+                            if (matched.every(c => c.isMatched)) {
+                                setGameState('victory');
+                                addXp(50 + (difficulty === 'medium' ? 50 : 0) + (difficulty === 'hard' ? 100 : 0));
+                            }
+                            return matched;
+                        });
+                        setIsChecking(false);
+                    }, 500);
+                } else {
+                    // NO MATCH - Close after 1s
+                    setTimeout(() => {
+                        setCards(finalCards => finalCards.map(c =>
+                            (c.id === card1.id || c.id === card2.id) ? { ...c, isFlipped: false } : c
+                        ));
+                        setIsChecking(false);
+                    }, 1000);
+                }
             }
-        }
+
+            return nextCards;
+        });
     };
 
     // --- Render Helpers ---
