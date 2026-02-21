@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Settings, User, Check, Camera } from "lucide-react";
+import { Settings, User, Check, Camera, Lock } from "lucide-react";
 import { useUser, AVATARS } from "@/contexts/UserContext";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,13 @@ import { UserAvatar } from "./UserAvatar";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabase";
 
 export function SettingsDialog({ children }: { children: React.ReactNode }) {
   const { name, setName, avatarId, setAvatarId, setCustomAvatar, customAvatar } = useUser();
   const [tempName, setTempName] = useState(name);
   const [tempAvatar, setTempAvatar] = useState(avatarId);
+  const [password, setPassword] = useState("");
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
@@ -105,8 +107,8 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
                     key={key}
                     onClick={() => setTempAvatar(key)}
                     className={`relative p-1 rounded-full transition-all ${tempAvatar === key
-                        ? 'ring-2 ring-primary ring-offset-2 scale-110'
-                        : 'hover:bg-muted'
+                      ? 'ring-2 ring-primary ring-offset-2 scale-110'
+                      : 'hover:bg-muted'
                       }`}
                   >
                     <UserAvatar avatarId={key} className="w-12 h-12" />
@@ -121,7 +123,40 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <Button onClick={handleSave} className="w-full rounded-xl font-bold">
+          <div className="space-y-4 pt-4 border-t border-blue-50">
+            <Label className="flex items-center gap-2 text-blue-900 font-fredoka">
+              <Lock className="w-4 h-4" />
+              Segurança
+            </Label>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Nova senha (mín. 6 dígitos)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-xl border-blue-100 h-11"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full rounded-xl border-blue-200 text-blue-600 font-Fredoka"
+                disabled={!password || password.length < 6}
+                onClick={async () => {
+                  const { error } = await supabase.auth.updateUser({ password });
+                  if (error) {
+                    toast({ variant: "destructive", title: "Erro", description: error.message });
+                  } else {
+                    toast({ title: "Sucesso!", description: "Sua senha foi atualizada." });
+                    setPassword("");
+                  }
+                }}
+              >
+                Atualizar Senha
+              </Button>
+            </div>
+          </div>
+
+          <Button onClick={handleSave} className="w-full rounded-xl font-bold bg-blue-500 hover:bg-blue-600 text-white h-12 shadow-lg">
             Salvar Alterações
           </Button>
         </div>

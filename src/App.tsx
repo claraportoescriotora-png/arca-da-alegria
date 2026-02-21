@@ -36,6 +36,8 @@ import Paywall from "./pages/Paywall";
 import SubscriptionGuard from "./components/SubscriptionGuard";
 import Admin from "./pages/admin/Admin";
 import Landing from "./pages/Landing";
+import Welcome from "./pages/Welcome";
+import ThankYou from "./pages/ThankYou";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,8 @@ const App = () => (
                     <Route path="/landing" element={<Landing />} />
 
                     <Route path="/" element={<Login />} />
+                    <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+                    <Route path="/obrigado" element={<ThankYou />} />
                     <Route path="/paywall" element={<ProtectedRoute><Paywall /></ProtectedRoute>} />
                     <Route path="/home" element={<ProtectedRoute><SubscriptionGuard><Home /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/stories" element={<ProtectedRoute><SubscriptionGuard><Stories /></SubscriptionGuard></ProtectedRoute>} />
