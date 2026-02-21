@@ -11,6 +11,7 @@ const CATEGORIES = [
 ];
 
 interface CardData {
+    id: number;
     category: 'animals' | 'people' | 'objects' | 'fruits';
     text: string;
     isSpecial?: boolean;
@@ -47,21 +48,33 @@ export default function CharadesGame() {
 
     // State
     const [gameState, setGameState] = useState<'menu' | 'drawing' | 'acting' | 'challenge'>('menu');
-    const [currentCard, setCurrentCard] = useState<CardData | null>(null);
+    const [currentCategory, setCurrentCategory] = useState<string | undefined>(undefined);
+    const [history, setHistory] = useState<number[]>([]);
 
     // Logic
-    const drawCard = (category?: Category) => {
+    const drawCard = (category?: string) => {
         setGameState('drawing');
+        setCurrentCategory(category);
 
         // Filter deck
         const pool = category ? CARDS.filter(c => c.category === category) : CARDS;
 
+        // Avoid repetition (don't pick from last 10 cards if pool is large enough)
+        const availablePool = pool.length > 15
+            ? pool.filter(c => !history.includes(c.id))
+            : pool;
+
         // Random pick
         setTimeout(() => {
-            const randomCard = pool[Math.floor(Math.random() * pool.length)];
+            const randomCard = availablePool[Math.floor(Math.random() * availablePool.length)];
             setCurrentCard(randomCard);
+            setHistory(prev => [randomCard.id, ...prev].slice(0, 10));
             setGameState('acting'); // Start Acting Phase
-        }, 1500);
+        }, 1200);
+    };
+
+    const skipCard = () => {
+        drawCard(currentCategory);
     };
 
     const handleGuessed = () => {
@@ -159,13 +172,19 @@ export default function CharadesGame() {
                                     <p className="text-amber-700 text-sm">Não fale nada! Apenas faça mímica.</p>
                                 </div>
 
-                                <div className="pt-4">
+                                <div className="pt-4 grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={skipCard}
+                                        className="py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold active:scale-95 transition-transform flex items-center justify-center gap-2"
+                                    >
+                                        Pular
+                                    </button>
                                     <button
                                         onClick={handleGuessed}
-                                        className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg shadow-green-200 active:scale-95 transition-transform flex items-center justify-center gap-2 text-lg"
+                                        className="py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg shadow-green-100 active:scale-95 transition-transform flex items-center justify-center gap-2"
                                     >
                                         <CheckCircle className="w-6 h-6" />
-                                        Eles Adivinharam!
+                                        Adivinharam!
                                     </button>
                                 </div>
                             </div>
