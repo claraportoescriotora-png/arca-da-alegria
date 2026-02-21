@@ -10,6 +10,8 @@ type SymbolType = 'cross' | 'dove' | 'heart' | 'star' | 'rainbow' | 'light' | 'b
 interface Card {
     id: number;
     symbol: SymbolType;
+    isFlipped: boolean;
+    isMatched: boolean;
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -62,16 +64,16 @@ export default function SignsGame() {
 
         const newCards = deck.map((symbol, index) => ({
             id: index,
-            symbol
+            symbol,
+            isFlipped: true, // Preview state
+            isMatched: false
         }));
 
         setCards(newCards);
-        setGameState('playing'); // Set to playing to show HUD
-        setIsPreview(true); // Flag for preview mode
+        setGameState('playing');
+        setIsPreview(true);
         setTimer(config.timeLimit > 0 ? config.timeLimit : 0);
         setMoves(0);
-        setFlippedIndices([]);
-        setMatchedIndices(new Set());
         setCountdown(3);
         setIsChecking(false);
 
@@ -82,7 +84,8 @@ export default function SignsGame() {
                     clearInterval(countdownInterval);
                     setTimeout(() => {
                         setCountdown(null);
-                        setIsPreview(false); // Hide all cards
+                        setIsPreview(false);
+                        setCards(curr => curr.map(c => ({ ...c, isFlipped: false })));
                     }, 1000);
                     return prev !== null ? 0 : null;
                 }
@@ -316,18 +319,18 @@ export default function SignsGame() {
                                 <button
                                     key={card.id + '-' + index}
                                     onClick={() => handleCardClick(index)}
-                                    className="aspect-square w-full max-h-24 relative focus:outline-none group"
+                                    className="aspect-square w-full max-h-24 relative focus:outline-none touch-manipulation"
+                                    style={{ WebkitTapHighlightColor: 'transparent' }}
                                 >
                                     <div className={cn(
-                                        "w-full h-full relative transition-all duration-500 preserve-3d transform-gpu shadow-sm rounded-xl",
-                                        "group-hover:scale-[1.02] group-active:scale-95",
-                                        (isPreview || flippedIndices.includes(index) || matchedIndices.has(index)) ? "rotate-y-180" : ""
+                                        "w-full h-full relative transition-transform duration-500 preserve-3d shadow-sm rounded-xl",
+                                        card.isFlipped ? "rotate-y-180" : ""
                                     )}>
-                                        {/* Front (Symbol) - This is what shows when face up */}
+                                        {/* Front (Symbol) */}
                                         <div
                                             className={cn(
                                                 "absolute inset-0 backface-hidden rounded-xl flex items-center justify-center border-2 rotate-y-180",
-                                                matchedIndices.has(index) ? "bg-green-50 border-green-200 shadow-green-100" : "bg-white border-white"
+                                                card.isMatched ? "bg-green-50 border-green-200" : "bg-white border-white"
                                             )}
                                             style={{ transform: "rotateY(180deg)" }}
                                         >
@@ -336,10 +339,10 @@ export default function SignsGame() {
                                             </svg>
                                         </div>
 
-                                        {/* Back (Pattern) - This is the initial face-down state */}
-                                        <div className="absolute inset-0 backface-hidden bg-indigo-500 rounded-xl flex items-center justify-center border-b-4 border-indigo-700 overflow-hidden">
-                                            <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '12px 12px' }} />
-                                            <span className="text-white opacity-50 absolute font-bold text-xl">?</span>
+                                        {/* Back (Pattern) */}
+                                        <div className="absolute inset-0 backface-hidden bg-indigo-600 rounded-xl flex items-center justify-center border-b-4 border-indigo-800 pointer-events-none">
+                                            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }} />
+                                            <span className="text-white font-bold text-2xl drop-shadow-sm font-fredoka">?</span>
                                         </div>
                                     </div>
                                 </button>
