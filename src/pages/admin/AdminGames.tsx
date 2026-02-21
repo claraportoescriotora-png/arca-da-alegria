@@ -96,8 +96,9 @@ export function AdminGames() {
                     title: newGameTitle,
                     type: newGameType,
                     status: 'available',
-                    config: {}, // Default empty config
-                    is_active: true // For backward compatibility if column exists
+                    image_url: newGameType === 'puzzle' ? 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800' : null,
+                    config: newGameType === 'puzzle' ? { image: 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800' } : {},
+                    is_active: true
                 });
 
             if (error) throw error;
@@ -136,11 +137,14 @@ export function AdminGames() {
                 .from('activities')
                 .getPublicUrl(filePath);
 
-            // 3. Update Game Config
+            // 3. Update Game Config and Image URL
             const newConfig = { ...selectedGame.config, image: publicUrl };
             const { error: updateError } = await supabase
                 .from('games')
-                .update({ config: newConfig })
+                .update({
+                    config: newConfig,
+                    image_url: publicUrl // Update the main image_url for the admin list
+                })
                 .eq('id', selectedGame.id);
 
             if (updateError) throw updateError;

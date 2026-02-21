@@ -19,27 +19,39 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
   const favorite = isFavorite(id);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Helper to get embed URL from YouTube link
-  const getEmbedUrl = (url: string) => {
+  // Robust YouTube ID extraction
+  const getYouTubeId = (url: string) => {
     if (!url) return '';
-    const videoId = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
   };
 
-  // Extract video ID for fallback thumbnail generation
-  const videoId = videoUrl?.split('v=')[1]?.split('&')[0] || videoUrl?.split('/').pop();
+  const videoId = getYouTubeId(videoUrl || '');
+
+  // Helper to get embed URL from YouTube link
+  const getEmbedUrl = (id: string) => {
+    if (!id) return '';
+    return `https://www.youtube.com/embed/${id}?autoplay=1`;
+  };
+
   // PRIORITY: Use stored thumbnail_url first (already hqdefault from import).
   // Only generate from videoId if no thumbnail is stored.
   const primaryThumbnail = thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
 
   const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
-    if (!videoId) return;
+    const currentId = getYouTubeId(videoUrl || '');
+    if (!currentId) return;
+
     // Progressive fallback: hqdefault -> mqdefault -> default
     if (target.src.includes('hqdefault')) {
-      target.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+      target.src = `https://img.youtube.com/vi/${currentId}/mqdefault.jpg`;
     } else if (target.src.includes('mqdefault')) {
-      target.src = `https://img.youtube.com/vi/${videoId}/default.jpg`;
+      target.src = `https://img.youtube.com/vi/${currentId}/default.jpg`;
+    } else {
+      // If it's some other broken URL, force it to YouTube hqdefault
+      target.src = `https://img.youtube.com/vi/${currentId}/hqdefault.jpg`;
     }
   };
 

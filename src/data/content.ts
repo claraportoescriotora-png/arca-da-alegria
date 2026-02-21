@@ -9,7 +9,7 @@ import criacaoImg from '@/assets/criacao.jpg';
 import joseImg from '@/assets/jose-do-egito.jpg';
 import dezMandamentosImg from '@/assets/dez-mandamentos.jpg';
 import musicaImg from '@/assets/musica-amor.jpg';
-import gamePuzzleImg from '@/assets/game-puzzle.jpg';
+// import gamePuzzleImg from '@/assets/game-puzzle.jpg'; // Missing asset removed
 import gameQuizImg from '@/assets/game-quiz.jpg';
 import gameFindImg from '@/assets/game-find.jpg';
 import gameMemoryImg from '@/assets/game-memory.jpg';
@@ -121,7 +121,7 @@ export const games: Game[] = [
   {
     id: 'game-1',
     title: 'Quebra-cabeça da Arca',
-    image: gamePuzzleImg,
+    image: storyNoahArk,
     difficulty: 'Fácil',
     duration: '5 min',
     xp: 50

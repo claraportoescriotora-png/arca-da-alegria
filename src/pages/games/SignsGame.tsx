@@ -18,7 +18,8 @@ type Difficulty = 'easy' | 'medium' | 'hard';
 
 const SYMBOLS: SymbolType[] = [
     'cross', 'dove', 'heart', 'star', 'rainbow', 'light', 'bread',
-    'fish', 'cloud', 'sun', 'leaf', 'mountain', 'path', 'crown'
+    'fish', 'cloud', 'sun', 'leaf', 'mountain', 'path', 'crown',
+    'cup', 'fire', 'water', 'music', 'book', 'anchor'
 ];
 
 export default function SignsGame() {
@@ -170,13 +171,13 @@ export default function SignsGame() {
             case 'cross':
                 return <path d="M10 2 v20 M2 8 h16" stroke={color} strokeWidth="3" strokeLinecap="round" />;
             case 'dove':
-                return <path d="M2 12 Q5 5 12 12 T22 12 Q18 18 12 18 T2 12" fill={color} />; // Simplified bird shape
+                return <path d="M2 12 Q5 5 12 12 T22 12 Q18 18 12 18 T2 12" fill={color} />;
             case 'heart':
                 return <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill={color} />;
             case 'star':
                 return <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill={color} />;
             case 'cloud':
-                return <path d="M17.5 19c0 .83-.67 1.5-1.5 1.5H4c-1.1 0-2-.9-2-2 0-1.1.9-2 2-2 .34 0 .65.09.93.24.23-1.63 1.63-2.9 3.32-2.9.23 0 .45.03.66.08C9.59 12.21 11.45 11 13.5 11c2.48 0 4.5 2.02 4.5 4.5 0 .17-.02.34-.05.5.95.27 1.65 1.12 1.65 2.15 0 .28-.05.55-.15.8z" fill={color} />
+                return <path d="M17.5 19c0 .83-.67 1.5-1.5 1.5H4c-1.1 0-2-.9-2-2 0-1.1.9-2 2-2 .34 0 .65.09.93.24.23-1.63 1.63-2.9 3.32-2.9.23 0 .45.03.66.08C9.59 12.21 11.45 11 13.5 11c2.48 0 4.5 2.02 4.5 4.5 0 .17-.02.34-.05.5.95.27 1.65 1.12 1.65 2.15 0 .28-.05.55-.15.8z" fill={color} />;
             case 'sun':
                 return (
                     <g>
@@ -193,10 +194,33 @@ export default function SignsGame() {
                     </g>
                 );
             case 'fish':
-                return <path d="M20 12c-2.5 0-4.5-1.5-6-3s-3.5-3-6-3C4 6 2 9 2 12s2 6 6 6c2.5 0 4.5-1.5 6-3s3.5-3 6-3l2 2v-4l-2 2z" stroke={color} strokeWidth="2" fill="none" />; // Ichthys style
+                return <path d="M20 12c-2.5 0-4.5-1.5-6-3s-3.5-3-6-3C4 6 2 9 2 12s2 6 6 6c2.5 0 4.5-1.5 6-3s3.5-3 6-3l2 2v-4l-2 2z" stroke={color} strokeWidth="2" fill="none" />;
+            case 'light':
+                return <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke={color} strokeWidth="2" strokeLinecap="round" />;
+            case 'bread':
+                return <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10z M12 6v12 M6 12h12" stroke={color} strokeWidth="2" fill="none" />;
+            case 'crown':
+                return <path d="M2 18h20l-2-10-4 4-4-8-4 8-4-4-2 10z" fill={color} />;
+            case 'anchor':
+                return <path d="M12 2v16 M5 12a7 7 0 0 0 14 0 M2 12h3 M19 12h3 M12 22v-4" stroke={color} strokeWidth="2" strokeLinecap="round" />;
+            case 'cup':
+                return <path d="M6 2h12v8a6 6 0 0 1-12 0V2z M12 10v10 M8 22h8" stroke={color} strokeWidth="2" fill="none" />;
+            case 'fire':
+                return <path d="M12 2c0 0-4 4-4 8a4 4 0 1 0 8 0c0-4-4-8-4-8z" fill={color} />;
+            case 'water':
+                return <path d="M12 2c0 0-7 7-7 11a7 7 0 1 0 14 0c0-4-7-11-7-11z" fill={color} />;
+            case 'music':
+                return <path d="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" stroke={color} strokeWidth="2" fill="none" />;
+            case 'book':
+                return <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z" stroke={color} strokeWidth="2" fill="none" />;
+            case 'leaf':
+                return <path d="M2 22c0-5.52 4.48-10 10-10s10 4.48 10 10" stroke={color} strokeWidth="2" fill="none" />;
+            case 'mountain':
+                return <path d="M2 20L10 4L18 20H2z M14 20L18 14L22 20H14z" fill={color} />;
+            case 'path':
+                return <path d="M4 22V2l16 20V2" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none" />;
             default:
                 return <circle cx="12" cy="12" r="8" fill={color} />;
-
         }
     };
 
@@ -209,6 +233,13 @@ export default function SignsGame() {
             case 'cloud': return '#bae6fd'; // Light Blue
             case 'rainbow': return 'transparent';
             case 'cross': return '#8b5cf6'; // Violet
+            case 'fire': return '#ef4444'; // Red
+            case 'water': return '#3b82f6'; // Blue
+            case 'music': return '#a855f7'; // Purple
+            case 'book': return '#6366f1'; // Indigo
+            case 'crown': return '#facc15'; // Yellow-400
+            case 'anchor': return '#64748b'; // Slate
+            case 'cup': return '#fb923c'; // Orange
             default: return '#6366f1'; // Indigo
         }
     };

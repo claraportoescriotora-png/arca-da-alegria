@@ -10,6 +10,38 @@ const CATEGORIES = [
     { id: 'fruits', label: 'Frutas', icon: <Apple className="w-5 h-5" />, color: 'bg-red-100 text-red-600 border-red-200' },
 ];
 
+interface CardData {
+    category: 'animals' | 'people' | 'objects' | 'fruits';
+    text: string;
+    isSpecial?: boolean;
+    specialAction?: string;
+}
+
+const CARDS: CardData[] = [
+    // Animals
+    { category: 'animals', text: 'Leão (Daniel)' },
+    { category: 'animals', text: 'Baleia (Jonas)' },
+    { category: 'animals', text: 'Ovelha (Bom Pastor)' },
+    { category: 'animals', text: 'Pomba (Noé)' },
+    { category: 'animals', text: 'Burrinho (Entrada Triunfal)' },
+    // People
+    { category: 'people', text: 'Davi (com sua funda)' },
+    { category: 'people', text: 'Golias (o gigante)' },
+    { category: 'people', text: 'Noé (construindo a arca)' },
+    { category: 'people', text: 'Moisés (abrindo o mar)' },
+    { category: 'people', text: 'Sansão (muito forte)', isSpecial: true, specialAction: 'Dê um abraço bem forte em alguém!' },
+    // Objects
+    { category: 'objects', text: 'Arca de Noé' },
+    { category: 'objects', text: 'Cesta de Moisés' },
+    { category: 'objects', text: 'Harpa de Davi' },
+    { category: 'objects', text: 'Coroa de Rei' },
+    { category: 'objects', text: 'Cruz de Jesus', isSpecial: true, specialAction: 'Diga "Jesus te ama" para todos!' },
+    // Fruits
+    { category: 'fruits', text: 'Maçã' },
+    { category: 'fruits', text: 'Uva' },
+    { category: 'fruits', text: 'Figo' },
+];
+
 export default function CharadesGame() {
     const navigate = useNavigate();
 

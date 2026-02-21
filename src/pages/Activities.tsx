@@ -36,7 +36,7 @@ export default function Activities() {
       const formattedActivities: Activity[] = (data || []).map(a => ({
         id: a.id,
         title: a.title,
-        image: a.image_url || 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800',
+        image: a.image_url || 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800',
         pdfUrl: a.pdf_url,
         type: a.type === 'coloring' ? 'Colorir' :
           a.type === 'cutting' ? 'Recortar' :
@@ -104,7 +104,7 @@ export default function Activities() {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800';
+                          target.src = 'https://images.unsplash.com/photo-1590422114704-582736159678?w=800';
                         }}
                       />
                       <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 bg-white/90 rounded-full shadow-sm text-foreground uppercase tracking-wide">

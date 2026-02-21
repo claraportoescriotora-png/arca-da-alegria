@@ -48,7 +48,13 @@ export default function PuzzleGame() {
       initializePuzzle(gridSize);
     };
     img.onerror = () => {
-      setImageLoadError(true);
+      // If the image fails, try the safe premium Biblical icon fallback
+      const fallback = 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp';
+      if (imageUrl !== fallback) {
+        setImageUrl(fallback);
+      } else {
+        setImageLoadError(true);
+      }
     };
     img.src = imageUrl;
   }, [imageUrl]);
