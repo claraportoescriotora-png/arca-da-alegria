@@ -144,16 +144,28 @@ export function AdminGames() {
             const finalUrlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
 
             // 4. Update Game Config and Image URL
+            console.log('Update target ID:', selectedGame.id);
+            console.log('New image URL:', finalUrlWithCacheBuster);
+
             const newConfig = { ...selectedGame.config, image: finalUrlWithCacheBuster };
-            const { error: updateError } = await supabase
+            
+            const { error: updateError, count } = await supabase
                 .from('games')
                 .update({
                     config: newConfig,
                     image_url: finalUrlWithCacheBuster // Aggressive sync
                 })
-                .eq('id', selectedGame.id);
+                .eq('id', selectedGame.id)
+                .select('id', { count: 'exact' }); // Force count verification
 
             if (updateError) throw updateError;
+            
+            if (count === 0) {
+                console.error('No rows affected by update. ID mismatch or RLS issue.');
+                throw new Error('Não foi possível encontrar o jogo no banco para atualizar. Verifique se o ID existe.');
+            }
+
+            console.log('Update successful, rows affected:', count);
 
             toast({ title: "Imagem salva com sucesso!", description: "O quebra-cabeça foi atualizado." });
 

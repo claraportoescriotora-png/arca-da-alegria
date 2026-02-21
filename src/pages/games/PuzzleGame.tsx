@@ -41,18 +41,22 @@ export default function PuzzleGame() {
 
   // Preload image and detect errors before starting the puzzle
   useEffect(() => {
-    if (!imageUrl) return;
+    if (!imageUrl) return; // Keep this check
+    // IMAGE LOADING LOGIC
     const img = new Image();
     img.onload = () => {
+      setImageLoaded(true);
       setImageLoadError(false);
-      initializePuzzle(gridSize);
+      initializePuzzle(gridSize); // Changed from initializeGame(img) to initializePuzzle(gridSize) to match existing logic
     };
     img.onerror = () => {
-      // If the image fails, but we HAVE a URL, don't show a random fallback.
-      // Just mark it as an error so the user knows they need to check the image.
+      console.error('Puzzle image load failed:', imageUrl);
       setImageLoadError(true);
     };
-    img.src = imageUrl;
+
+    // Crucial: Append timestamp if not already there to bypass potential stale CDN/Cache
+    const finalSrc = imageUrl?.includes('?') ? imageUrl : `${imageUrl}?t=${Date.now()}`;
+    img.src = finalSrc;
   }, [imageUrl]);
 
   useEffect(() => {
