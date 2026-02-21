@@ -91,6 +91,27 @@ export default function SignsGame() {
         }, 1000);
     };
 
+    // --- Game Logic ---
+    useEffect(() => {
+        if (gameState !== 'playing' || isPreview) return;
+
+        // Timer
+        const config = getConfig(difficulty);
+        if (config.timeLimit > 0) {
+            const interval = setInterval(() => {
+                setTimer(t => {
+                    if (t <= 1) {
+                        clearInterval(interval);
+                        setGameState('gameover');
+                        return 0;
+                    }
+                    return t - 1;
+                });
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [gameState, difficulty, isPreview]);
+
     const handleCardClick = (index: number) => {
         // Prevents: clicks during preview, checking, or when card is already flipped/matched
         if (gameState !== 'playing' || isPreview || isChecking) return;
