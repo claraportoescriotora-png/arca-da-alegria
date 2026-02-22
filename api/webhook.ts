@@ -106,14 +106,16 @@ export default async function handler(req: any, res: any) {
         }
 
         // Extract Customer Data
-        const orderStatus = payload.order_status || payload.status;
-        const eventType = payload.webhook_event_type || payload.event_type || orderStatus;
         const customer = payload.Customer || payload.customer || {};
-        const email = customer.email || payload.email;
+        const email = (customer.email || payload.email || "").toLowerCase().trim();
+        const fullName = customer.full_name || customer.name || payload.full_name || payload.name;
 
         if (!email) {
             return res.status(400).json({ error: 'No email found in payload' });
         }
+
+        const orderStatus = payload.order_status || payload.status;
+        const eventType = payload.webhook_event_type || payload.event_type || orderStatus;
 
         console.log(`Webhook Event: ${eventType} for ${email} (Test: ${!!isInternalTest})`);
 
@@ -129,7 +131,11 @@ export default async function handler(req: any, res: any) {
                 const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
                     email,
                     email_confirm: true,
-                    user_metadata: { source: 'kiwify', is_test: isInternalTest }
+                    user_metadata: {
+                        source: 'kiwify',
+                        is_test: isInternalTest,
+                        full_name: fullName // This is caught by the DB trigger
+                    }
                 });
 
                 if (createError) {
@@ -162,6 +168,7 @@ export default async function handler(req: any, res: any) {
                 const { error: upsertError } = await supabase.from('profiles').upsert({
                     id: userId,
                     email: email,
+                    full_name: fullName,
                     subscription_status: 'active',
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'id' });
