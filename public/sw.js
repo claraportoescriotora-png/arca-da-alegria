@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'amiguitos-v5'; // v5: Broad media bypass
+const CACHE_NAME = 'amiguitos-v6'; // v6: Fix YouTube thumbnails on Safari
 
 // Asset types to cache
 const PRECACHE_ASSETS = [
@@ -28,6 +28,7 @@ self.addEventListener('fetch', (event) => {
     // Bypass SW for all external media to avoid opaque response caching issues in PWA
     const isExternalMedia =
         url.hostname.includes('ytimg.com') ||
+        url.hostname.includes('youtube.com') || // Covers img.youtube.com
         url.hostname.includes('unsplash.com') ||
         url.hostname.includes('supabase.co') ||
         url.hostname.includes('googleusercontent.com');

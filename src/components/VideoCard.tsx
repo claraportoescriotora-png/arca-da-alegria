@@ -63,8 +63,12 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl }
     } else if (target.src.includes('sddefault')) {
       setImageSrc(`https://img.youtube.com/vi/${videoId}/default.jpg`);
     } else {
-      // Last resort: standard biblically themed fallback
-      setImageSrc('https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp');
+      // Last resort: If it's a video, DON'T use the sheep icon. Use a neutral background.
+      if (videoId) {
+        setImageSrc(""); // Empty will show the bg-muted pulse or nothing
+      } else {
+        setImageSrc('https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp');
+      }
     }
   };
 
