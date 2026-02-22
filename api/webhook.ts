@@ -134,6 +134,7 @@ export default async function handler(req: any, res: any) {
 
                 if (createError) {
                     console.error('Error creating user:', createError);
+                    throw createError; // Throwing will trigger the 500 catch and return error to Kiwify
                 } else if (newUser?.user) {
                     userId = newUser.user.id;
                     // Generate Login Link
