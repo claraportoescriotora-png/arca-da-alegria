@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { BottomNav } from '@/components/BottomNav';
-import { Trophy, Calendar, ArrowRight, Star } from 'lucide-react';
+import { TROPHY_XP } from '@/lib/xp';
+import { isContentLocked } from '@/lib/drip';
+import { useAuth } from '@/contexts/AuthProvider';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Lock, Clock, Trophy, Calendar, ArrowRight, Star, ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Pagination } from '@/components/Pagination';
 
@@ -12,6 +17,7 @@ interface MissionPack {
     description: string;
     cover_url: string;
     total_days: number;
+    unlock_delay_days: number;
 }
 
 export default function Missions() {
@@ -26,6 +32,9 @@ export default function Missions() {
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
     const [enrolledPackIds, setEnrolledPackIds] = useState<Set<string>>(new Set());
+    const { profile } = useAuth();
+    const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
+    const [selectedLockedPack, setSelectedLockedPack] = useState<MissionPack | null>(null);
 
     useEffect(() => {
         fetchPacksAndEnrollments();
@@ -102,13 +111,25 @@ export default function Missions() {
                         <>
                             {packs.map(pack => {
                                 const isEnrolled = enrolledPackIds.has(pack.id);
+                                const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                                    unlockDelayDays: pack.unlock_delay_days
+                                });
+
                                 return (
                                     <div
                                         key={pack.id}
-                                        onClick={() => navigate(`/missions/${pack.id}`)}
+                                        onClick={() => {
+                                            if (isLocked) {
+                                                setSelectedLockedPack(pack);
+                                                setIsDripDialogOpen(true);
+                                            } else {
+                                                navigate(`/missions/${pack.id}`);
+                                            }
+                                        }}
                                         className={cn(
-                                            "group bg-card hover:bg-muted/50 transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
-                                            isEnrolled ? "border-primary/50 bg-primary/5" : "border-border"
+                                            "group bg-card transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
+                                            isEnrolled ? "border-primary/50 bg-primary/5" : "border-border",
+                                            isLocked && "grayscale opacity-80"
                                         )}
                                     >
                                         <div className="flex gap-4">
@@ -123,6 +144,11 @@ export default function Missions() {
                                                         ATIVO
                                                     </div>
                                                 )}
+                                                {isLocked && (
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                        <Lock className="w-6 h-6 text-white" />
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-bold text-lg text-foreground mb-1 truncate">{pack.title}</h3>
@@ -134,21 +160,64 @@ export default function Missions() {
                                                         <Calendar className="w-3 h-3" />
                                                         {pack.total_days} Dias
                                                     </span>
-                                                    <span className="flex items-center gap-1 text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-md">
-                                                        <Star className="w-3 h-3 fill-current" />
-                                                        Premium
-                                                    </span>
+                                                    {isLocked ? (
+                                                        <span className="flex items-center gap-1 text-orange-600 bg-orange-500/10 px-2 py-1 rounded-md">
+                                                            <Clock className="w-3 h-3" />
+                                                            Libera em {daysRemaining}d
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1 text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-md">
+                                                            <Star className="w-3 h-3 fill-current" />
+                                                            Premium
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="self-center">
                                                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                                    <ArrowRight className="w-4 h-4" />
+                                                    {isLocked ? <Lock className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 );
                             })}
+
+                            {/* Drip Locked Info Modal */}
+                            <Dialog open={isDripDialogOpen} onOpenChange={setIsDripDialogOpen}>
+                                <DialogContent className="sm:max-w-md bg-white border-none rounded-3xl overflow-hidden p-0">
+                                    <div className="bg-primary/10 p-8 flex flex-col items-center text-center">
+                                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+                                            <Lock className="w-10 h-10 text-primary" />
+                                        </div>
+                                        <DialogTitle className="font-fredoka text-2xl text-slate-800">Caminho Bloqueado!</DialogTitle>
+                                        <DialogDescription className="text-slate-600 mt-2">
+                                            Esta jornada "{selectedLockedPack?.title}" será liberada em breve para você!
+                                        </DialogDescription>
+                                    </div>
+
+                                    <div className="p-6 space-y-4">
+                                        <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl text-blue-700">
+                                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                                <Clock className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-sm">Tempo de Preparação</p>
+                                                <p className="text-xs opacity-80">
+                                                    O conteúdo está sendo preparado. Continue entrando todos os dias para desbloquear!
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            className="w-full h-12 rounded-full font-bold text-lg"
+                                            onClick={() => setIsDripDialogOpen(false)}
+                                        >
+                                            Entendi
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
 
                             {packs.length === 0 && (
                                 <div className="text-center py-12 bg-card rounded-3xl border border-dashed border-border">

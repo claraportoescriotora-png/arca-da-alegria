@@ -19,6 +19,7 @@ interface MissionPack {
     cover_url: string;
     total_days: number;
     is_active: boolean;
+    unlock_delay_days?: number;
 }
 
 interface Mission {
@@ -114,9 +115,10 @@ export function AdminMissions() {
             const dataToSave = {
                 title: packFormData.title,
                 description: packFormData.description,
-                image_url: packFormData.cover_url, // Note: SQL uses cover_url but content_expansion uses cover_url? Let's check schema. using cover_url based on missions_expansion.sql
+                image_url: packFormData.cover_url,
                 cover_url: packFormData.cover_url,
                 total_days: packFormData.total_days || 30,
+                unlock_delay_days: Number(packFormData.unlock_delay_days || 0),
                 is_active: packFormData.is_active ?? true
             };
 
@@ -531,13 +533,29 @@ export function AdminMissions() {
                                     onChange={(e) => setPackFormData({ ...packFormData, total_days: parseInt(e.target.value) })}
                                 />
                             </div>
-                            <div className="flex items-center space-x-2 pt-8">
+                            <div className="flex items-center space-x-2">
                                 <Switch
                                     checked={packFormData.is_active ?? true}
                                     onCheckedChange={(checked) => setPackFormData({ ...packFormData, is_active: checked })}
                                 />
                                 <Label>Ativo</Label>
                             </div>
+                        </div>
+
+                        <div className="space-y-2 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <Label className="text-blue-800 font-bold flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Dias para Liberar (Gotejamento)
+                            </Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                value={packFormData.unlock_delay_days || 0}
+                                onChange={(e) => setPackFormData({ ...packFormData, unlock_delay_days: parseInt(e.target.value) || 0 })}
+                                placeholder="0 = Imediato"
+                                className="bg-white"
+                            />
+                            <p className="text-[10px] text-slate-500">Número de dias após o cadastro do usuário para liberar esta jornada.</p>
                         </div>
                     </div>
                     <DialogFooter>

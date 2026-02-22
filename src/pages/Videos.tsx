@@ -15,6 +15,8 @@ interface Video {
   duration: string;
   category: string;
   videoUrl: string;
+  unlock_delay_days: number;
+  required_mission_day: number;
 }
 
 const categories = ['Todos', 'Músicas', 'Histórias', 'Aprendizado'];
@@ -64,7 +66,9 @@ export default function Videos() {
         thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
         duration: v.duration || '0:00',
         category: v.category || 'Músicas',
-        videoUrl: v.video_url || ''
+        videoUrl: v.video_url || '',
+        unlock_delay_days: v.unlock_delay_days || 0,
+        required_mission_day: v.required_mission_day || 0
       }));
 
       setVideos(formattedVideos);
@@ -128,6 +132,8 @@ export default function Videos() {
                   duration={video.duration}
                   category={video.category}
                   videoUrl={video.videoUrl}
+                  unlockDelayDays={video.unlock_delay_days}
+                  requiredMissionDay={video.required_mission_day}
                 />
               ))}
             </>

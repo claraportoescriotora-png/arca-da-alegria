@@ -18,6 +18,8 @@ interface Game {
   xp: number;
   type: string;
   status: string;
+  unlock_delay_days?: number;
+  required_mission_day?: number;
 }
 
 export default function Games() {
@@ -116,7 +118,9 @@ export default function Games() {
         duration: '5 min',
         xp: g.xp_reward || 50,
         type: g.type || 'external',
-        status: g.status || 'available'
+        status: g.status || 'available',
+        unlock_delay_days: g.unlock_delay_days || 0,
+        required_mission_day: g.required_mission_day || 0
       }));
 
       setGames(formattedGames);
@@ -257,6 +261,8 @@ export default function Games() {
                     image={game.image}
                     difficulty={game.difficulty}
                     duration={game.duration}
+                    unlockDelayDays={game.unlock_delay_days}
+                    requiredMissionDay={game.required_mission_day}
                     onClick={() => handlePlayGame(game)}
                   />
                 ))}

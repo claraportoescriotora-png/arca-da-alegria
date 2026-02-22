@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { supabase } from "@/lib/supabase";
@@ -21,6 +21,8 @@ interface Story {
     category: string;
     is_premium: boolean;
     created_at: string;
+    unlock_delay_days?: number;
+    required_mission_day?: number;
 }
 
 export function AdminStories() {
@@ -93,7 +95,9 @@ export function AdminStories() {
                         audio_url: currentStory.audio_url,
                         duration: currentStory.duration,
                         category: currentStory.category,
-                        is_premium: currentStory.is_premium
+                        is_premium: currentStory.is_premium,
+                        unlock_delay_days: Number(currentStory.unlock_delay_days || 0),
+                        required_mission_day: Number(currentStory.required_mission_day || 0)
                     })
                     .eq('id', currentStory.id);
                 if (error) throw error;
@@ -107,7 +111,9 @@ export function AdminStories() {
                         audio_url: currentStory.audio_url,
                         duration: currentStory.duration,
                         category: currentStory.category,
-                        is_premium: currentStory.is_premium || false
+                        is_premium: currentStory.is_premium || false,
+                        unlock_delay_days: Number(currentStory.unlock_delay_days || 0),
+                        required_mission_day: Number(currentStory.required_mission_day || 0)
                     }]);
                 if (error) throw error;
                 toast({ title: "História criada com sucesso!" });
@@ -388,6 +394,38 @@ export function AdminStories() {
                                 checked={currentStory.is_premium || false}
                                 onCheckedChange={checked => setCurrentStory({ ...currentStory, is_premium: checked })}
                             />
+                        </div>
+
+                        {/* Content Drip Settings */}
+                        <div className="space-y-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <h4 className="font-bold text-sm text-blue-800 flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Configurações de Gotejamento (Drip)
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Dias para Liberar</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={currentStory.unlock_delay_days || 0}
+                                        onChange={e => setCurrentStory({ ...currentStory, unlock_delay_days: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">0 = Liberado imediatamente</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Missão Obrigatória (Dia)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={currentStory.required_mission_day || 0}
+                                        onChange={e => setCurrentStory({ ...currentStory, required_mission_day: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">Obrigatório concluir até o dia X</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

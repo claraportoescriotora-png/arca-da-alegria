@@ -20,6 +20,8 @@ interface Video {
     category: string;
     is_active: boolean;
     is_duplicate?: boolean;
+    unlock_delay_days?: number;
+    required_mission_day?: number;
 }
 
 export function AdminVideos() {
@@ -99,7 +101,9 @@ export function AdminVideos() {
                 video_url: currentVideo.video_url,
                 duration: currentVideo.duration,
                 category: currentVideo.category,
-                is_active: currentVideo.is_active !== undefined ? currentVideo.is_active : true
+                is_active: currentVideo.is_active !== undefined ? currentVideo.is_active : true,
+                unlock_delay_days: Number(currentVideo.unlock_delay_days || 0),
+                required_mission_day: Number(currentVideo.required_mission_day || 0)
             };
 
             if (isEditing && currentVideo.id) {
@@ -643,6 +647,38 @@ export function AdminVideos() {
                                 checked={currentVideo.is_active !== false} // Default true
                                 onCheckedChange={checked => setCurrentVideo({ ...currentVideo, is_active: checked })}
                             />
+                        </div>
+
+                        {/* Content Drip Settings */}
+                        <div className="space-y-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <h4 className="font-bold text-sm text-blue-800 flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Configurações de Gotejamento (Drip)
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Dias para Liberar</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={currentVideo.unlock_delay_days || 0}
+                                        onChange={e => setCurrentVideo({ ...currentVideo, unlock_delay_days: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">0 = Liberado imediatamente</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Missão Reabilitadora (Dia)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={currentVideo.required_mission_day || 0}
+                                        onChange={e => setCurrentVideo({ ...currentVideo, required_mission_day: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">Obrigatório concluir até o dia X</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

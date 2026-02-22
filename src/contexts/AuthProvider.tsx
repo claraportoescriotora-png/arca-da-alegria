@@ -14,6 +14,7 @@ export interface Profile {
     level: number;
     streak: number;
     avatar_url?: string;
+    created_at?: string;
 }
 
 interface AuthContextType {

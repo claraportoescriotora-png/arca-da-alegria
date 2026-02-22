@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, Download, Pencil, Trash2, Upload, FileType } from "lucide-react";
+import { Loader2, Plus, Download, Pencil, Trash2, Upload, FileType, Clock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -17,6 +17,8 @@ interface Activity {
     image_url: string;
     pdf_url: string;
     type: string; // 'coloring', 'cutting', 'puzzle'
+    unlock_delay_days?: number;
+    required_mission_day?: number;
 }
 
 export function AdminDownloads() {
@@ -99,7 +101,9 @@ export function AdminDownloads() {
                 description: formData.description,
                 type: formData.type,
                 image_url: imageUrl,
-                pdf_url: pdfUrl
+                pdf_url: pdfUrl,
+                unlock_delay_days: Number(formData.unlock_delay_days || 0),
+                required_mission_day: Number(formData.required_mission_day || 0)
             };
 
             let error;
@@ -337,6 +341,38 @@ export function AdminDownloads() {
                                     {formData.pdf_url && !pdfFile && (
                                         <p className="text-xs text-green-600 mt-1 truncate">PDF atual mantido</p>
                                     )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content Drip Settings */}
+                        <div className="space-y-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <h4 className="font-bold text-sm text-blue-800 flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Configurações de Gotejamento (Drip)
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Dias para Liberar</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={formData.unlock_delay_days || 0}
+                                        onChange={e => setFormData({ ...formData, unlock_delay_days: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">0 = Liberado imediatamente</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Missão Obrigatória (Dia)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={formData.required_mission_day || 0}
+                                        onChange={e => setFormData({ ...formData, required_mission_day: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">Obrigatório concluir até o dia X</p>
                                 </div>
                             </div>
                         </div>

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Settings, Upload, Image as ImageIcon, Gamepad2 } from "lucide-react";
+import { Loader2, Settings, Upload, Image as ImageIcon, Gamepad2, Clock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -17,6 +17,8 @@ interface Game {
     type: string;
     status: string; // 'available' | 'coming_soon'
     config: any;
+    unlock_delay_days?: number;
+    required_mission_day?: number;
 }
 
 export function AdminGames() {
@@ -119,59 +121,53 @@ export function AdminGames() {
         }
     };
 
-    const handlePuzzleUpload = async () => {
-        if (!selectedGame || !puzzleImageFile) return;
+    const handleSaveConfig = async () => {
+        if (!selectedGame) return;
 
         setUploading(true);
         try {
-            // 1. Upload file to 'activities' bucket
-            const fileExt = puzzleImageFile.name.split('.').pop();
-            const fileName = `puzzle-${selectedGame.id}-${Date.now()}.${fileExt}`;
-            const filePath = `games/${fileName}`;
+            let finalUrlWithCacheBuster = selectedGame.image_url;
 
-            const { error: uploadError } = await supabase.storage
-                .from('activities')
-                .upload(filePath, puzzleImageFile);
+            // 1. Upload file if selected
+            if (puzzleImageFile) {
+                const fileExt = puzzleImageFile.name.split('.').pop();
+                const fileName = `puzzle-${selectedGame.id}-${Date.now()}.${fileExt}`;
+                const filePath = `games/${fileName}`;
 
-            if (uploadError) throw uploadError;
+                const { error: uploadError } = await supabase.storage
+                    .from('activities')
+                    .upload(filePath, puzzleImageFile);
 
-            // 2. Get Public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('activities')
-                .getPublicUrl(filePath);
+                if (uploadError) throw uploadError;
 
-            // 3. Add Cache Buster to force UI refresh everywhere
-            const finalUrlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
+                const { data: { publicUrl } } = supabase.storage
+                    .from('activities')
+                    .getPublicUrl(filePath);
 
-            // 4. Update Game Config and Image URL
-            const { data: { session } } = await supabase.auth.getSession();
-            console.log('Current Session User ID:', session?.user?.id);
-            console.log('Update target ID:', selectedGame.id);
-            console.log('New image URL:', finalUrlWithCacheBuster);
+                finalUrlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
+            }
 
-            const newConfig = { ...selectedGame.config, image: finalUrlWithCacheBuster };
+            // 2. Update Game Config and Image URL
+            const newConfig = { ...selectedGame.config };
+            if (puzzleImageFile) {
+                newConfig.image = finalUrlWithCacheBuster;
+            }
 
             const { error: updateError, data } = await supabase
                 .from('games')
                 .update({
                     config: newConfig,
-                    image_url: finalUrlWithCacheBuster // Aggressive sync
+                    image_url: finalUrlWithCacheBuster,
+                    unlock_delay_days: Number(selectedGame.unlock_delay_days || 0),
+                    required_mission_day: Number(selectedGame.required_mission_day || 0)
                 })
                 .eq('id', selectedGame.id)
-                .select(); // Get data back to verify success
+                .select();
 
             if (updateError) throw updateError;
 
-            if (!data || data.length === 0) {
-                console.error('No rows affected by update. ID mismatch or RLS issue.');
-                throw new Error('Não foi possível encontrar o jogo no banco para atualizar. Verifique se o ID existe.');
-            }
+            toast({ title: "Configurações salvas!", description: "O jogo foi atualizado com sucesso." });
 
-            console.log('Update successful, rows affected:', data.length);
-
-            toast({ title: "Imagem salva com sucesso!", description: "O quebra-cabeça foi atualizado." });
-
-            // Clean up state and force reload
             setPuzzleImageFile(null);
             setIsConfigOpen(false);
             setSelectedGame(null);
@@ -179,7 +175,7 @@ export function AdminGames() {
 
         } catch (error: any) {
             console.error(error);
-            toast({ variant: "destructive", title: "Erro no salvamento", description: error.message });
+            toast({ variant: "destructive", title: "Erro ao salvar", description: error.message });
         } finally {
             setUploading(false);
         }
@@ -248,12 +244,10 @@ export function AdminGames() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {game.type === 'puzzle' && (
-                                            <Button variant="outline" size="sm" onClick={() => openConfig(game)}>
-                                                <Settings className="w-4 h-4 mr-2" />
-                                                Configurar
-                                            </Button>
-                                        )}
+                                        <Button variant="outline" size="sm" onClick={() => openConfig(game)}>
+                                            <Settings className="w-4 h-4 mr-2" />
+                                            Configurar
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -317,8 +311,8 @@ export function AdminGames() {
                         </DialogDescription>
                     </DialogHeader>
 
-                    {selectedGame?.type === 'puzzle' && (
-                        <div className="space-y-4 py-4">
+                    <div className="space-y-4 py-4">
+                        {selectedGame?.type === 'puzzle' && (
                             <div className="space-y-2">
                                 <Label>Imagem do Quebra-Cabeça</Label>
                                 <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
@@ -348,18 +342,50 @@ export function AdminGames() {
                                     </div>
                                 )}
                             </div>
+                        )}
+
+                        {/* Content Drip Settings */}
+                        <div className="space-y-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <h4 className="font-bold text-sm text-blue-800 flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Configurações de Gotejamento (Drip)
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Dias para Liberar</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={selectedGame?.unlock_delay_days || 0}
+                                        onChange={e => selectedGame && setSelectedGame({ ...selectedGame, unlock_delay_days: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">0 = Liberado imediatamente</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-xs">Missão Obrigatória (Dia)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        value={selectedGame?.required_mission_day || 0}
+                                        onChange={e => selectedGame && setSelectedGame({ ...selectedGame, required_mission_day: parseInt(e.target.value) || 0 })}
+                                        className="bg-white"
+                                    />
+                                    <p className="text-[10px] text-slate-500">Obrigatório concluir até o dia X</p>
+                                </div>
+                            </div>
                         </div>
-                    )}
+                    </div>
 
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsConfigOpen(false)}>Cancelar</Button>
-                        <Button onClick={handlePuzzleUpload} disabled={uploading || !puzzleImageFile}>
+                        <Button onClick={handleSaveConfig} disabled={uploading}>
                             {uploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Salvar Configuração
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     );
 }
