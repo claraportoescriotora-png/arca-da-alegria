@@ -8,6 +8,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button";
 import { BottomNav } from '@/components/BottomNav';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
+import { cn } from '@/lib/utils';
 
 interface Story {
   id: string;
@@ -16,11 +20,14 @@ interface Story {
   content: string;
   category: string;
   duration: string;
+  unlock_delay_days?: number;
+  required_mission_day?: number;
 }
 
 export default function StoryDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { addXp } = useUser();
   const { toast } = useToast();
@@ -31,6 +38,11 @@ export default function StoryDetail() {
   const [speech, setSpeech] = useState<SpeechSynthesisUtterance | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
 
+  const [isDripLocked, setIsDripLocked] = useState(false);
+  const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+  const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+  const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+
   // Quiz State
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -40,7 +52,7 @@ export default function StoryDetail() {
 
   useEffect(() => {
     fetchStory();
-  }, [id]);
+  }, [id, profile]);
 
   // Fetch Quiz when dialog opens
   useEffect(() => {
@@ -68,8 +80,23 @@ export default function StoryDetail() {
           image: data.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
           content: data.content || 'Conteúdo em breve...',
           category: data.category || 'Geral',
-          duration: data.duration || '5 min'
+          duration: data.duration || '5 min',
+          unlock_delay_days: data.unlock_delay_days || 0,
+          required_mission_day: data.required_mission_day || 0
         });
+
+        // Check if locked
+        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+          unlockDelayDays: data.unlock_delay_days,
+          requiredMissionDay: data.required_mission_day
+        });
+
+        if (isLocked) {
+          setIsDripLocked(true);
+          setDripDaysRemaining(daysRemaining);
+          setUnlockDelayDays(data.unlock_delay_days || 0);
+          setRequiredMissionDay(data.required_mission_day || 0);
+        }
       }
     } catch (error) {
       console.error('Error fetching story:', error);
@@ -91,7 +118,7 @@ export default function StoryDetail() {
   }, []);
 
   const handleSpeak = () => {
-    if (!story) return;
+    if (!story || isDripLocked) return;
 
     if (isPlaying) {
       window.speechSynthesis.cancel();
@@ -114,6 +141,7 @@ export default function StoryDetail() {
   };
 
   const handleFinish = () => {
+    if (isDripLocked) return;
     addXp(50);
     toast({
       title: "Parabéns! 🎉",
@@ -121,7 +149,6 @@ export default function StoryDetail() {
     });
   };
 
-  // ...
   const favorite = story ? isFavorite(story.id) : false;
 
   if (loading) {
@@ -139,9 +166,6 @@ export default function StoryDetail() {
       </div>
     );
   }
-
-  // Quiz logic moved to top
-  // ...
 
   const fetchQuiz = async () => {
     setLoadingQuiz(true);
@@ -213,8 +237,6 @@ export default function StoryDetail() {
     }, 1000);
   };
 
-
-
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Hero Image */}
@@ -273,10 +295,12 @@ export default function StoryDetail() {
           {/* Audio Player Button */}
           <button
             onClick={handleSpeak}
-            className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl font-semibold mb-6 transition-all duration-300 ${isPlaying
-              ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-              : 'gradient-primary text-white hover:opacity-90'
-              }`}
+            disabled={isDripLocked}
+            className={cn(
+              "w-full flex items-center justify-center gap-3 p-4 rounded-2xl font-semibold mb-6 transition-all duration-300",
+              isPlaying ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : 'gradient-primary text-white hover:opacity-90',
+              isDripLocked && "opacity-50 cursor-not-allowed"
+            )}
           >
             {isPlaying ? (
               <>
@@ -294,7 +318,7 @@ export default function StoryDetail() {
           {/* Story Content */}
           <div className="prose prose-sm max-w-none">
             <p className="text-foreground leading-relaxed whitespace-pre-line text-lg">
-              {story.content}
+              {isDripLocked ? "Conteúdo bloqueado. Retorne em breve para ler esta história!" : story.content}
             </p>
           </div>
 
@@ -304,7 +328,12 @@ export default function StoryDetail() {
             {/* Dynamic Quiz Button */}
             <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
               <DialogTrigger asChild>
-                <button className="w-full flex items-center justify-center gap-2 p-4 bg-yellow-100 text-yellow-700 rounded-2xl font-bold hover:bg-yellow-200 transition-colors">
+                <button
+                  disabled={isDripLocked}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 p-4 bg-yellow-100 text-yellow-700 rounded-2xl font-bold hover:bg-yellow-200 transition-colors",
+                    isDripLocked && "opacity-50 cursor-not-allowed"
+                  )}>
                   <HelpCircle className="w-5 h-5" />
                   Responder Quiz
                 </button>
@@ -383,7 +412,11 @@ export default function StoryDetail() {
 
             <button
               onClick={handleFinish}
-              className="w-full flex items-center justify-center gap-2 p-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-colors"
+              disabled={isDripLocked}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 p-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-colors",
+                isDripLocked && "opacity-50 cursor-not-allowed"
+              )}
             >
               <CheckCircle className="w-5 h-5" />
               Terminei de Ler!
@@ -393,6 +426,16 @@ export default function StoryDetail() {
         </div>
       </main>
 
+      <DripLockModal
+        isOpen={isDripLocked}
+        onOpenChange={(open) => {
+          setIsDripLocked(open);
+          if (!open) navigate('/stories');
+        }}
+        daysRemaining={dripDaysRemaining}
+        unlockDelayDays={unlockDelayDays}
+        requiredMissionDay={requiredMissionDay}
+      />
       <BottomNav />
     </div>
   );

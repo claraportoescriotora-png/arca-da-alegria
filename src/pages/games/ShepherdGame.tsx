@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 import { ArrowLeft, RefreshCw, Trophy, ArrowUp, ArrowDown, ArrowLeft as ArrowLeftIcon, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
@@ -26,8 +29,15 @@ const FRUITS: { type: FruitType; icon: string; color: string }[] = [
 export default function ShepherdGame() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { profile } = useAuth();
     const { addXp } = useUser();
     const { toast } = useToast();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // --- State ---
     const [snake, setSnake] = useState<Position[]>([{ x: 7, y: 7 }]);
@@ -48,9 +58,47 @@ export default function ShepherdGame() {
 
     // --- Initialization ---
     useEffect(() => {
+        if (id) fetchGameConfig();
         spawnFruit();
         spawnWolf();
-    }, []);
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                toast({ title: "Jogo Indisponível", description: "Este jogo estará disponível em breve!", variant: "default" });
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Erro", description: "Falha ao carregar jogo.", variant: "destructive" });
+            navigate('/games');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // --- Input Handling ---
     useEffect(() => {
@@ -203,6 +251,8 @@ export default function ShepherdGame() {
         if (wolf && wolf.x === pos.x && wolf.y === pos.y) return true;
         return false;
     };
+
+    if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
 
     const distanceFromHead = (pos: Position) => {
         if (snake.length === 0) return 0;
@@ -361,6 +411,17 @@ export default function ShepherdGame() {
                 </div>
 
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

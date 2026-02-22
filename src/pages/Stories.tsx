@@ -16,6 +16,8 @@ interface Story {
   category: string;
   duration: string;
   progress?: number;
+  unlock_delay_days?: number;
+  required_mission_day?: number;
 }
 
 const categories = ['Todas', 'Favoritas', 'Antigo Testamento', 'Parábolas', 'Novo Testamento'];
@@ -86,7 +88,9 @@ export default function Stories() {
         image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
         category: s.category || 'Outros',
         duration: s.duration || '5 min',
-        progress: progressMap[s.id] || 0
+        progress: progressMap[s.id] || 0,
+        unlock_delay_days: s.unlock_delay_days || 0,
+        required_mission_day: s.required_mission_day || 0
       }));
 
       // Special case: Favorites (this is still tricky with server-side pagination if we don't have a favorites table)
@@ -158,6 +162,8 @@ export default function Stories() {
                   category={story.category}
                   duration={story.duration}
                   progress={story.progress}
+                  unlock_delay_days={story.unlock_delay_days}
+                  required_mission_day={story.required_mission_day}
                 />
               ))}
             </>

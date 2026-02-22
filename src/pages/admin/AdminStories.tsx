@@ -19,7 +19,7 @@ interface Story {
     audio_url: string;
     duration: string;
     category: string;
-    is_premium: boolean;
+    content: string;
     created_at: string;
     unlock_delay_days?: number;
     required_mission_day?: number;
@@ -91,11 +91,11 @@ export function AdminStories() {
                     .from('stories')
                     .update({
                         title: currentStory.title,
+                        content: currentStory.content,
                         cover_url: currentStory.cover_url,
                         audio_url: currentStory.audio_url,
                         duration: currentStory.duration,
                         category: currentStory.category,
-                        is_premium: currentStory.is_premium,
                         unlock_delay_days: Number(currentStory.unlock_delay_days || 0),
                         required_mission_day: Number(currentStory.required_mission_day || 0)
                     })
@@ -107,11 +107,11 @@ export function AdminStories() {
                     .from('stories')
                     .insert([{
                         title: currentStory.title,
+                        content: currentStory.content || '',
                         cover_url: currentStory.cover_url,
                         audio_url: currentStory.audio_url,
                         duration: currentStory.duration,
                         category: currentStory.category,
-                        is_premium: currentStory.is_premium || false,
                         unlock_delay_days: Number(currentStory.unlock_delay_days || 0),
                         required_mission_day: Number(currentStory.required_mission_day || 0)
                     }]);
@@ -173,7 +173,7 @@ export function AdminStories() {
     };
 
     const openNew = () => {
-        setCurrentStory({ category: 'biblical', is_premium: false });
+        setCurrentStory({ category: 'biblical', content: '' });
         setIsEditing(false);
         setIsDialogOpen(true);
     };
@@ -244,7 +244,6 @@ export function AdminStories() {
                             <TableHead>Título</TableHead>
                             <TableHead>Categoria</TableHead>
                             <TableHead>Duração</TableHead>
-                            <TableHead>Premium</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -280,13 +279,6 @@ export function AdminStories() {
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-slate-500">{story.duration}</TableCell>
-                                    <TableCell>
-                                        {story.is_premium ? (
-                                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">Premium</span>
-                                        ) : (
-                                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Grátis</span>
-                                        )}
-                                    </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
                                             <Button variant="ghost" size="icon" onClick={() => openEdit(story)}>
@@ -388,11 +380,14 @@ export function AdminStories() {
                                 </Select>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                            <Label>Conteúdo Premium (Cadeado)?</Label>
-                            <Switch
-                                checked={currentStory.is_premium || false}
-                                onCheckedChange={checked => setCurrentStory({ ...currentStory, is_premium: checked })}
+
+                        <div className="space-y-2">
+                            <Label>Conteúdo da História</Label>
+                            <Textarea
+                                value={currentStory.content || ''}
+                                onChange={e => setCurrentStory({ ...currentStory, content: e.target.value })}
+                                placeholder="Era uma vez..."
+                                className="min-h-[200px] font-sans"
                             />
                         </div>
 

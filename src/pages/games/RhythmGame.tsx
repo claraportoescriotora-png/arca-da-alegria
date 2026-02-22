@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Music, Trophy, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 
 // --- Configuration ---
 const COLORS = [
@@ -21,8 +25,16 @@ const VERSES = [
 ];
 
 export default function RhythmGame() {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { profile } = useAuth();
     const { addXp } = useUser();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // State
     const [sequence, setSequence] = useState<number[]>([]);
@@ -67,19 +79,47 @@ export default function RhythmGame() {
         }
     };
 
+    // --- Initialization ---
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // --- Game Logic ---
     const startGame = () => {
-        // If we have a saved level, start from there? 
-        // Or should "Start" always reset? 
-        // User asked: "Si eu sair do jogo o nivel deve ser salvo".
-        // So when I enter, I should be at that level.
-        // But if I fail, I might want to retry that level, not reset to 1.
-        // 'startGame' is called on "Começar" (first load) and "Reiniciar" (Game Over).
-
-        // Let's keep current level on start IF it is > 1.
-        // But if Game Over, we usually retry same level.
-
-        // Reset sequence logic
         setSequence([]);
         setPlayerSequence([]);
         setGameState('watching');
@@ -88,27 +128,17 @@ export default function RhythmGame() {
         setRound(startLevel);
         setMessage("Observe...");
 
-        // We need to generate the full sequence up to this level
-        // But this is "Simon Says" (cumulative) or "Memory" (new pattern each level)?
-        // Implementation Plan said: "Simon Says". usually cumulative.
-        // But if I restore level 10, I don't have the history of the previous 9 steps.
-        // So I must generate a NEW sequence of length (Level + 1).
-
         setTimeout(() => startRoundWithLevel(startLevel), 1000);
     };
 
-    // Helper to generate a full sequence for a specific level
     const startRoundWithLevel = (lvl: number) => {
-        // Length: Level + 1 (Level 1 = 2 steps)
         const length = lvl + 1;
         const newSeq: number[] = [];
 
         let last = -1;
         for (let i = 0; i < length; i++) {
             let next = Math.floor(Math.random() * 4);
-            // Smart Random: Avoid 3 repeats, enhance variation
             if (i > 0 && next === last && Math.random() > 0.3) {
-                // Try to change if repeating (70% chance to change)
                 next = (next + 1) % 4;
             }
             newSeq.push(next);
@@ -118,18 +148,15 @@ export default function RhythmGame() {
         setSequence(newSeq);
         setPlayerSequence([]);
         setGameState('watching');
-        setMessage(`Nível ${lvl}: Observe!`); // Fixed: lvl instead of round
+        setMessage(`Nível ${lvl}: Observe!`);
 
         playSequence(newSeq);
     }
 
-    // Called when advancing
     const nextRound = () => {
-        // We add ONE step to the EXISTING sequence
         const currentSeq = [...sequence];
 
         let next = Math.floor(Math.random() * 4);
-        // Avoid 3 repeats
         if (currentSeq.length >= 2) {
             const last1 = currentSeq[currentSeq.length - 1];
             const last2 = currentSeq[currentSeq.length - 2];
@@ -142,8 +169,7 @@ export default function RhythmGame() {
         setSequence(newSeq);
         setPlayerSequence([]);
         setGameState('watching');
-        setMessage(`Nível ${round + 1}: Observe!`); // round has been incremented before call? No.
-        // We carefully manage state updates.
+        setMessage(`Nível ${round + 1}: Observe!`);
 
         playSequence(newSeq);
     };
@@ -161,7 +187,7 @@ export default function RhythmGame() {
             const btnId = seq[i];
             activateButton(btnId);
             i++;
-        }, 800); // Slightly faster
+        }, 800);
     };
 
     const activateButton = (id: number) => {
@@ -172,31 +198,27 @@ export default function RhythmGame() {
     };
 
     const handleTap = (id: number) => {
-        if (gameState !== 'playing') return;
+        if (gameState !== 'playing' || isDripLocked) return;
 
         activateButton(id);
 
         const newPlayerSeq = [...playerSequence, id];
         setPlayerSequence(newPlayerSeq);
 
-        // Check correct so far
         const currentIndex = newPlayerSeq.length - 1;
         if (newPlayerSeq[currentIndex] !== sequence[currentIndex]) {
-            // Error
             setGameState('gameover');
             setMessage("Ops! Vamos tentar de novo?");
-            playTone(150, 'triangle'); // Sad tone
+            playTone(150, 'triangle');
             return;
         }
 
-        // Check if round complete
         if (newPlayerSeq.length === sequence.length) {
             setGameState('success');
             const verse = VERSES[Math.floor(Math.random() * VERSES.length)];
             setMessage(verse);
             addXp(20);
 
-            // Save Level
             const nextLevel = round + 1;
             localStorage.setItem('rhythm_level', nextLevel.toString());
 
@@ -206,6 +228,8 @@ export default function RhythmGame() {
             }, 2000);
         }
     };
+
+    if (loading) return <div className="flex justify-center items-center h-screen bg-sky-100 font-sans"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-600"></div></div>;
 
     return (
         <div className="min-h-screen bg-sky-100 flex flex-col font-sans select-none overflow-hidden">
@@ -287,7 +311,7 @@ export default function RhythmGame() {
                         {/* Game Over Overlay */}
                         {gameState === 'gameover' && (
                             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center z-10 animate-in fade-in">
-                                <RotateCcw className="w-16 h-16 text-sky-500 mb-4" /> {/* Typo fix: RotateCcw */}
+                                <RotateCcw className="w-16 h-16 text-sky-500 mb-4" />
                                 <h3 className="text-xl font-bold text-sky-900 mb-4">Tente Novamente!</h3>
                                 <button
                                     onClick={startGame}
@@ -300,6 +324,17 @@ export default function RhythmGame() {
                     </div>
                 )}
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Trophy, Clock } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 
 // --- Types ---
 type SymbolType = 'cross' | 'dove' | 'heart' | 'star' | 'rainbow' | 'light' | 'bread' | 'fish' | 'cloud' | 'sun' | 'leaf' | 'mountain' | 'path' | 'crown' | 'cup' | 'fire' | 'water' | 'music' | 'book' | 'anchor';
@@ -23,8 +27,16 @@ const SYMBOLS: SymbolType[] = [
 ];
 
 export default function SignsGame() {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { profile } = useAuth();
     const { addXp } = useUser();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // Game State
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -42,6 +54,45 @@ export default function SignsGame() {
             case 'easy': return { rows: 4, cols: 3, pairs: 6, timeLimit: 60 }; // 3x4 grid
             case 'medium': return { rows: 5, cols: 4, pairs: 10, timeLimit: 180 }; // 4x5 grid
             case 'hard': return { rows: 6, cols: 5, pairs: 15, timeLimit: 300 }; // 5x6 grid
+        }
+    };
+
+    // --- Initialization ---
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -243,6 +294,8 @@ export default function SignsGame() {
         }
     };
 
+    if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
+
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             {/* Header */}
@@ -417,6 +470,17 @@ export default function SignsGame() {
                     </div>
                 )}
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

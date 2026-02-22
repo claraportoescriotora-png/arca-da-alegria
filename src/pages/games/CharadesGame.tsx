@@ -1,7 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Smile, Users, Heart, Star, Sparkles, User, Apple, Box, CheckCircle, PawPrint } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 
 const CATEGORIES = [
     { id: 'animals', label: 'Animais', icon: <PawPrint className="w-6 h-6" />, color: 'bg-orange-100 text-orange-600 border-orange-200' },
@@ -193,7 +197,15 @@ const CARDS: CardData[] = [
 ];
 
 export default function CharadesGame() {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { profile } = useAuth();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // State
     const [gameState, setGameState] = useState<'menu' | 'drawing' | 'acting' | 'challenge'>('menu');
@@ -201,25 +213,61 @@ export default function CharadesGame() {
     const [currentCategory, setCurrentCategory] = useState<string | undefined>(undefined);
     const [history, setHistory] = useState<number[]>([]);
 
+    // --- Initialization ---
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Logic
     const drawCard = (category?: string) => {
+        if (isDripLocked) return;
         setGameState('drawing');
         setCurrentCategory(category);
 
-        // Filter deck
         const pool = category ? CARDS.filter(c => c.category === category) : CARDS;
-
-        // Avoid repetition (don't pick from last 10 cards if pool is large enough)
         const availablePool = pool.length > 15
             ? pool.filter(c => !history.includes(c.id))
             : pool;
 
-        // Random pick
         setTimeout(() => {
             const randomCard = availablePool[Math.floor(Math.random() * availablePool.length)];
             setCurrentCard(randomCard);
             setHistory(prev => [randomCard.id, ...prev].slice(0, 10));
-            setGameState('acting'); // Start Acting Phase
+            setGameState('acting');
         }, 1200);
     };
 
@@ -229,12 +277,13 @@ export default function CharadesGame() {
 
     const handleGuessed = () => {
         if (currentCard?.isSpecial) {
-            setGameState('challenge'); // Go to Love Challenge Phase
+            setGameState('challenge');
         } else {
-            // No challenge? Just loop back or show small celebration
-            setGameState('challenge'); // Let's simplify: every card has a "Done" state, but special ones have extra text.
+            setGameState('challenge');
         }
     }
+
+    if (loading) return <div className="flex justify-center items-center h-screen bg-amber-50 font-sans"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-600"></div></div>;
 
     return (
         <div className="min-h-screen bg-amber-50 flex flex-col font-sans select-none overflow-hidden">
@@ -298,7 +347,7 @@ export default function CharadesGame() {
                     </div>
                 )}
 
-                {/* PHASE 1: ACTING (No Special Instructions visible yet) */}
+                {/* PHASE 1: ACTING */}
                 {gameState === 'acting' && currentCard && (
                     <div className="w-full max-w-sm relative group perspective-1000 animate-in zoom-in-90 duration-500">
                         <div className="bg-white rounded-[2rem] shadow-2xl border-4 border-amber-200 overflow-hidden relative">
@@ -342,10 +391,9 @@ export default function CharadesGame() {
                     </div>
                 )}
 
-                {/* PHASE 2: CHALLENGE REVEAL (After Guessing) */}
+                {/* PHASE 2: CHALLENGE REVEAL */}
                 {gameState === 'challenge' && currentCard && (
                     <div className="w-full max-w-sm relative group perspective-1000 animate-in zoom-in-90 duration-500">
-                        {/* Wrapper for visual feedback (Confetti) */}
                         <div className="absolute inset-0 pointer-events-none">
                             <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 bg-yellow-300 rounded-full blur-3xl opacity-30 animate-pulse"></div>
                         </div>
@@ -361,7 +409,6 @@ export default function CharadesGame() {
                                     <p className="text-slate-600">Vocês acertaram que era <b>{currentCard.text}</b>!</p>
                                 </div>
 
-                                {/* Special Instruction - NOW REVEALED */}
                                 {currentCard.isSpecial ? (
                                     <div className="bg-rose-50 border-2 border-rose-200 p-5 rounded-2xl flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-5">
                                         <Heart className="w-10 h-10 text-rose-500 fill-rose-500 animate-pulse" />
@@ -393,6 +440,17 @@ export default function CharadesGame() {
                 )}
 
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

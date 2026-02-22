@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Trophy, Lightbulb, Key, DoorOpen, Skull } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 
 // --- Types ---
 type CellType = 'wall' | 'path' | 'start' | 'end' | 'key' | 'door' | 'sin';
@@ -19,8 +23,16 @@ interface Cell {
 }
 
 export default function FindJesusGame() {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { profile } = useAuth();
     const { addXp } = useUser();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // --- State ---
     const [level, setLevel] = useState(() => parseInt(localStorage.getItem('find_jesus_level') || '1'));
@@ -68,11 +80,6 @@ export default function FindJesusGame() {
             for (const n of neighbors) {
                 if (n.x >= 0 && n.x < size && n.y >= 0 && n.y < size) {
                     const nCell = grid[n.y][n.x];
-                    // Walkable?
-                    // Wall is no up. Sin is no up.
-                    // Door is walkable ONLY if we are hypothetically checking connectivity assuming we have key,
-                    // BUT for the 'Guide' we check real state. 
-                    // For 'Generation' we treat door as walkable because we place key reachable.
                     if (nCell.type !== 'wall' && nCell.type !== 'sin' && !visited.has(`${n.x},${n.y}`)) {
                         visited.add(`${n.x},${n.y}`);
                         queue.push({
@@ -85,7 +92,6 @@ export default function FindJesusGame() {
         }
         return null;
     };
-
 
     // --- Maze Generation ---
     const generateMaze = useCallback(() => {
@@ -177,14 +183,11 @@ export default function FindJesusGame() {
         let pathToEnd = getPath(newGrid, { x: 1, y: 1 }, 'end');
 
         if (level >= 5 && pathToEnd && pathToEnd.length > 10) {
-            // Place Door as a bottleneck near the end
             const doorIdx = Math.floor(pathToEnd.length * 0.7);
             const doorPos = pathToEnd[doorIdx];
             newGrid[doorPos.y][doorPos.x].type = 'door';
             newGrid[doorPos.y][doorPos.x].open = false;
 
-            // Place Key: MUST be reachable from start WITHOUT passing through the door
-            // We verify reachability after placing
             let keyPlaced = false;
             let attempts = 0;
             while (!keyPlaced && attempts < 100) {
@@ -194,8 +197,6 @@ export default function FindJesusGame() {
                     const originalType = newGrid[ky][kx].type;
                     newGrid[ky][kx].type = 'key';
 
-                    // Logic check: Is key reachable from [1,1]?
-                    // We temporarily treat door as wall for this check
                     const tempGrid = newGrid.map(row => row.map(c => ({ ...c })));
                     tempGrid[doorPos.y][doorPos.x].type = 'wall';
                     if (getPath(tempGrid, { x: 1, y: 1 }, 'key')) {
@@ -220,8 +221,6 @@ export default function FindJesusGame() {
                     const originalType = newGrid[ty][tx].type;
                     newGrid[ty][tx].type = 'sin';
 
-                    // Verify that game is still solvable
-                    // If level >= 5, must be able to reach key THEN end
                     const stillSolvable = getPath(newGrid, { x: 1, y: 1 }, 'end');
                     if (stillSolvable) {
                         trapsPlaced++;
@@ -257,6 +256,45 @@ export default function FindJesusGame() {
         setGrid(newGrid);
     };
 
+    // --- Initialization ---
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // --- Guide ---
     const triggerGuide = () => {
         if (guideCooldown > 0 || showGuide || gameState !== 'playing') return;
@@ -264,18 +302,11 @@ export default function FindJesusGame() {
         setGuideCooldown(30 + (level * 2));
 
         const target = (level >= 5 && !hasKey) ? 'key' : 'end';
-
-        // Custom BFS that respects Doors if locked
-        // ... (similar to previous, can just re-use logic)
-        // For simplicity reusing BFS logic in-line not needed if we trust player to explore
-        // Let's implement a visual "Hint" that just highlights direction or short path
-
-        // Simple BFS for Guide
         const path = getPath(grid, playerPos, target as CellType);
 
         if (path) {
             const newGrid = [...grid];
-            path.slice(0, 15).forEach(p => { // Only show next 15 steps
+            path.slice(0, 15).forEach(p => {
                 if (newGrid[p.y][p.x].type === 'path' || newGrid[p.y][p.x].type === 'door') {
                     newGrid[p.y][p.x].isGuide = true;
                 }
@@ -298,7 +329,7 @@ export default function FindJesusGame() {
 
     // --- Move ---
     const move = (dx: number, dy: number) => {
-        if (gameState !== 'playing') return;
+        if (gameState !== 'playing' || isDripLocked) return;
         const newX = playerPos.x + dx;
         const newY = playerPos.y + dy;
         const size = getGridSize();
@@ -309,7 +340,6 @@ export default function FindJesusGame() {
         if (cell.type === 'wall') return;
         if (cell.type === 'door' && !hasKey) return;
 
-        // SIN TRAP
         if (cell.type === 'sin') {
             setGameState('gameover');
             return;
@@ -334,7 +364,7 @@ export default function FindJesusGame() {
     };
 
     const restartLevel = () => {
-        generateMaze(); // Regenerates same level
+        generateMaze();
     };
 
     useEffect(() => { generateMaze(); }, [generateMaze]);
@@ -349,9 +379,11 @@ export default function FindJesusGame() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [playerPos, grid, gameState]);
+    }, [playerPos, grid, gameState, isDripLocked]);
 
     const gridSize = getGridSize();
+
+    if (loading) return <div className="flex justify-center items-center h-screen bg-slate-950 font-sans"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white"></div></div>;
 
     return (
         <div className="min-h-screen bg-slate-950 flex flex-col font-sans touch-none select-none">
@@ -412,7 +444,7 @@ export default function FindJesusGame() {
                         let bg = "bg-slate-900";
                         if (cell.type === 'wall') bg = "bg-slate-800 rounded-sm scale-90";
                         else if (cell.type === 'door') bg = hasKey ? "bg-green-900/50" : "bg-red-900/50";
-                        else if (cell.type === 'sin') bg = "bg-red-950/30"; // Subtle warning on path?
+                        else if (cell.type === 'sin') bg = "bg-red-950/30";
                         else if (cell.isGuide) bg = "bg-yellow-500/20";
 
                         return (
@@ -453,6 +485,17 @@ export default function FindJesusGame() {
                     <button onClick={() => move(1, 0)} className="p-3 bg-white/10 rounded-full text-white">➡️</button>
                 </div>
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

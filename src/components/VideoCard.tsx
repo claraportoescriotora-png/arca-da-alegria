@@ -2,11 +2,11 @@ import { Play, Heart, X } from 'lucide-react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogFooter } from "@/components/ui/dialog";
-import { Lock, Clock, Trophy, ChevronRight } from 'lucide-react';
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Lock, Clock, Trophy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthProvider';
 import { isContentLocked } from '@/lib/drip';
-import { Button } from '@/components/ui/button';
+import { DripLockModal } from '@/components/DripLockModal';
 
 interface VideoCardProps {
   id: string;
@@ -37,7 +37,6 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
   const getYouTubeId = (url: string) => {
     if (!url) return '';
     try {
-      // Support for standard, embed, shorts, youtu.be, and playlist links
       const regExp = /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/|live\/)([^#&?]*).*/;
       const match = url.match(regExp);
       const id = (match && match[1].length === 11) ? match[1] : '';
@@ -57,7 +56,6 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
     return `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
   };
 
-  // PRIORITY: Always use YouTube's own thumbnails for videos to keep the app light.
   const [imageSrc, setImageSrc] = useState(videoId
     ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
     : (thumbnail || ''));
@@ -67,7 +65,6 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
     const target = e.target as HTMLImageElement;
     if (!videoId) return;
 
-    // Progressive fallback: hqdefault -> mqdefault -> sddefault -> default
     if (target.src.includes('hqdefault')) {
       setImageSrc(`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`);
     } else if (target.src.includes('mqdefault')) {
@@ -75,11 +72,7 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
     } else if (target.src.includes('sddefault')) {
       setImageSrc(`https://img.youtube.com/vi/${videoId}/default.jpg`);
     } else {
-      if (videoId) {
-        setImageSrc("");
-      } else {
-        setImageSrc('https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp');
-      }
+      setImageSrc("");
     }
   };
 
@@ -147,7 +140,6 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
         </div>
       </div>
 
-      {/* Main Video Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-3xl p-0 bg-black border-none overflow-hidden rounded-xl aspect-video">
           <div className="relative w-full h-full">
@@ -175,57 +167,13 @@ export function VideoCard({ id, title, thumbnail, duration, category, videoUrl, 
         </DialogContent>
       </Dialog>
 
-      {/* Drip Locked Info Modal */}
-      <Dialog open={isDripDialogOpen} onOpenChange={setIsDripDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white border-none rounded-3xl overflow-hidden p-0">
-          <div className="bg-primary/10 p-8 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-              <Lock className="w-10 h-10 text-primary" />
-            </div>
-            <DialogTitle className="font-fredoka text-2xl text-slate-800">Conteúdo em Breve!</DialogTitle>
-            <DialogDescription className="text-slate-600 mt-2">
-              Estamos preparando o melhor conteúdo para você. Este conteúdo será liberado em breve!
-            </DialogDescription>
-          </div>
-
-          <div className="p-6 space-y-4">
-            {unlockDelayDays && unlockDelayDays > 0 && (
-              <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl text-blue-700">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Tempo de Espera</p>
-                  <p className="text-xs opacity-80">Liberado em {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}.</p>
-                </div>
-              </div>
-            )}
-
-            {requiredMissionDay && requiredMissionDay > 0 && (
-              <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-2xl text-orange-700">
-                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Requisito de Missão</p>
-                  <p className="text-xs opacity-80">Conclua as missões diárias até o Dia {requiredMissionDay}.</p>
-                </div>
-              </div>
-            )}
-
-            <Button
-              className="w-full h-12 rounded-full font-bold text-lg"
-              onClick={() => {
-                setIsDripDialogOpen(false);
-                navigate('/missions');
-              }}
-            >
-              Ir para Missões
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DripLockModal
+        isOpen={isDripDialogOpen}
+        onOpenChange={setIsDripDialogOpen}
+        daysRemaining={daysRemaining}
+        unlockDelayDays={unlockDelayDays}
+        requiredMissionDay={requiredMissionDay}
+      />
     </>
   );
 }

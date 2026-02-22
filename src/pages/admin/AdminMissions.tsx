@@ -115,7 +115,6 @@ export function AdminMissions() {
             const dataToSave = {
                 title: packFormData.title,
                 description: packFormData.description,
-                image_url: packFormData.cover_url,
                 cover_url: packFormData.cover_url,
                 total_days: packFormData.total_days || 30,
                 unlock_delay_days: Number(packFormData.unlock_delay_days || 0),

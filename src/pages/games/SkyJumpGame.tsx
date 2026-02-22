@@ -4,6 +4,9 @@ import { ArrowLeft, RefreshCw, Trophy } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 import { supabase } from '@/lib/supabase';
 
 // --- Constants ---
@@ -40,8 +43,16 @@ interface Doodler {
 
 export default function SkyJumpGame() {
     const navigate = useNavigate();
+    const { profile } = useAuth();
     const { addXp } = useUser();
     const { toast } = useToast();
+    const { id } = useParams<{ id: string }>();
+
+    const [isDripLocked, setIsDripLocked] = useState(false);
+    const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+    const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+    const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     // Ref for game loop to avoid re-renders
     const requestRef = useRef<number>();
@@ -62,9 +73,47 @@ export default function SkyJumpGame() {
     const [highScore, setHighScore] = useState(0);
 
     useEffect(() => {
+        if (id) fetchGameConfig();
         const saved = localStorage.getItem('skyJumpHighScore');
         if (saved) setHighScore(parseInt(saved));
-    }, []);
+    }, [id]);
+
+    const fetchGameConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('games')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            if (data.status !== 'available') {
+                toast({ title: "Jogo Indisponível", description: "Este jogo estará disponível em breve!", variant: "default" });
+                navigate('/games');
+                return;
+            }
+
+            // Drip Check
+            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+                unlockDelayDays: data.unlock_delay_days,
+                requiredMissionDay: data.required_mission_day
+            });
+
+            if (isLocked) {
+                setIsDripLocked(true);
+                setDripDaysRemaining(daysRemaining);
+                setUnlockDelayDays(data.unlock_delay_days || 0);
+                setRequiredMissionDay(data.required_mission_day || 0);
+            }
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Erro", description: "Falha ao carregar jogo.", variant: "destructive" });
+            navigate('/games');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // ...
 
@@ -359,6 +408,8 @@ export default function SkyJumpGame() {
         }
     };
 
+    if (loading) return <div className="flex justify-center items-center h-screen group-bg"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
+
     const handleTouchEnd = (side: 'left' | 'right') => {
         if (side === 'left') input.current.left = false;
         if (side === 'right') input.current.right = false;
@@ -470,6 +521,17 @@ export default function SkyJumpGame() {
                     </div>
                 )}
             </main>
+
+            <DripLockModal
+                isOpen={isDripLocked}
+                onOpenChange={(open) => {
+                    setIsDripLocked(open);
+                    if (!open) navigate('/games');
+                }}
+                daysRemaining={dripDaysRemaining}
+                unlockDelayDays={unlockDelayDays}
+                requiredMissionDay={requiredMissionDay}
+            />
         </div>
     );
 }

@@ -24,6 +24,8 @@ interface ContentItem {
   category?: string;
   difficulty?: 'Fácil' | 'Médio' | 'Difícil';
   duration?: string;
+  unlock_delay_days?: number;
+  required_mission_day?: number;
 }
 
 export default function Home() {
@@ -136,7 +138,9 @@ export default function Home() {
           id: s.id,
           title: s.title,
           image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
-          duration: s.duration || '5 min'
+          duration: s.duration || '5 min',
+          unlock_delay_days: s.unlock_delay_days || 0,
+          required_mission_day: s.required_mission_day || 0
         })));
       }
 
@@ -153,7 +157,9 @@ export default function Home() {
           title: g.title,
           image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
           difficulty: g.difficulty || 'Fácil',
-          duration: '5 min'
+          duration: '5 min',
+          unlock_delay_days: g.unlock_delay_days || 0,
+          required_mission_day: g.required_mission_day || 0
         })));
       }
 
@@ -287,6 +293,8 @@ export default function Home() {
                   title={story.title}
                   image={story.image}
                   progress={undefined}
+                  unlockDelayDays={story.unlock_delay_days}
+                  requiredMissionDay={story.required_mission_day}
                 />
               ))}
             </div>
@@ -319,6 +327,8 @@ export default function Home() {
                   image={game.image}
                   difficulty={game.difficulty}
                   duration={game.duration}
+                  unlockDelayDays={game.unlock_delay_days}
+                  requiredMissionDay={game.required_mission_day}
                   onClick={() => handlePlayGame(game.title)}
                 />
               ))}

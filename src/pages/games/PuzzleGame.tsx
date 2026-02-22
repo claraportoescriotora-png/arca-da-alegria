@@ -5,6 +5,9 @@ import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from '@/contexts/AuthProvider';
+import { isContentLocked } from '@/lib/drip';
+import { DripLockModal } from '@/components/DripLockModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,8 +27,14 @@ interface PuzzlePiece {
 export default function PuzzleGame() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const { addXp } = useUser();
   const { toast } = useToast();
+
+  const [isDripLocked, setIsDripLocked] = useState(false);
+  const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
+  const [unlockDelayDays, setUnlockDelayDays] = useState(0);
+  const [requiredMissionDay, setRequiredMissionDay] = useState(0);
 
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
@@ -85,6 +94,20 @@ export default function PuzzleGame() {
       const config = data.config || {};
       const img = config.image || data.image_url;
       const size = Math.sqrt(config.pieces || 9);
+
+      // Drip Check
+      const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+        unlockDelayDays: data.unlock_delay_days,
+        requiredMissionDay: data.required_mission_day
+      });
+
+      if (isLocked) {
+        setIsDripLocked(true);
+        setDripDaysRemaining(daysRemaining);
+        setUnlockDelayDays(data.unlock_delay_days || 0);
+        setRequiredMissionDay(data.required_mission_day || 0);
+        // We don't return here because we want to show the modal in the UI
+      }
 
       setImageUrl(img);
       setGridSize(Math.max(3, Math.min(size, 6))); // Clamp between 3 and 6
@@ -297,6 +320,17 @@ export default function PuzzleGame() {
         </div>
 
       </main>
+
+      <DripLockModal
+        isOpen={isDripLocked}
+        onOpenChange={(open) => {
+          setIsDripLocked(open);
+          if (!open) navigate('/games');
+        }}
+        daysRemaining={dripDaysRemaining}
+        unlockDelayDays={unlockDelayDays}
+        requiredMissionDay={requiredMissionDay}
+      />
     </div>
   );
 }
