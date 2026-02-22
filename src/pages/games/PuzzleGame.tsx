@@ -45,9 +45,28 @@ export default function PuzzleGame() {
   const [imageLoadError, setImageLoadError] = useState(false);
   const [gridSize, setGridSize] = useState(3); // Default 3x3
 
+  const [unlockDelayDaysFetched, setUnlockDelayDaysFetched] = useState<number>(0);
+  const [requiredMissionDayFetched, setRequiredMissionDayFetched] = useState<number>(0);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
   useEffect(() => {
     if (id) fetchGameConfig();
   }, [id]);
+
+  // Drip check runs AFTER both data and profile are ready
+  useEffect(() => {
+    if (!dataLoaded || profile === null) return;
+    const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+      unlockDelayDays: unlockDelayDaysFetched,
+      requiredMissionDay: requiredMissionDayFetched
+    });
+    if (isLocked) {
+      setIsDripLocked(true);
+      setDripDaysRemaining(daysRemaining);
+      setUnlockDelayDays(unlockDelayDaysFetched);
+      setRequiredMissionDay(requiredMissionDayFetched);
+    }
+  }, [dataLoaded, profile]);
 
   // Preload image and detect errors before starting the puzzle
   useEffect(() => {
@@ -95,22 +114,11 @@ export default function PuzzleGame() {
       const img = config.image || data.image_url;
       const size = Math.sqrt(config.pieces || 9);
 
-      // Drip Check
-      const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-        unlockDelayDays: data.unlock_delay_days,
-        requiredMissionDay: data.required_mission_day
-      });
-
-      if (isLocked) {
-        setIsDripLocked(true);
-        setDripDaysRemaining(daysRemaining);
-        setUnlockDelayDays(data.unlock_delay_days || 0);
-        setRequiredMissionDay(data.required_mission_day || 0);
-        // We don't return here because we want to show the modal in the UI
-      }
-
-      setImageUrl(img);
       setGridSize(Math.max(3, Math.min(size, 6))); // Clamp between 3 and 6
+
+      setUnlockDelayDaysFetched(data.unlock_delay_days || 0);
+      setRequiredMissionDayFetched(data.required_mission_day || 0);
+      setDataLoaded(true);
     } catch (error) {
       console.error(error);
       toast({ title: "Erro", description: "Falha ao carregar jogo.", variant: "destructive" });

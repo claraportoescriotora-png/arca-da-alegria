@@ -45,22 +45,34 @@ export default function MissionDetail() {
 
     const [pack, setPack] = useState<PackDetails | null>(null);
     const [days, setDays] = useState<MissionDay[]>([]);
-    const [loading, setLoading] = useState(true);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
     const [isDripLocked, setIsDripLocked] = useState(false);
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
     const [unlockDelayDays, setUnlockDelayDays] = useState(0);
 
+    const [unlockDelayDaysFetched, setUnlockDelayDaysFetched] = useState<number>(0);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
     // New State for Enrollment & Weeks
     const [enrolledAt, setEnrolledAt] = useState<Date | null>(null);
     const [activeWeek, setActiveWeek] = useState(1);
 
     useEffect(() => {
-        if (id && profile) {
-            fetchData();
+        if (id) fetchData();
+    }, [id]);
+
+    useEffect(() => {
+        if (!dataLoaded || profile === null) return;
+        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+            unlockDelayDays: unlockDelayDaysFetched
+        });
+        if (isLocked) {
+            setIsDripLocked(true);
+            setDripDaysRemaining(daysRemaining);
+            setUnlockDelayDays(unlockDelayDaysFetched);
         }
-    }, [id, profile]);
+    }, [dataLoaded, profile]);
 
     const fetchData = async () => {
         try {
@@ -76,16 +88,8 @@ export default function MissionDetail() {
             if (packError) throw packError;
             setPack(packData);
 
-            // Drip Check
-            const { isLocked: isPackDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-                unlockDelayDays: packData.unlock_delay_days
-            });
-
-            if (isPackDripLocked) {
-                setIsDripLocked(true);
-                setDripDaysRemaining(daysRemaining);
-                setUnlockDelayDays(packData.unlock_delay_days || 0);
-            }
+            setUnlockDelayDaysFetched(packData.unlock_delay_days || 0);
+            setDataLoaded(true);
 
             // 2. Fetch Enrollment
             const { data: enrollmentData } = await supabase

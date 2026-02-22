@@ -36,6 +36,28 @@ export default function RhythmGame() {
     const [requiredMissionDay, setRequiredMissionDay] = useState(0);
     const [loading, setLoading] = useState(true);
 
+    const [unlockDelayDaysFetched, setUnlockDelayDaysFetched] = useState<number>(0);
+    const [requiredMissionDayFetched, setRequiredMissionDayFetched] = useState<number>(0);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id]);
+
+    useEffect(() => {
+        if (!dataLoaded || profile === null) return;
+        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+            unlockDelayDays: unlockDelayDaysFetched,
+            requiredMissionDay: requiredMissionDayFetched
+        });
+        if (isLocked) {
+            setIsDripLocked(true);
+            setDripDaysRemaining(daysRemaining);
+            setUnlockDelayDays(unlockDelayDaysFetched);
+            setRequiredMissionDay(requiredMissionDayFetched);
+        }
+    }, [dataLoaded, profile]);
+
     // State
     const [sequence, setSequence] = useState<number[]>([]);
     const [playerSequence, setPlayerSequence] = useState<number[]>([]);
@@ -99,18 +121,9 @@ export default function RhythmGame() {
                 return;
             }
 
-            // Drip Check
-            const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-                unlockDelayDays: data.unlock_delay_days,
-                requiredMissionDay: data.required_mission_day
-            });
-
-            if (isLocked) {
-                setIsDripLocked(true);
-                setDripDaysRemaining(daysRemaining);
-                setUnlockDelayDays(data.unlock_delay_days || 0);
-                setRequiredMissionDay(data.required_mission_day || 0);
-            }
+            setUnlockDelayDaysFetched(data.unlock_delay_days || 0);
+            setRequiredMissionDayFetched(data.required_mission_day || 0);
+            setDataLoaded(true);
         } catch (error) {
             console.error(error);
         } finally {

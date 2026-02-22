@@ -52,14 +52,28 @@ export default function StoryDetail() {
 
   useEffect(() => {
     fetchStory();
-  }, [id, profile]);
+  }, [id]);
 
-  // Fetch Quiz when dialog opens
   useEffect(() => {
     if (showQuiz && story) {
       fetchQuiz();
     }
   }, [showQuiz, story]);
+
+  // Re-check drip whenever profile or story changes
+  useEffect(() => {
+    if (!story || !profile) return;
+
+    const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+      unlockDelayDays: story.unlock_delay_days,
+      requiredMissionDay: story.required_mission_day
+    });
+
+    setIsDripLocked(isLocked);
+    setDripDaysRemaining(daysRemaining);
+    setUnlockDelayDays(story.unlock_delay_days || 0);
+    setRequiredMissionDay(story.required_mission_day || 0);
+  }, [story, profile]);
 
   const fetchStory = async () => {
     if (!id) return;
@@ -84,19 +98,6 @@ export default function StoryDetail() {
           unlock_delay_days: data.unlock_delay_days || 0,
           required_mission_day: data.required_mission_day || 0
         });
-
-        // Check if locked
-        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-          unlockDelayDays: data.unlock_delay_days,
-          requiredMissionDay: data.required_mission_day
-        });
-
-        if (isLocked) {
-          setIsDripLocked(true);
-          setDripDaysRemaining(daysRemaining);
-          setUnlockDelayDays(data.unlock_delay_days || 0);
-          setRequiredMissionDay(data.required_mission_day || 0);
-        }
       }
     } catch (error) {
       console.error('Error fetching story:', error);
