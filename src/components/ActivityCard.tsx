@@ -1,5 +1,5 @@
 import { Download, Printer, Lock } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
 import { isContentLocked } from '@/lib/drip';
@@ -10,11 +10,12 @@ interface ActivityCardProps {
   title: string;
   image: string;
   type: string;
+  pdfUrl?: string;
   unlockDelayDays?: number;
   requiredMissionDay?: number;
 }
 
-export function ActivityCard({ id, title, image, type, unlockDelayDays, requiredMissionDay }: ActivityCardProps) {
+export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, requiredMissionDay }: ActivityCardProps) {
   const { profile } = useAuth();
   const navigate = useNavigate();
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
@@ -25,13 +26,37 @@ export function ActivityCard({ id, title, image, type, unlockDelayDays, required
     requiredMissionDay
   });
 
-  const handleAction = (e: React.MouseEvent) => {
+  const handleDownload = useCallback(() => {
+    if (!pdfUrl) return;
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `${title}.pdf`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [pdfUrl, title]);
+
+  const handlePrint = useCallback(() => {
+    if (!pdfUrl) return;
+    window.open(pdfUrl, '_blank');
+  }, [pdfUrl]);
+
+  const handleAction = useCallback((e: React.MouseEvent, action: 'download' | 'print') => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (isLocked) {
-      e.preventDefault();
-      e.stopPropagation();
       setIsDripDialogOpen(true);
+      return;
     }
-  };
+
+    if (action === 'download') {
+      handleDownload();
+    } else {
+      handlePrint();
+    }
+  }, [isLocked, handleDownload, handlePrint]);
 
   return (
     <>
@@ -60,7 +85,7 @@ export function ActivityCard({ id, title, image, type, unlockDelayDays, required
 
           <div className="flex gap-2 mt-3">
             <button
-              onClick={handleAction}
+              onClick={(e) => handleAction(e, 'download')}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-colors ${isLocked ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
             >
@@ -68,7 +93,7 @@ export function ActivityCard({ id, title, image, type, unlockDelayDays, required
               Baixar
             </button>
             <button
-              onClick={handleAction}
+              onClick={(e) => handleAction(e, 'print')}
               className={`p-2 rounded-xl transition-colors ${isLocked ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
             >

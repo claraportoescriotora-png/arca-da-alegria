@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, Moon, Sun } from 'lucide-react';
+import { Bell, Moon, Sun, BookOpen, Gamepad2, Play, FileText, ChevronRight, Heart } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useConfig } from '@/contexts/ConfigContext';
 import { useUser } from '@/contexts/UserContext';
@@ -12,7 +12,6 @@ import { StoryCard } from '@/components/StoryCard';
 import { GameCard } from '@/components/GameCard';
 import { NotificationsSheet } from '@/components/NotificationsSheet';
 import { UserAvatar } from '@/components/UserAvatar';
-import { BookOpen, Gamepad2, Play, FileText, ChevronRight, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
@@ -91,24 +90,19 @@ export default function Home() {
       let activeDay = days[0];
       let percent = 0;
 
-      // Logic: Find the first day that is NOT 100% complete. 
-      // If all previous days are complete, show the current one.
       for (const day of days) {
         const totalTasks = day.mission_tasks.length;
-        if (totalTasks === 0) continue; // Skip days with no tasks? Or count as done?
+        if (totalTasks === 0) continue;
 
         const completedTasks = day.mission_tasks.filter((t: any) => completedSet.has(t.id)).length;
 
         if (completedTasks < totalTasks) {
           activeDay = day;
           percent = Math.round((completedTasks / totalTasks) * 100);
-          break; // Found our current active day
+          break;
         } else {
-          // This day is fully complete.
-          // If it's the last day, we might stay on it or show "Completed"
           activeDay = day;
           percent = 100;
-          // Continue loop to see if there is a NEXT day that is incomplete
         }
       }
 
@@ -127,7 +121,6 @@ export default function Home() {
     try {
       setLoading(true);
 
-      // Fetch 2 Stories
       const { data: storiesData } = await supabase
         .from('stories')
         .select('*')
@@ -144,7 +137,6 @@ export default function Home() {
         })));
       }
 
-      // Fetch 2 Games
       const { data: gamesData } = await supabase
         .from('games')
         .select('*')
@@ -170,11 +162,8 @@ export default function Home() {
     }
   };
 
-  const handlePlayGame = (title: string) => {
-    toast({
-      title: "Em breve",
-      description: `O jogo "${title}" estará disponível logo!`,
-    });
+  const handlePlayGame = (id: string) => {
+    navigate(`/game/${id}`);
   };
 
   const unreadNotifications = notifications.some(n => !n.read);
@@ -329,7 +318,7 @@ export default function Home() {
                   duration={game.duration}
                   unlockDelayDays={game.unlock_delay_days}
                   requiredMissionDay={game.required_mission_day}
-                  onClick={() => handlePlayGame(game.title)}
+                  onClick={() => handlePlayGame(game.id)}
                 />
               ))}
             </div>

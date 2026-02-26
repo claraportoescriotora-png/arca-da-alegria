@@ -38,8 +38,6 @@ export default function Activities() {
       const formattedActivities: Activity[] = (data || []).map(a => ({
         id: a.id,
         title: a.title,
-        // Only use placeholder if the URL is strictly missing.
-        // Also add a light cache-buster for mobile PWA stability.
         image: a.image_url
           ? (a.image_url.includes('?') ? a.image_url : `${a.image_url}?t=${Date.now()}`)
           : 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
@@ -57,17 +55,6 @@ export default function Activities() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDownload = (url: string, title: string) => {
-    if (!url) return;
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${title}.pdf`;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
@@ -110,6 +97,7 @@ export default function Activities() {
                     title={activity.title}
                     image={activity.image}
                     type={activity.type}
+                    pdfUrl={activity.pdfUrl}
                     unlockDelayDays={activity.unlock_delay_days}
                     requiredMissionDay={activity.required_mission_day}
                   />
@@ -131,7 +119,6 @@ export default function Activities() {
                   {Array.from({ length: Math.ceil(activities.length / itemsPerPage) }, (_, i) => i + 1)
                     .filter(page => {
                       const totalPages = Math.ceil(activities.length / itemsPerPage);
-                      // Show first page, last page, current page, and adjacent pages
                       return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1;
                     })
                     .map((page, idx, arr) => (

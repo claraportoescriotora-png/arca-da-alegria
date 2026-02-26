@@ -51,36 +51,15 @@ export default function ShepherdGame() {
     const [isGameOver, setIsGameOver] = useState(false);
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(() => parseInt(localStorage.getItem('shepherd_highscore') || '0'));
-    const [gameWon, setGameWon] = useState(false); // Can you "win"? Maybe reach 100 sheep?
+    const [gameWon, setGameWon] = useState(false);
 
     const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
-    const boardRef = useRef<HTMLDivElement>(null);
 
     const [unlockDelayDaysFetched, setUnlockDelayDaysFetched] = useState<number>(0);
     const [requiredMissionDayFetched, setRequiredMissionDayFetched] = useState<number>(0);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    useEffect(() => {
-        if (id) fetchGameConfig();
-        spawnFruit();
-        spawnWolf();
-    }, [id]);
-
-    useEffect(() => {
-        if (!dataLoaded || profile === null) return;
-        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-            unlockDelayDays: unlockDelayDaysFetched,
-            requiredMissionDay: requiredMissionDayFetched
-        });
-        if (isLocked) {
-            setIsDripLocked(true);
-            setDripDaysRemaining(daysRemaining);
-            setUnlockDelayDays(unlockDelayDaysFetched);
-            setRequiredMissionDay(requiredMissionDayFetched);
-        }
-    }, [dataLoaded, profile]);
-
-    const fetchGameConfig = async () => {
+    const fetchGameConfig = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('games')
@@ -106,7 +85,147 @@ export default function ShepherdGame() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, navigate, toast]);
+
+    useEffect(() => {
+        if (id) fetchGameConfig();
+    }, [id, fetchGameConfig]);
+
+    useEffect(() => {
+        if (!dataLoaded || profile === null) return;
+        const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+            unlockDelayDays: unlockDelayDaysFetched,
+            requiredMissionDay: requiredMissionDayFetched
+        });
+        if (isLocked) {
+            setIsDripLocked(true);
+            setDripDaysRemaining(daysRemaining);
+            setUnlockDelayDays(unlockDelayDaysFetched);
+            setRequiredMissionDay(requiredMissionDayFetched);
+        }
+    }, [dataLoaded, profile, unlockDelayDaysFetched, requiredMissionDayFetched]);
+
+    // --- Logic ---
+    const isOccupied = useCallback((pos: Position) => {
+        if (snake.some(s => s.x === pos.x && s.y === pos.y)) return true;
+        if (wolf && wolf.x === pos.x && wolf.y === pos.y) return true;
+        return false;
+    }, [snake, wolf]);
+
+    const spawnFruit = useCallback(() => {
+        let newPos;
+        let attempts = 0;
+        do {
+            newPos = {
+                x: Math.floor(Math.random() * GRID_SIZE),
+                y: Math.floor(Math.random() * GRID_SIZE)
+            };
+            attempts++;
+        } while (isOccupied(newPos) && attempts < 50);
+
+        const randomFruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+        setFruit({ pos: newPos, type: randomFruit.type, icon: randomFruit.icon });
+    }, [isOccupied]);
+
+    const distanceFromHead = useCallback((pos: Position) => {
+        if (snake.length === 0) return 0;
+        return Math.abs(pos.x - snake[0].x) + Math.abs(pos.y - snake[0].y);
+    }, [snake]);
+
+    const spawnWolf = useCallback(() => {
+        let newPos;
+        let attempts = 0;
+        do {
+            newPos = {
+                x: Math.floor(Math.random() * GRID_SIZE),
+                y: Math.floor(Math.random() * GRID_SIZE)
+            };
+            attempts++;
+        } while (
+            (isOccupied(newPos) || distanceFromHead(newPos) < 4) && attempts < 50
+        );
+
+        if (attempts < 50) setWolf(newPos);
+    }, [isOccupied, distanceFromHead]);
+
+    const handleWolfCollision = useCallback(() => {
+        toast({
+            title: "Cuidado com o Lobo! 🐺",
+            description: "Você perdeu algumas ovelhinhas!",
+            variant: "destructive",
+            duration: 2000
+        });
+
+        setSnake(prev => {
+            const keepCount = Math.max(1, prev.length - 3);
+            return prev.slice(0, keepCount);
+        });
+        spawnWolf();
+    }, [toast, spawnWolf]);
+
+    const handleGameOver = useCallback(() => {
+        setIsGameOver(true);
+        setIsPlaying(false);
+        if (score > 0) {
+            addXp(score * 10);
+        }
+
+        const currentHS = parseInt(localStorage.getItem('shepherd_highscore') || '0');
+        if (score > currentHS) {
+            setHighScore(score);
+            localStorage.setItem('shepherd_highscore', score.toString());
+        }
+    }, [score, addXp]);
+
+    const moveSnake = useCallback(() => {
+        setDirection(nextDirection);
+        const newHead = {
+            x: snake[0].x + nextDirection.x,
+            y: snake[0].y + nextDirection.y
+        };
+
+        if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
+            handleGameOver();
+            return;
+        }
+
+        const bodyCollision = snake.slice(0, -1).some(segment => segment.x === newHead.x && segment.y === newHead.y);
+        if (bodyCollision) {
+            handleGameOver();
+            return;
+        }
+
+        if (wolf && newHead.x === wolf.x && newHead.y === wolf.y) {
+            handleWolfCollision();
+            return;
+        }
+
+        const newSnake = [newHead, ...snake];
+
+        if (newHead.x === fruit.pos.x && newHead.y === fruit.pos.y) {
+            setScore(s => s + 1);
+            spawnFruit();
+        } else {
+            newSnake.pop();
+        }
+
+        setWolfTimer(t => {
+            if (t >= WOLF_MOVE_INTERVAL) {
+                spawnWolf();
+                return 0;
+            }
+            return t + 1;
+        });
+
+        setSnake(newSnake);
+    }, [snake, nextDirection, fruit, wolf, handleGameOver, handleWolfCollision, spawnFruit, spawnWolf]);
+
+    useEffect(() => {
+        if (dataLoaded && !isPlaying) {
+            spawnFruit();
+            spawnWolf();
+        }
+    }, [dataLoaded, isPlaying, spawnFruit, spawnWolf]);
 
     // --- Input Handling ---
     useEffect(() => {
@@ -133,139 +252,7 @@ export default function ShepherdGame() {
         return () => {
             if (gameLoopRef.current) clearInterval(gameLoopRef.current);
         };
-    }, [isPlaying, isGameOver, gameWon, snake, direction, nextDirection, wolf, score]); // Dependencies for closure freshness
-
-    // --- Logic ---
-    const moveSnake = () => {
-        setDirection(nextDirection);
-        const newHead = {
-            x: snake[0].x + nextDirection.x,
-            y: snake[0].y + nextDirection.y
-        };
-
-        // 1. Check if moving OUTSIDE grid
-        if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
-            handleGameOver();
-            return;
-        }
-
-        // 2. Check if moving INTO itself (Self-Collision)
-        // Forgiveness: Only die if it's NOT the tail (which will move). 
-        // Actually standard snake dies on body. But let's check carefully.
-        const bodyCollision = snake.slice(0, -1).some(segment => segment.x === newHead.x && segment.y === newHead.y);
-        if (bodyCollision) {
-            handleGameOver();
-            return;
-        }
-
-        // 3. Wolf Collision
-        if (wolf && newHead.x === wolf.x && newHead.y === wolf.y) {
-            handleWolfCollision();
-            // Don't move into the wolf, just hit it and recoil? 
-            // Or move through it but lose tail?
-            // Let's bounce back? Or just continue moving but lose tail?
-            // "O jogo continua" -> Ensure we don't die. 
-            // If we just continue, we'll overlap the wolf. Let's respawn the wolf immediately if hit.
-            spawnWolf();
-        }
-
-        const newSnake = [newHead, ...snake];
-
-        // 4. Fruit Collection
-        if (newHead.x === fruit.pos.x && newHead.y === fruit.pos.y) {
-            setScore(s => s + 1);
-            spawnFruit();
-            // Don't pop tail -> snake grows
-        } else {
-            newSnake.pop(); // Remove tail
-        }
-
-        // Wolf Movement Logic
-        setWolfTimer(t => {
-            if (t >= WOLF_MOVE_INTERVAL) {
-                spawnWolf(); // Relocate wolf
-                return 0;
-            }
-            return t + 1;
-        });
-
-        setSnake(newSnake);
-    };
-
-    const handleWolfCollision = () => {
-        toast({
-            title: "Cuidado com o Lobo! 🐺",
-            description: "Você perdeu algumas ovelhinhas!",
-            variant: "destructive",
-            duration: 2000
-        });
-
-        // Lose last 3 segments (but keep at least head)
-        setSnake(prev => {
-            const keepCount = Math.max(1, prev.length - 3);
-            return prev.slice(0, keepCount);
-        });
-    };
-
-    const handleGameOver = () => {
-        setIsGameOver(true);
-        setIsPlaying(false);
-        if (score > 0) {
-            addXp(score * 10); // 10 XP per sheep
-        }
-
-        // Update High Score
-        if (score > highScore) {
-            setHighScore(score);
-            localStorage.setItem('shepherd_highscore', score.toString());
-        }
-    };
-
-    const spawnFruit = () => {
-        // Random Position not on snake or wolf
-        let newPos;
-        do {
-            newPos = {
-                x: Math.floor(Math.random() * GRID_SIZE),
-                y: Math.floor(Math.random() * GRID_SIZE)
-            };
-        } while (isOccupied(newPos));
-
-        const randomFruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
-        setFruit({ pos: newPos, type: randomFruit.type, icon: randomFruit.icon });
-    };
-
-    const spawnWolf = () => {
-        // Random Position away from head
-        let newPos;
-        let attempts = 0;
-        do {
-            newPos = {
-                x: Math.floor(Math.random() * GRID_SIZE),
-                y: Math.floor(Math.random() * GRID_SIZE)
-            };
-            attempts++;
-        } while (
-            (isOccupied(newPos) || distanceFromHead(newPos) < 4) && attempts < 50
-        );
-
-        if (attempts < 50) setWolf(newPos);
-    };
-
-    const isOccupied = (pos: Position) => {
-        // Check snake
-        if (snake.some(s => s.x === pos.x && s.y === pos.y)) return true;
-        // Check wolf
-        if (wolf && wolf.x === pos.x && wolf.y === pos.y) return true;
-        return false;
-    };
-
-    if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
-
-    const distanceFromHead = (pos: Position) => {
-        if (snake.length === 0) return 0;
-        return Math.abs(pos.x - snake[0].x) + Math.abs(pos.y - snake[0].y);
-    };
+    }, [isPlaying, isGameOver, gameWon, score, moveSnake]);
 
     const startGame = () => {
         setSnake([{ x: 7, y: 7 }]);
@@ -278,27 +265,19 @@ export default function ShepherdGame() {
         spawnWolf();
     };
 
-    // --- Rendering Helpers ---
     const getCellContent = (x: number, y: number) => {
-        // 1. Snake Head
-        if (snake[0].x === x && snake[0].y === y) return <span className="text-xl animate-bounce">🧑‍🦯</span>; // Shepherd/Leader
-
-        // 2. Snake Body
+        if (snake[0].x === x && snake[0].y === y) return <span className="text-xl animate-bounce">🧑‍🦯</span>;
         const bodyIndex = snake.findIndex((s, i) => i > 0 && s.x === x && s.y === y);
         if (bodyIndex !== -1) return <span className="text-lg animate-pulse delay-75">🐑</span>;
-
-        // 3. Fruit
         if (fruit.pos.x === x && fruit.pos.y === y) return <span className="text-lg animate-bounce">{fruit.icon}</span>;
-
-        // 4. Wolf
         if (wolf && wolf.x === x && wolf.y === y) return <span className="text-xl">🐺</span>;
-
         return null;
     };
 
+    if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div></div>;
+
     return (
         <div className="min-h-screen bg-[#F0F9FF] flex flex-col font-sans">
-            {/* Header */}
             <header className="sticky top-0 z-20 glass border-b border-border/50">
                 <div className="container max-w-md mx-auto px-4 py-3 flex items-center justify-between">
                     <button
@@ -307,7 +286,6 @@ export default function ShepherdGame() {
                     >
                         <ArrowLeft className="w-5 h-5 text-slate-700" />
                     </button>
-
                     <div className="flex flex-col items-center">
                         <h1 className="font-fredoka font-bold text-lg text-slate-700">O Bom Pastor</h1>
                         <div className="flex gap-4 text-xs font-bold text-slate-500">
@@ -315,7 +293,6 @@ export default function ShepherdGame() {
                             <span className="flex items-center gap-1 text-amber-500">🏆 {highScore}</span>
                         </div>
                     </div>
-
                     <button
                         onClick={startGame}
                         className="w-10 h-10 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors active:scale-95 shadow-sm text-green-700"
@@ -325,14 +302,10 @@ export default function ShepherdGame() {
                 </div>
             </header>
 
-            {/* Game Area */}
             <main className="flex-1 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-
-                {/* Sky / Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-200 to-transparent -z-10" />
                 <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-green-100 to-transparent -z-10" />
 
-                {/* Board */}
                 <div
                     className="relative bg-white/40 backdrop-blur-sm border-4 border-white rounded-xl shadow-xl overflow-hidden"
                     style={{
@@ -344,7 +317,6 @@ export default function ShepherdGame() {
                         aspectRatio: '1/1',
                     }}
                 >
-                    {/* Overlay if Not Playing */}
                     {!isPlaying && (
                         <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
                             {isGameOver ? (
@@ -368,7 +340,6 @@ export default function ShepherdGame() {
                         </div>
                     )}
 
-                    {/* Grid Cells */}
                     {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
                         const x = i % GRID_SIZE;
                         const y = Math.floor(i / GRID_SIZE);
@@ -378,7 +349,7 @@ export default function ShepherdGame() {
                                 key={i}
                                 className={cn(
                                     "w-full h-full flex items-center justify-center text-sm select-none",
-                                    isChecker ? "bg-green-50/50" : "bg-green-100/50" // Checkerboard pattern
+                                    isChecker ? "bg-green-50/50" : "bg-green-100/50"
                                 )}
                             >
                                 {getCellContent(x, y)}
@@ -387,7 +358,6 @@ export default function ShepherdGame() {
                     })}
                 </div>
 
-                {/* Mobile Controls */}
                 <div className="mt-4 grid grid-cols-3 gap-3 w-full max-w-[220px] relative z-20 pb-8">
                     <div />
                     <button
@@ -417,7 +387,6 @@ export default function ShepherdGame() {
                         <ArrowRight className="w-10 h-10 text-slate-600" />
                     </button>
                 </div>
-
             </main>
 
             <DripLockModal
