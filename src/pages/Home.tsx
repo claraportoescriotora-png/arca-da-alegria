@@ -20,6 +20,7 @@ interface ContentItem {
   id: string;
   title: string;
   image: string;
+  type?: string;
   category?: string;
   difficulty?: 'Fácil' | 'Médio' | 'Difícil';
   duration?: string;
@@ -149,6 +150,7 @@ export default function Home() {
           title: g.title,
           image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
           difficulty: g.difficulty || 'Fácil',
+          type: g.type,
           duration: '5 min',
           unlock_delay_days: g.unlock_delay_days || 0,
           required_mission_day: g.required_mission_day || 0
@@ -162,8 +164,27 @@ export default function Home() {
     }
   };
 
-  const handlePlayGame = (id: string) => {
-    navigate(`/game/${id}`);
+  const handlePlayGame = (game: ContentItem) => {
+    if (game.type === 'puzzle') {
+      navigate(`/games/puzzle/${game.id}`);
+    } else if (game.type === 'shepherd') {
+      navigate(`/games/shepherd/${game.id}`);
+    } else if (game.type === 'sky_jump') {
+      navigate(`/games/sky-jump/${game.id}`);
+    } else if (game.type === 'memory') {
+      navigate(`/games/signs/${game.id}`);
+    } else if (game.type === 'find_jesus') {
+      navigate(`/games/find-jesus/${game.id}`);
+    } else if (game.type === 'rhythm') {
+      navigate(`/games/rhythm/${game.id}`);
+    } else if (game.type === 'charades') {
+      navigate(`/games/charades/${game.id}`);
+    } else {
+      toast({
+        title: "Em construção",
+        description: "Este jogo está sendo integrado.",
+      });
+    }
   };
 
   const unreadNotifications = notifications.some(n => !n.read);
@@ -318,7 +339,7 @@ export default function Home() {
                   duration={game.duration}
                   unlockDelayDays={game.unlock_delay_days}
                   requiredMissionDay={game.required_mission_day}
-                  onClick={() => handlePlayGame(game.id)}
+                  onClick={() => handlePlayGame(game)}
                 />
               ))}
             </div>

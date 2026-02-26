@@ -46,6 +46,7 @@ export default function MissionDetail() {
     const [pack, setPack] = useState<PackDetails | null>(null);
     const [days, setDays] = useState<MissionDay[]>([]);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const [isDripLocked, setIsDripLocked] = useState(false);
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);

@@ -115,6 +115,7 @@ export default function PuzzleGame() {
       const size = Math.sqrt(config.pieces || 9);
 
       setGridSize(Math.max(3, Math.min(size, 6))); // Clamp between 3 and 6
+      setImageUrl(img);
 
       setUnlockDelayDaysFetched(data.unlock_delay_days || 0);
       setRequiredMissionDayFetched(data.required_mission_day || 0);

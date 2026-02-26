@@ -162,8 +162,8 @@ export default function Stories() {
                   category={story.category}
                   duration={story.duration}
                   progress={story.progress}
-                  unlock_delay_days={story.unlock_delay_days}
-                  required_mission_day={story.required_mission_day}
+                  unlockDelayDays={story.unlock_delay_days}
+                  requiredMissionDay={story.required_mission_day}
                 />
               ))}
             </>

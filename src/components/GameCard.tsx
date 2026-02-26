@@ -37,8 +37,6 @@ export function GameCard({ id, title, image, difficulty, duration, unlockDelayDa
 
     if (onClick) {
       onClick();
-    } else {
-      navigate(`/game/${id}`);
     }
   };
 
