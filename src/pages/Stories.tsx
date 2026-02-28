@@ -158,7 +158,7 @@ export default function Stories() {
                   key={story.id}
                   id={story.id}
                   title={story.title}
-                  image={story.image}
+                  image={story.image || "https://minha-zona-amiguito.b-cdn.net/Hist%C3%B3rias/historias%20biblicas.webp"}
                   category={story.category}
                   duration={story.duration}
                   progress={story.progress}

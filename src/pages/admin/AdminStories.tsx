@@ -174,7 +174,12 @@ export function AdminStories() {
     };
 
     const openNew = () => {
-        setCurrentStory({ category: 'biblical', content: '' });
+        setCurrentStory({
+            category: 'biblical',
+            content: '',
+            cover_url: "https://minha-zona-amiguito.b-cdn.net/Hist%C3%B3rias/historias%20biblicas.webp",
+            // is_premium: false // This property is not defined in the Story interface
+        });
         setIsEditing(false);
         setIsDialogOpen(true);
     };
@@ -271,7 +276,11 @@ export function AdminStories() {
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <img src={story.cover_url} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" />
+                                        <img
+                                            src={story.cover_url || "https://minha-zona-amiguito.b-cdn.net/Hist%C3%B3rias/historias%20biblicas.webp"}
+                                            alt={story.title}
+                                            className="w-10 h-10 rounded-lg object-cover bg-slate-100"
+                                        />
                                     </TableCell>
                                     <TableCell className="font-medium text-slate-700">{story.title}</TableCell>
                                     <TableCell>
