@@ -379,14 +379,14 @@ export default function Home() {
             </div>
             <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x hide-scrollbar after:content-[''] after:w-1 after:shrink-0">
               {featuredCatalog.map(item => (
-                <div key={item.id + item.type} className="snap-start w-[120px] shrink-0">
+                <div key={item.id + item.type} className="snap-start w-[120px] sm:w-[140px] shrink-0">
                   <CoverCard
                     id={item.id}
                     title={item.title}
                     coverUrl={item.coverUrl}
                     type={item.type}
                   />
-                  <p className="mt-2 text-xs font-medium text-muted-foreground truncate w-full max-w-[120px]">{item.title}</p>
+                  <p className="mt-2 text-xs font-medium text-muted-foreground truncate w-full">{item.title}</p>
                 </div>
               ))}
             </div>
