@@ -377,7 +377,7 @@ export default function Home() {
                 Ver tudo
               </button>
             </div>
-            <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+            <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x hide-scrollbar after:content-[''] after:w-1 after:shrink-0">
               {featuredCatalog.map(item => (
                 <div key={item.id + item.type} className="snap-start w-[120px] shrink-0">
                   <CoverCard
