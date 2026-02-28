@@ -1,11 +1,13 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Video, Gamepad2, Target, Download, Home, LogOut, Sparkles, ShoppingCart } from 'lucide-react';
+import { BookOpen, Video, Gamepad2, Target, Download, Home, LogOut, Sparkles, ShoppingCart, Film, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 
 const menuItems = [
     { label: 'Histórias', icon: BookOpen, path: '/admin/stories' },
     { label: 'Vídeos', icon: Video, path: '/admin/videos' },
+    { label: 'Filmes', icon: Film, path: '/admin/movies' },
+    { label: 'Séries', icon: Layers, path: '/admin/series' },
     { label: 'Jogos', icon: Gamepad2, path: '/admin/games' },
     { label: 'Missões', icon: Target, path: '/admin/missions' },
     { label: 'Downloads', icon: Download, path: '/admin/downloads' },

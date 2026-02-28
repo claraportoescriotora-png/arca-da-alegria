@@ -563,7 +563,7 @@ export function AdminVideos() {
 
             {/* Create/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{isEditing ? 'Editar Vídeo' : 'Novo Vídeo'}</DialogTitle>
                     </DialogHeader>
@@ -585,11 +585,11 @@ export function AdminVideos() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>URL do Vídeo (YouTube/MP4)</Label>
+                            <Label>URL do Vídeo (Bunny Stream/YouTube/MP4)</Label>
                             <Input
                                 value={currentVideo.video_url || ''}
                                 onChange={e => setCurrentVideo({ ...currentVideo, video_url: e.target.value })}
-                                placeholder="https://..."
+                                placeholder="https://iframe.mediadelivery.net/play/..."
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -693,7 +693,7 @@ export function AdminVideos() {
 
             {/* Bulk Update Category Dialog */}
             <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Alterar Categoria em Massa</DialogTitle>
                         <DialogDescription>

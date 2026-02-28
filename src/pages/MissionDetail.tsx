@@ -251,7 +251,7 @@ export default function MissionDetail() {
             </header>
 
             <main className="container max-w-md mx-auto px-4 mt-6">
-                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mb-4">
+                <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar mb-4">
                     {[1, 2, 3, 4].map(week => (
                         <button
                             key={week}

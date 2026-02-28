@@ -10,6 +10,7 @@ import { QuickAccessCard } from '@/components/QuickAccessCard';
 import { DevotionalCard } from '@/components/DevotionalCard';
 import { StoryCard } from '@/components/StoryCard';
 import { GameCard } from '@/components/GameCard';
+import { CoverCard } from '@/components/CoverCard';
 import { NotificationsSheet } from '@/components/NotificationsSheet';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +29,13 @@ interface ContentItem {
   required_mission_day?: number;
 }
 
+interface CatalogItem {
+  id: string;
+  title: string;
+  coverUrl: string;
+  type: 'movie' | 'series';
+}
+
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { name, level, avatarId, notifications } = useUser();
@@ -38,6 +46,7 @@ export default function Home() {
 
   const [recentStories, setRecentStories] = useState<ContentItem[]>([]);
   const [recentGames, setRecentGames] = useState<ContentItem[]>([]);
+  const [featuredCatalog, setFeaturedCatalog] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Mission Progress State
@@ -77,7 +86,7 @@ export default function Home() {
         .eq('pack_id', pack.id)
         .order('day_number');
 
-      if (!days) return;
+      if (!days || days.length === 0) return;
 
       // 3. Get user's completed tasks
       const { data: userProgress } = await supabase
@@ -156,6 +165,16 @@ export default function Home() {
           required_mission_day: g.required_mission_day || 0
         })));
       }
+
+      // Fetch 2 random/latest Series and 2 Movies for "Em Destaque"
+      const { data: seriesData } = await supabase.from('series').select('*').eq('is_active', true).limit(2).order('created_at', { ascending: false });
+      const { data: moviesData } = await supabase.from('movies').select('*').eq('is_active', true).limit(2).order('created_at', { ascending: false });
+
+      const combined = [
+        ...(seriesData || []).map(s => ({ id: s.id, title: s.title, coverUrl: s.cover_url, type: 'series' as const })),
+        ...(moviesData || []).map(m => ({ id: m.id, title: m.title, coverUrl: m.cover_url, type: 'movie' as const }))
+      ];
+      setFeaturedCatalog(combined);
 
     } catch (error) {
       console.error('Error loading home content:', error);
@@ -345,6 +364,34 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        {/* Em Destaque (Catalog) */}
+        {featuredCatalog.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-fredoka text-lg font-semibold text-foreground">Séries & Filmes</h2>
+              <button
+                onClick={() => navigate('/videos')}
+                className="text-sm text-primary font-medium hover:underline"
+              >
+                Ver tudo
+              </button>
+            </div>
+            <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+              {featuredCatalog.map(item => (
+                <div key={item.id + item.type} className="snap-start w-[120px] shrink-0">
+                  <CoverCard
+                    id={item.id}
+                    title={item.title}
+                    coverUrl={item.coverUrl}
+                    type={item.type}
+                  />
+                  <p className="mt-2 text-xs font-medium text-muted-foreground truncate w-full max-w-[120px]">{item.title}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <BottomNav />

@@ -1,163 +1,229 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Film, Music, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
-import { SearchBar } from '@/components/SearchBar';
-import { CategoryTabs } from '@/components/CategoryTabs';
+import { CoverCard } from '@/components/CoverCard';
 import { VideoCard } from '@/components/VideoCard';
-import { Pagination } from '@/components/Pagination';
 import { supabase } from '@/lib/supabase';
+
+interface Series {
+  id: string;
+  title: string;
+  coverUrl: string;
+}
+
+interface Movie {
+  id: string;
+  title: string;
+  coverUrl: string;
+  unlockDelayDays: number;
+  requiredMissionDay: number;
+}
 
 interface Video {
   id: string;
   title: string;
-  thumbnail: string; // Mapped from thumbnail_url
+  thumbnail: string;
   duration: string;
   category: string;
   videoUrl: string;
-  unlock_delay_days: number;
-  required_mission_day: number;
+  description: string;
+  unlockDelayDays: number;
+  requiredMissionDay: number;
 }
-
-const categories = ['Todos', 'Músicas', 'Histórias', 'Aprendizado'];
 
 export default function Videos() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [series, setSeries] = useState<Series[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Pagination
-  const ITEMS_PER_PAGE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-
   useEffect(() => {
-    fetchVideos();
-  }, [currentPage, search, activeCategory]);
+    fetchCatalog();
+  }, []);
 
-  const fetchVideos = async () => {
+  const fetchCatalog = async () => {
     try {
       setLoading(true);
 
-      // 1. Build Query
-      let query = supabase.from('videos').select('*', { count: 'exact' });
+      // Fetch Series
+      const { data: seriesData } = await supabase
+        .from('series')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
-      if (search) {
-        query = query.ilike('title', `%${search}%`);
+      if (seriesData) {
+        setSeries(seriesData.map(s => ({
+          id: s.id,
+          title: s.title,
+          coverUrl: s.cover_url
+        })));
       }
 
-      if (activeCategory !== 'Todos') {
-        query = query.eq('category', activeCategory);
+      // Fetch Movies
+      const { data: moviesData } = await supabase
+        .from('movies')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (moviesData) {
+        setMovies(moviesData.map(m => ({
+          id: m.id,
+          title: m.title,
+          coverUrl: m.cover_url,
+          unlockDelayDays: m.unlock_delay_days || 0,
+          requiredMissionDay: m.required_mission_day || 0
+        })));
       }
 
-      // Add Range
-      query = query.range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
+      // Fetch Videos (Older content, like Músicas)
+      const { data: videosData } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(10); // Limit to top 10 recent videos
 
-      const { data, error, count } = await query;
+      if (videosData) {
+        setVideos(videosData.map(v => ({
+          id: v.id,
+          title: v.title,
+          thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
+          duration: v.duration || '0:00',
+          category: v.category || 'Músicas',
+          description: '',
+          videoUrl: v.video_url || '',
+          unlockDelayDays: v.unlock_delay_days || 0,
+          requiredMissionDay: v.required_mission_day || 0
+        })));
+      }
 
-      if (error) throw error;
-      if (count !== null) setTotalItems(count);
-
-      const formattedVideos: Video[] = (data || []).map(v => ({
-        id: v.id,
-        title: v.title,
-        thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
-        duration: v.duration || '0:00',
-        category: v.category || 'Músicas',
-        videoUrl: v.video_url || '',
-        unlock_delay_days: v.unlock_delay_days || 0,
-        required_mission_day: v.required_mission_day || 0
-      }));
-
-      setVideos(formattedVideos);
     } catch (error) {
-      console.error('Error loading videos:', error);
+      console.error('Error loading catalog:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-slate-900 pb-24 text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 glass border-b border-border">
+      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
         <div className="container max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-full bg-card hover:bg-muted transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="font-fredoka text-xl font-bold text-foreground">Vídeos</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              <h1 className="font-fredoka text-xl font-bold text-white">Catálogo</h1>
+            </div>
+            <PlayCircle className="w-8 h-8 text-fuchsia-500" />
           </div>
-
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Buscar vídeos..."
-          />
         </div>
       </header>
 
       {/* Content */}
-      <main className="container max-w-md mx-auto px-4 py-6 space-y-6">
-        <CategoryTabs
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
+      <main className="container max-w-md mx-auto py-6 space-y-8 overflow-hidden">
 
-        <div className="grid grid-cols-1 gap-4">
-          {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm flex flex-col">
-                <div className="w-full aspect-video bg-muted animate-pulse" />
-                <div className="p-4 space-y-2">
-                  <div className="h-5 w-3/4 bg-muted animate-pulse rounded-md" />
-                  <div className="h-4 w-1/4 bg-muted animate-pulse rounded-md" />
-                </div>
-              </div>
-            ))
-          ) : (
-            <>
-              {videos.map(video => (
-                <VideoCard
-                  key={video.id}
-                  id={video.id}
-                  title={video.title}
-                  thumbnail={video.thumbnail}
-                  duration={video.duration}
-                  category={video.category}
-                  videoUrl={video.videoUrl}
-                  unlockDelayDays={video.unlock_delay_days}
-                  requiredMissionDay={video.required_mission_day}
-                />
-              ))}
-            </>
-          )}
-        </div>
-
-        {!loading && (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-fuchsia-500"></div>
+          </div>
+        ) : (
           <>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(totalItems / ITEMS_PER_PAGE)}
-              onPageChange={setCurrentPage}
-            />
+            {/* Séries Section */}
+            {series.length > 0 && (
+              <section>
+                <div className="px-4 flex items-center gap-2 mb-3">
+                  <Layers className="w-5 h-5 text-fuchsia-400" />
+                  <h2 className="font-fredoka text-lg font-bold text-white">Séries de Animação</h2>
+                </div>
+                <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x hide-scrollbar">
+                  {series.map(s => (
+                    <div key={s.id} className="snap-start">
+                      <CoverCard
+                        id={s.id}
+                        title={s.title}
+                        coverUrl={s.coverUrl}
+                        type="series"
+                      />
+                      <p className="mt-2 text-xs font-medium text-slate-300 truncate w-full max-w-[120px] sm:max-w-[140px]">{s.title}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
-            {videos.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Nenhum vídeo encontrado</p>
+            {/* Filmes Section */}
+            {movies.length > 0 && (
+              <section>
+                <div className="px-4 flex items-center gap-2 mb-3">
+                  <Film className="w-5 h-5 text-indigo-400" />
+                  <h2 className="font-fredoka text-lg font-bold text-white">Filmes e Especiais</h2>
+                </div>
+                <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x hide-scrollbar">
+                  {movies.map(m => (
+                    <div key={m.id} className="snap-start">
+                      <CoverCard
+                        id={m.id}
+                        title={m.title}
+                        coverUrl={m.coverUrl}
+                        type="movie"
+                        unlockDelayDays={m.unlockDelayDays}
+                        requiredMissionDay={m.requiredMissionDay}
+                      />
+                      <p className="mt-2 text-xs font-medium text-slate-300 truncate w-full max-w-[120px] sm:max-w-[140px]">{m.title}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Vídeos Antigos (Músicas etc) */}
+            {videos.length > 0 && (
+              <section>
+                <div className="px-4 flex items-center gap-2 mb-3">
+                  <Music className="w-5 h-5 text-pink-400" />
+                  <h2 className="font-fredoka text-lg font-bold text-white">Clipes e Músicas</h2>
+                </div>
+                <div className="px-4 grid grid-cols-1 gap-4">
+                  {videos.map(video => (
+                    <div key={video.id} className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700">
+                      <VideoCard
+                        id={video.id}
+                        title={video.title}
+                        thumbnail={video.thumbnail}
+                        duration={video.duration}
+                        category={video.category}
+                        description={video.description}
+                        unlockDelayDays={video.unlockDelayDays}
+                        requiredMissionDay={video.requiredMissionDay}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {series.length === 0 && movies.length === 0 && videos.length === 0 && (
+              <div className="text-center py-12 px-4">
+                <p className="text-slate-400">Nenhum conteúdo no catálogo ainda.</p>
               </div>
             )}
           </>
         )}
       </main>
 
-      <BottomNav />
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <BottomNav />
+      </div>
+
     </div>
   );
 }

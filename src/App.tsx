@@ -26,6 +26,8 @@ import Notifications from "./pages/Notifications";
 import Privacy from "./pages/Privacy";
 import Help from "./pages/Help";
 import StoryDetail from "./pages/StoryDetail";
+import VideoDetail from "./pages/VideoDetail";
+import SeriesDetail from "./pages/SeriesDetail";
 import NotFound from "./pages/NotFound";
 import Devotional from "./pages/Devotional";
 import Missions from "./pages/Missions";
@@ -67,6 +69,8 @@ const App = () => (
                     <Route path="/stories" element={<ProtectedRoute><SubscriptionGuard><Stories /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/story/:id" element={<ProtectedRoute><SubscriptionGuard><StoryDetail /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/videos" element={<ProtectedRoute><SubscriptionGuard><Videos /></SubscriptionGuard></ProtectedRoute>} />
+                    <Route path="/video/:id" element={<ProtectedRoute><SubscriptionGuard><VideoDetail /></SubscriptionGuard></ProtectedRoute>} />
+                    <Route path="/series/:id" element={<ProtectedRoute><SubscriptionGuard><SeriesDetail /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/games" element={<ProtectedRoute><SubscriptionGuard><Games /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/games/puzzle/:id" element={<ProtectedRoute><SubscriptionGuard><PuzzleGame /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/games/shepherd/:id" element={<ProtectedRoute><SubscriptionGuard><ShepherdGame /></SubscriptionGuard></ProtectedRoute>} />

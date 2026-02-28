@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminStories } from '@/pages/admin/AdminStories';
 import { AdminVideos } from '@/pages/admin/AdminVideos';
+import { AdminMovies } from '@/pages/admin/AdminMovies';
+import { AdminSeries } from '@/pages/admin/AdminSeries';
 import { AdminGames } from '@/pages/admin/AdminGames';
 import { AdminMissions } from '@/pages/admin/AdminMissions';
 import { AdminDownloads } from '@/pages/admin/AdminDownloads';
@@ -71,6 +73,8 @@ export default function Admin() {
                     <Route path="/" element={<Navigate to="stories" replace />} />
                     <Route path="stories" element={<AdminStories />} />
                     <Route path="videos" element={<AdminVideos />} />
+                    <Route path="movies" element={<AdminMovies />} />
+                    <Route path="series" element={<AdminSeries />} />
                     <Route path="games" element={<AdminGames />} />
                     <Route path="missions" element={<AdminMissions />} />
                     <Route path="downloads" element={<AdminDownloads />} />
