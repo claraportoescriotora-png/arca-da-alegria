@@ -302,7 +302,7 @@ export function AdminSeries() {
             const newVideosToInsert: any[] = [];
 
             for (const bv of bunnyVideos) {
-                const videoUrl = `https://iframe.mediadelivery.net/play/${libraryId}/${bv.guid}`;
+                const videoUrl = `https://iframe.mediadelivery.net/embed/${libraryId}/${bv.guid}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`;
 
                 // Evita criar se já existe esse vídeo URL na temporada
                 if (!existingUrls.includes(videoUrl)) {

@@ -5,11 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Loader2, Search, X, ChevronLeft, ChevronRight, Settings2, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search, X, ChevronLeft, ChevronRight, Settings2, Clock, DownloadCloud } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
-import { DownloadCloud } from "lucide-react";
 
 interface Movie {
     id: string;
@@ -250,7 +250,7 @@ export function AdminMovies() {
             const newVideosToInsert: any[] = [];
 
             for (const bv of bunnyVideos) {
-                const videoUrl = `https://iframe.mediadelivery.net/play/${libraryId}/${bv.guid}`;
+                const videoUrl = `https://iframe.mediadelivery.net/embed/${libraryId}/${bv.guid}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`;
 
                 // Evita criar se já existe esse vídeo URL no app
                 if (!existingUrls.includes(videoUrl)) {
