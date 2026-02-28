@@ -208,7 +208,7 @@ export default function Landing() {
                     {/* Hero Illustration */}
                     <div className="flex items-end justify-center h-full">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daniamiguitoejesus.webp"
+                            src="https://minha-zona-amiguito.b-cdn.net/landingpages/natameseufilhoheroamiguito.webp"
                             alt="Daniel e Jesus"
                             className="w-full max-w-md h-auto object-bottom"
                         />
