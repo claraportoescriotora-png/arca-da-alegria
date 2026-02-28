@@ -7,9 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Loader2, Search, X, ChevronLeft, ChevronRight, Settings2, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { DownloadCloud } from "lucide-react";
 
 interface Movie {
     id: string;
@@ -49,6 +49,23 @@ export function AdminMovies() {
     const [bulkCategory, setBulkCategory] = useState("Filme");
     const [isBulkCustomCategory, setIsBulkCustomCategory] = useState(false);
     const [bulkSubmitting, setBulkSubmitting] = useState(false);
+
+    // Import Bunny
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [importCollectionId, setImportCollectionId] = useState("");
+    const [importing, setImporting] = useState(false);
+
+    // Configurações Locais Bunny
+    const [bunnyApiKey, setBunnyApiKey] = useState(localStorage.getItem('bunny_api_key') || '');
+    const [bunnyLibraryId, setBunnyLibraryId] = useState(localStorage.getItem('bunny_library_id') || '');
+    const [bunnyCdnHostname, setBunnyCdnHostname] = useState(localStorage.getItem('bunny_cdn_hostname') || '');
+
+    // Salva configurações locais automaticamente sempre que mudarem
+    useEffect(() => {
+        localStorage.setItem('bunny_api_key', bunnyApiKey);
+        localStorage.setItem('bunny_library_id', bunnyLibraryId);
+        localStorage.setItem('bunny_cdn_hostname', bunnyCdnHostname);
+    }, [bunnyApiKey, bunnyLibraryId, bunnyCdnHostname]);
 
     useEffect(() => {
         fetchMovies();
@@ -186,6 +203,96 @@ export function AdminMovies() {
         }
     };
 
+    const handleImportBunnyCollection = async () => {
+        if (!importCollectionId.trim()) {
+            return toast({ variant: "destructive", title: "Informe o ID da Coleção" });
+        }
+
+        const libraryId = bunnyLibraryId.trim();
+        const apiKey = bunnyApiKey.trim();
+        const cdnHostname = bunnyCdnHostname.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+        if (!libraryId || !apiKey || !cdnHostname) {
+            return toast({
+                variant: "destructive",
+                title: "Configurações Ausentes",
+                description: "Preencha a API Key, Library ID e CDN Hostname nas opções abaixo antes de importar."
+            });
+        }
+
+        setImporting(true);
+        try {
+            // 1. Obter vídeos da coleção no Bunny
+            const response = await fetch(`https://video.bunnycdn.com/library/${libraryId}/videos?collection=${importCollectionId}&itemsPerPage=1000`, {
+                headers: {
+                    accept: 'application/json',
+                    AccessKey: apiKey
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro na API do Bunny: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const bunnyVideos = data.items || [];
+
+            if (bunnyVideos.length === 0) {
+                toast({ title: "Nenhum vídeo encontrado", description: "Esta coleção parece estar vazia." });
+                setImporting(false);
+                return;
+            }
+
+            // 2. Obter filmes atuais para evitar repetição (bater URLs)
+            const existingUrls = movies.map(m => m.video_url);
+
+            // 3. Montar os inserts (só os não existentes)
+            const newVideosToInsert: any[] = [];
+
+            for (const bv of bunnyVideos) {
+                const videoUrl = `https://iframe.mediadelivery.net/play/${libraryId}/${bv.guid}`;
+
+                // Evita criar se já existe esse vídeo URL no app
+                if (!existingUrls.includes(videoUrl)) {
+                    // Tenta formatar a duração em segundos
+                    const totalSecs = Math.floor(bv.length || 0);
+                    const mins = Math.floor(totalSecs / 60);
+                    const secs = totalSecs % 60;
+                    const durationStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+                    newVideosToInsert.push({
+                        title: bv.title || "Novo Filme",
+                        description: "",
+                        thumbnail_url: `https://${cdnHostname}/${bv.guid}/${bv.thumbnailFileName || 'thumbnail.webp'}`,
+                        cover_url: `https://${cdnHostname}/${bv.guid}/${bv.thumbnailFileName || 'thumbnail.webp'}`,
+                        video_url: videoUrl,
+                        duration: durationStr,
+                        category: "Filme",
+                        unlock_delay_days: 0,
+                        required_mission_day: 0,
+                        is_active: true
+                    });
+                }
+            }
+
+            // 4. Salvar no Supabase
+            if (newVideosToInsert.length > 0) {
+                await supabase.from('movies').insert(newVideosToInsert.reverse()).throwOnError(); // Reverse pra manter a ordem original
+                toast({ title: `Importado com sucesso!`, description: `${newVideosToInsert.length} novos filmes adicionados.` });
+                setIsImportDialogOpen(false);
+                setImportCollectionId("");
+                fetchMovies();
+            } else {
+                toast({ title: "Nenhum arquivo novo", description: "Todos os filmes desta coleção já foram importados." });
+            }
+
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Erro na Importação", description: error.message });
+        } finally {
+            setImporting(false);
+        }
+    };
+
     const openNew = () => {
         setCurrentMovie({ category: 'Filme', is_active: true });
         setIsEditing(false);
@@ -217,6 +324,10 @@ export function AdminMovies() {
                     <p className="text-slate-500">Adicione filmes únicos longas metragens ou curtas (Bunny.net).</p>
                 </div>
                 <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="text-slate-700 bg-white">
+                        <DownloadCloud className="w-4 h-4 mr-2" />
+                        Importar do Bunny
+                    </Button>
                     <Button onClick={openNew} className="bg-indigo-600 hover:bg-indigo-700">
                         <Plus className="w-4 h-4 mr-2" />
                         Novo Filme
@@ -564,6 +675,70 @@ export function AdminMovies() {
                         <Button onClick={handleBulkCategoryUpdate} disabled={bulkSubmitting}>
                             {bulkSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Atualizar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Dialog de Importação do Bunny */}
+            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Importar Coleção Bunny.net</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="p-4 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200">
+                            <strong>Como funciona:</strong> Cole abaixo o ID da sua Coleção no Bunny.net. O sistema vai puxar todos os vídeos que estiverem lá, criar a Thumbnail, pegar o Título e o Link, e transformar tudo em Filmes individuais na galeria! (Sem afetar filmes antigos).
+                        </div>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-slate-600">Video Library ID</Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Ex: 608121"
+                                        value={bunnyLibraryId}
+                                        onChange={e => setBunnyLibraryId(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-slate-600">CDN Hostname</Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Ex: vz-xxxxxxxx.b-cdn.net"
+                                        value={bunnyCdnHostname}
+                                        onChange={e => setBunnyCdnHostname(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-slate-600">API Key (Access Key)</Label>
+                                <Input
+                                    type="password"
+                                    placeholder="Cole a chave da API aqui..."
+                                    value={bunnyApiKey}
+                                    onChange={e => setBunnyApiKey(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-400">Suas chaves ficam salvas em segurança somente neste navegador.</p>
+                            </div>
+                        </div>
+
+                        <hr className="my-4 border-slate-100" />
+
+                        <div className="space-y-2">
+                            <Label>Bunny Collection ID para Importar</Label>
+                            <Input
+                                placeholder="ex: 3e104b26-b0d3-4b09-aeaf-067bb32d64ad"
+                                value={importCollectionId}
+                                onChange={e => setImportCollectionId(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsImportDialogOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleImportBunnyCollection} disabled={importing} className="bg-blue-600 hover:bg-blue-700 text-white">
+                            {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <DownloadCloud className="w-4 h-4 mr-2" />}
+                            Importar Vídeos
                         </Button>
                     </DialogFooter>
                 </DialogContent>
