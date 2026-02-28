@@ -74,6 +74,16 @@ export function AdminSeries() {
     const [importCollectionId, setImportCollectionId] = useState("");
     const [importing, setImporting] = useState(false);
 
+    // Configurações Locais Bunny
+    const [bunnyApiKey, setBunnyApiKey] = useState(localStorage.getItem('bunny_api_key') || '');
+    const [bunnyLibraryId, setBunnyLibraryId] = useState(localStorage.getItem('bunny_library_id') || '');
+
+    // Salva configurações locais automaticamente sempre que mudarem
+    useEffect(() => {
+        localStorage.setItem('bunny_api_key', bunnyApiKey);
+        localStorage.setItem('bunny_library_id', bunnyLibraryId);
+    }, [bunnyApiKey, bunnyLibraryId]);
+
     useEffect(() => {
         if (view === 'seriesList') {
             fetchSeries();
@@ -246,14 +256,14 @@ export function AdminSeries() {
             return toast({ variant: "destructive", title: "Informe o ID da Coleção" });
         }
 
-        const libraryId = import.meta.env.VITE_BUNNY_LIBRARY_ID;
-        const apiKey = import.meta.env.VITE_BUNNY_API_KEY;
+        const libraryId = bunnyLibraryId.trim();
+        const apiKey = bunnyApiKey.trim();
 
         if (!libraryId || !apiKey) {
             return toast({
                 variant: "destructive",
-                title: "Chaves de API ausentes",
-                description: "VITE_BUNNY_API_KEY ou VITE_BUNNY_LIBRARY_ID não estão configuradas na Vercel/.env"
+                title: "Configurações Ausentes",
+                description: "Preencha a API Key e o Library ID nas opções abaixo antes de importar."
             });
         }
 
@@ -634,8 +644,32 @@ export function AdminSeries() {
                         <div className="p-4 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200">
                             <strong>Como funciona:</strong> Cole abaixo o ID da sua Coleção no Bunny.net. O sistema vai puxar todos os vídeos que estiverem lá, criar a Thumbnail, pegar o Título e o Link, e transformar tudo em Episódios desta temporada na ordem original! (Novos episódios sem afetar os antigos).
                         </div>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-slate-600">Video Library ID (Somente números)</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="Ex: 608121"
+                                    value={bunnyLibraryId}
+                                    onChange={e => setBunnyLibraryId(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-slate-600">API Key (Access Key)</Label>
+                                <Input
+                                    type="password"
+                                    placeholder="Cole a chave da API aqui..."
+                                    value={bunnyApiKey}
+                                    onChange={e => setBunnyApiKey(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-400">Suas chaves ficam salvas em segurança somente neste navegador.</p>
+                            </div>
+                        </div>
+
+                        <hr className="my-4 border-slate-100" />
+
                         <div className="space-y-2">
-                            <Label>Bunny Collection ID</Label>
+                            <Label>Bunny Collection ID para Importar</Label>
                             <Input
                                 placeholder="ex: 3e104b26-b0d3-4b09-aeaf-067bb32d64ad"
                                 value={importCollectionId}
