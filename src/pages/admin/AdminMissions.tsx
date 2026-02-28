@@ -30,7 +30,7 @@ interface Mission {
     description: string;
     xp_reward: number;
     icon: string;
-    linked_content_type?: 'story' | 'video' | 'game' | null;
+    linked_content_type?: 'story' | 'video' | 'game' | 'movie' | 'series' | null;
     linked_content_id?: string | null;
 }
 
@@ -59,7 +59,9 @@ export function AdminMissions() {
         stories: { id: string, title: string }[];
         videos: { id: string, title: string }[];
         games: { id: string, title: string }[];
-    }>({ stories: [], videos: [], games: [] });
+        movies: { id: string, title: string }[];
+        series: { id: string, title: string }[];
+    }>({ stories: [], videos: [], games: [], movies: [], series: [] });
 
     useEffect(() => {
         fetchPacks();
@@ -78,16 +80,20 @@ export function AdminMissions() {
     }, [isMissionDialogOpen]);
 
     const fetchAvailableContent = async () => {
-        const [storiesRes, videosRes, gamesRes] = await Promise.all([
+        const [storiesRes, videosRes, gamesRes, moviesRes, seriesRes] = await Promise.all([
             supabase.from('stories').select('id, title').order('title'),
             supabase.from('videos').select('id, title').order('title'),
-            supabase.from('games').select('id, title').order('title')
+            supabase.from('games').select('id, title').order('title'),
+            supabase.from('movies').select('id, title').order('title'),
+            supabase.from('series').select('id, title').order('title')
         ]);
 
         setAvailableContent({
             stories: storiesRes.data || [],
             videos: videosRes.data || [],
-            games: gamesRes.data || []
+            games: gamesRes.data || [],
+            movies: moviesRes.data || [],
+            series: seriesRes.data || []
         });
     };
 
@@ -377,6 +383,8 @@ export function AdminMissions() {
                                                 <SelectItem value="story">História</SelectItem>
                                                 <SelectItem value="video">Vídeo</SelectItem>
                                                 <SelectItem value="game">Jogo</SelectItem>
+                                                <SelectItem value="movie">Filme</SelectItem>
+                                                <SelectItem value="series">Série</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -400,6 +408,12 @@ export function AdminMissions() {
                                                     ))}
                                                     {missionFormData.linked_content_type === 'game' && availableContent.games.map(g => (
                                                         <SelectItem key={g.id} value={g.id}>{g.title}</SelectItem>
+                                                    ))}
+                                                    {missionFormData.linked_content_type === 'movie' && availableContent.movies.map(m => (
+                                                        <SelectItem key={m.id} value={m.id}>{m.title}</SelectItem>
+                                                    ))}
+                                                    {missionFormData.linked_content_type === 'series' && availableContent.series.map(s => (
+                                                        <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>

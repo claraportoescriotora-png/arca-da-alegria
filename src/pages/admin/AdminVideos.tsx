@@ -389,12 +389,24 @@ export function AdminVideos() {
     const totalPages = Math.ceil(filteredVideos.length / itemsPerPage);
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Vídeos</h2>
-                    <p className="text-slate-500">Adicione vídeos do YouTube ou importe playlists.</p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+            <div>
+                <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Vídeos</h2>
+                <p className="text-slate-500">Adicione vídeos do YouTube ou importe playlists.</p>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:w-64">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
+                    <Input
+                        type="search"
+                        placeholder="Buscar vídeos..."
+                        className="pl-8 bg-white"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
+
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setIsImportOpen(true)} className="border-blue-200 text-blue-600 hover:bg-blue-50">
                         <Download className="w-4 h-4 mr-2" />
