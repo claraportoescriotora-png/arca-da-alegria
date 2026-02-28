@@ -77,12 +77,14 @@ export function AdminSeries() {
     // Configurações Locais Bunny
     const [bunnyApiKey, setBunnyApiKey] = useState(localStorage.getItem('bunny_api_key') || '');
     const [bunnyLibraryId, setBunnyLibraryId] = useState(localStorage.getItem('bunny_library_id') || '');
+    const [bunnyCdnHostname, setBunnyCdnHostname] = useState(localStorage.getItem('bunny_cdn_hostname') || '');
 
     // Salva configurações locais automaticamente sempre que mudarem
     useEffect(() => {
         localStorage.setItem('bunny_api_key', bunnyApiKey);
         localStorage.setItem('bunny_library_id', bunnyLibraryId);
-    }, [bunnyApiKey, bunnyLibraryId]);
+        localStorage.setItem('bunny_cdn_hostname', bunnyCdnHostname);
+    }, [bunnyApiKey, bunnyLibraryId, bunnyCdnHostname]);
 
     useEffect(() => {
         if (view === 'seriesList') {
@@ -258,12 +260,13 @@ export function AdminSeries() {
 
         const libraryId = bunnyLibraryId.trim();
         const apiKey = bunnyApiKey.trim();
+        const cdnHostname = bunnyCdnHostname.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-        if (!libraryId || !apiKey) {
+        if (!libraryId || !apiKey || !cdnHostname) {
             return toast({
                 variant: "destructive",
                 title: "Configurações Ausentes",
-                description: "Preencha a API Key e o Library ID nas opções abaixo antes de importar."
+                description: "Preencha a API Key, Library ID e CDN Hostname nas opções abaixo antes de importar."
             });
         }
 
@@ -314,7 +317,7 @@ export function AdminSeries() {
                         episode_number: getNextEpNum(),
                         title: bv.title || "Novo Episódio",
                         description: "",
-                        thumbnail_url: `https://vz-${libraryId}.b-cdn.net/${bv.guid}/${bv.thumbnailFileName || 'thumbnail.jpg'}`,
+                        thumbnail_url: `https://${cdnHostname}/${bv.guid}/${bv.thumbnailFileName || 'thumbnail.webp'}`,
                         video_url: videoUrl,
                         duration: durationStr,
                         unlock_delay_days: 0,
@@ -645,14 +648,25 @@ export function AdminSeries() {
                             <strong>Como funciona:</strong> Cole abaixo o ID da sua Coleção no Bunny.net. O sistema vai puxar todos os vídeos que estiverem lá, criar a Thumbnail, pegar o Título e o Link, e transformar tudo em Episódios desta temporada na ordem original! (Novos episódios sem afetar os antigos).
                         </div>
                         <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label className="text-slate-600">Video Library ID (Somente números)</Label>
-                                <Input
-                                    type="text"
-                                    placeholder="Ex: 608121"
-                                    value={bunnyLibraryId}
-                                    onChange={e => setBunnyLibraryId(e.target.value)}
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-slate-600">Video Library ID</Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Ex: 608121"
+                                        value={bunnyLibraryId}
+                                        onChange={e => setBunnyLibraryId(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-slate-600">CDN Hostname</Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Ex: vz-xxxxxxxx.b-cdn.net"
+                                        value={bunnyCdnHostname}
+                                        onChange={e => setBunnyCdnHostname(e.target.value)}
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-slate-600">API Key (Access Key)</Label>
