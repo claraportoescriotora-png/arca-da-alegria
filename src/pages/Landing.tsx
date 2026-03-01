@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play, Check } from 'lucide-react';
+import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play, Check, Shield } from 'lucide-react';
 
 export default function Landing() {
     const [currentGameIndex, setCurrentGameIndex] = useState(0);
@@ -97,7 +97,7 @@ export default function Landing() {
         },
         {
             title: "Catálogo Crescente",
-            description: "Mais de 215 conteúdos catalogados e organizados para você. Toda semana, novidades.",
+            description: "Mais de 20h de conteúdo Seguro e Sem Ideologias. Toda semana, novidades.",
             tag: "Novidades",
             image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/conteudoeducativo%20(1).webp",
             color: "bg-pink-100 text-pink-800"
@@ -631,8 +631,7 @@ export default function Landing() {
                             Vídeos, filmes e aprendizado seguro para seu filho.
                         </h2>
                         <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
-                            Mais de 215 vídeos escolhidos a dedo. Nada de ideologias, bagunça ou conteúdo vazio.
-                            Só valores cristãos e aprendizado de verdade. Enquanto o YouTube expõe, a gente protege.
+                            Mais de 20h de conteúdo Seguro e Sem Ideologias. Só valores cristãos e aprendizado de verdade. Enquanto o YouTube expõe, a gente protege.
                         </p>
                     </div>
 
@@ -861,7 +860,7 @@ export default function Landing() {
 
                                 <ul className="space-y-3">
                                     {[
-                                        "215+ vídeos escolhidos a dedo",
+                                        "20h+ de conteúdo Seguro e Sem Ideologias",
                                         "70+ histórias bíblicas",
                                         "Jogos que desenvolvem a mente",
                                         "Missões de oração em família",
@@ -912,6 +911,73 @@ export default function Landing() {
                         </div>
                     </div>
 
+                </div>
+            </section>
+
+            {/* Quem é Nathan Lima? */}
+            <section className="py-20 bg-gray-50 border-t border-gray-100">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
+                            <img
+                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/familianatan.webp"
+                                alt="Nathan Lima e sua família"
+                                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
+                            />
+                        </div>
+                        <div className="space-y-6">
+                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                                Quem é Nathan Lima?
+                            </h2>
+                            <h3 className="text-xl text-blue-600 font-bold">
+                                Pai, Marido e Educador: Uma vida dedicada a edificar a próxima geração.
+                            </h3>
+                            <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
+                                <p>
+                                    Nathan não é apenas um rosto no aplicativo; ele é o curador que garante que cada segundo de tela no Meu Amiguito seja uma semente do Reino no coração do seu filho.
+                                </p>
+                                <ul className="space-y-4 mt-6">
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Sparkles className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Criador do Projeto Força Kids:</strong>
+                                            <span className="text-sm md:text-base">Idealizador de um movimento em Quixeramobim focado em levar o Avivamento Espiritual para os pequenos através de missões e ensino bíblico.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Heart className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Pai e Marido:</strong>
+                                            <span className="text-sm md:text-base">Vive diariamente a missão de liderar sua família e educar seu filho, o Bernardo, nos princípios inegociáveis da Palavra.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <BookOpen className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Professor de Escola Dominical:</strong>
+                                            <span className="text-sm md:text-base">Especialista em ensino infantil, com anos de experiência traduzindo verdades profundas em linguagem que as crianças amam e entendem.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Shield className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Sentinela da Curadoria:</strong>
+                                            <span className="text-sm md:text-base">Responsável por selecionar e validar as quase 20 horas de conteúdo seguro, garantindo que a "janela digital" da sua casa esteja protegida.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
