@@ -174,29 +174,29 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-end relative z-10">
                     <div className="space-y-6 pb-20">
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
-                            Um lugar seguro, alegre e cheio de fé para o seu filho crescer.
+                            O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele Está Sendo Edificado, e Não Doutrinado.
                         </h1>
                         <p className="text-lg text-gray-700 leading-relaxed">
-                            Histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
+                            O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
                         </p>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800">Acesso imediato</span>
+                                <span className="text-gray-800 font-medium">Acesso imediato</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800">Conteúdo infantil cristão selecionado</span>
+                                <span className="text-gray-800 font-medium">Conteúdo infantil cristão selecionado por quem vive o ministério</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800">Experiências para viver juntos</span>
+                                <span className="text-gray-800 font-medium">Experiências para viver juntos e tirar a criança da tela</span>
                             </div>
                         </div>
                         <button onClick={scrollToOffer} className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg flex items-center gap-2 group">
@@ -206,11 +206,11 @@ export default function Landing() {
                     </div>
 
                     {/* Hero Illustration */}
-                    <div className="flex items-end justify-center h-full">
+                    <div className="flex items-end justify-center h-full relative">
                         <img
                             src="https://minha-zona-amiguito.b-cdn.net/landingpages/natameseufilhoheroamiguito.webp"
-                            alt="Daniel e Jesus"
-                            className="w-full max-w-md h-auto object-bottom"
+                            alt="Nathan e seu filho"
+                            className="w-full max-w-2xl lg:max-w-3xl h-auto object-bottom transform lg:scale-110 lg:translate-y-4"
                         />
                     </div>
                 </div>
