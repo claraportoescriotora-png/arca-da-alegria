@@ -206,11 +206,11 @@ export default function Landing() {
                     </div>
 
                     {/* Hero Illustration */}
-                    <div className="flex items-end justify-center h-full relative">
+                    <div className="flex items-end justify-center h-full relative xl:translate-x-8">
                         <img
                             src="https://minha-zona-amiguito.b-cdn.net/landingpages/natameseufilhoheroamiguito.webp"
                             alt="Nathan e seu filho"
-                            className="w-full max-w-2xl lg:max-w-3xl h-auto object-bottom transform lg:scale-110 lg:translate-y-4"
+                            className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
                         />
                     </div>
                 </div>
