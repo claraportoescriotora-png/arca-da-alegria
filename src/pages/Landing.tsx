@@ -174,7 +174,7 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-end relative z-10">
                     <div className="space-y-6 pb-20">
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
-                            O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele Está Sendo Edificado, e Não Doutrinado.
+                            O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.
                         </h1>
                         <p className="text-lg text-gray-700 leading-relaxed">
                             O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
@@ -293,20 +293,20 @@ export default function Landing() {
                             <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
                             <img
                                 src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/familianatan%20(1).webp"
-                                alt="Nathan Lima e sua família"
+                                alt="Natan Lima e sua família"
                                 className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
                             />
                         </div>
                         <div className="space-y-6">
                             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                                Quem é Nathan Lima?
+                                Quem é Natan Lima?
                             </h2>
                             <h3 className="text-xl text-blue-600 font-bold">
-                                Pai, Marido e Educador: Uma vida dedicada a edificar a próxima geração.
+                                Pai, Esposo e Educador: Uma vida dedicada a edificar a próxima geração.
                             </h3>
                             <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
                                 <p>
-                                    Nathan não é apenas um rosto no aplicativo; ele é o curador que garante que cada segundo de tela no Meu Amiguito seja uma semente do Reino no coração do seu filho.
+                                    Natan não é apenas um rosto no aplicativo; ele é o curador que garante que cada segundo de tela no Meu Amiguito seja uma semente do Reino no coração do seu filho.
                                 </p>
                                 <ul className="space-y-4 mt-6">
                                     <li className="flex items-start gap-4">
@@ -323,7 +323,7 @@ export default function Landing() {
                                             <Heart className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <strong className="text-gray-900 block mb-1">Pai e Marido:</strong>
+                                            <strong className="text-gray-900 block mb-1">Pai e Esposo:</strong>
                                             <span className="text-sm md:text-base">Vive diariamente a missão de liderar sua família e educar seu filho, o Bernardo, nos princípios inegociáveis da Palavra.</span>
                                         </div>
                                     </li>
