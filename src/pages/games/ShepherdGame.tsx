@@ -58,6 +58,7 @@ export default function ShepherdGame() {
     const [unlockDelayDaysFetched, setUnlockDelayDaysFetched] = useState<number>(0);
     const [requiredMissionDayFetched, setRequiredMissionDayFetched] = useState<number>(0);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     const fetchGameConfig = useCallback(async () => {
         try {
@@ -221,11 +222,12 @@ export default function ShepherdGame() {
     }, [snake, nextDirection, fruit, wolf, handleGameOver, handleWolfCollision, spawnFruit, spawnWolf]);
 
     useEffect(() => {
-        if (dataLoaded && !isPlaying) {
+        if (dataLoaded && !isPlaying && !hasInitialized) {
             spawnFruit();
             spawnWolf();
+            setHasInitialized(true);
         }
-    }, [dataLoaded, isPlaying, spawnFruit, spawnWolf]);
+    }, [dataLoaded, isPlaying, spawnFruit, spawnWolf, hasInitialized]);
 
     // --- Input Handling ---
     useEffect(() => {

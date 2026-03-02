@@ -13,6 +13,9 @@ import { cn } from '@/lib/utils';
 import { VideoCard } from '@/components/VideoCard';
 import ReactPlayer from 'react-player';
 
+// Bypassing strict typing bug in react-player v3
+const Player = ReactPlayer as React.FC<any>;
+
 interface Video {
     id: string;
     title: string;
@@ -41,6 +44,7 @@ export default function VideoDetail() {
     const [video, setVideo] = useState<Video | null>(null);
     const [recommendations, setRecommendations] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
+    const [videoError, setVideoError] = useState(false);
 
     const [isDripLocked, setIsDripLocked] = useState(false);
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
@@ -183,6 +187,11 @@ export default function VideoDetail() {
                             <p className="font-bold text-lg mb-2">Conteúdo Bloqueado</p>
                             <p className="text-sm text-gray-300">Continue suas missões para desbloquear!</p>
                         </div>
+                    ) : videoError ? (
+                        <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-4 text-center z-10 border border-slate-800">
+                            <p className="font-bold text-lg mb-2 text-white">Ops, vídeo indisponível 💔</p>
+                            <p className="text-sm">Parece que o link deste conteúdo saiu do ar ou está quebrado. Nossa equipe já foi notificada!</p>
+                        </div>
                     ) : (
                         video.video_url && (video.video_url.includes('mediadelivery.net') || video.video_url.includes('b-cdn.net') || video.video_url.includes('bunny.net')) ? (
                             <iframe
@@ -191,19 +200,19 @@ export default function VideoDetail() {
                                 style={{ border: 'none', position: 'absolute', top: 0, height: '100%', width: '100%' }}
                                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                                 allowFullScreen={true}
+                                onError={() => setVideoError(true)}
                             ></iframe>
                         ) : (
-                            <ReactPlayer
+                            <Player
                                 url={video.video_url}
                                 width="100%"
                                 height="100%"
                                 controls={true}
                                 playing={false}
+                                onError={() => setVideoError(true)}
                                 config={{
                                     youtube: {
-                                        playerVars: {
-                                            origin: 'https://www.youtube.com'
-                                        }
+                                        origin: 'https://www.youtube.com'
                                     }
                                 }}
                                 fallback={<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-500"></div>}

@@ -1,8 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+export interface VideoBanner {
+    id: string;
+    image_url: string;
+    link_url: string;
+}
+
 interface ConfigContextType {
     logoUrl: string;
+    videoBanners: VideoBanner[];
     loading: boolean;
 }
 
@@ -11,6 +18,7 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
     const [logoUrl, setLogoUrl] = useState<string>(''); // Start empty to prevent flicker
     const [faviconUrl, setFaviconUrl] = useState<string>(''); // Start empty
+    const [videoBanners, setVideoBanners] = useState<VideoBanner[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -34,14 +42,25 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners']);
 
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
                 const favicon = data.find(item => item.key === 'favicon_url');
+                const banners = data.find(item => item.key === 'video_banners');
 
                 if (logo) setLogoUrl(logo.value);
                 if (favicon) setFaviconUrl(favicon.value);
+
+                if (banners && banners.value) {
+                    try {
+                        const parsedBanners = typeof banners.value === 'string' ? JSON.parse(banners.value) : banners.value;
+                        setVideoBanners(Array.isArray(parsedBanners) ? parsedBanners : []);
+                    } catch (e) {
+                        console.error('Failed to parse video banners:', e);
+                        setVideoBanners([]);
+                    }
+                }
             }
         } catch (error) {
             console.error('Error fetching config:', error);
@@ -51,7 +70,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ConfigContext.Provider value={{ logoUrl, loading }}>
+        <ConfigContext.Provider value={{ logoUrl, videoBanners, loading }}>
             {children}
         </ConfigContext.Provider>
     );

@@ -389,47 +389,41 @@ export function AdminVideos() {
     const totalPages = Math.ceil(filteredVideos.length / itemsPerPage);
 
     return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-            <div>
-                <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Vídeos</h2>
-                <p className="text-slate-500">Adicione vídeos do YouTube ou importe playlists.</p>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-64">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-                    <Input
-                        type="search"
-                        placeholder="Buscar vídeos..."
-                        className="pl-8 bg-white"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Vídeos</h2>
+                    <p className="text-slate-500">Adicione vídeos do YouTube ou importe playlists.</p>
                 </div>
 
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setIsImportOpen(true)} className="border-blue-200 text-blue-600 hover:bg-blue-50">
-                        <Download className="w-4 h-4 mr-2" />
-                        Importar Playlist
-                    </Button>
-                    <Button onClick={openNew} className="bg-green-500 hover:bg-green-600">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Novo Vídeo
-                    </Button>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex gap-2 justify-between items-center bg-slate-50/50">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
                         <Input
-                            placeholder="Buscar vídeo..."
-                            className="pl-10 bg-white border-slate-200"
+                            type="search"
+                            placeholder="Buscar vídeos..."
+                            className="pl-8 bg-white"
                             value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setIsImportOpen(true)} className="border-blue-200 text-blue-600 hover:bg-blue-50 flex-1 sm:flex-none">
+                            <Download className="w-4 h-4 mr-2" />
+                            Importar
+                        </Button>
+                        <Button onClick={openNew} className="bg-green-500 hover:bg-green-600 flex-1 sm:flex-none">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Vídeo
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden w-full">
+                <div className="p-4 border-b border-slate-100 flex gap-2 justify-between items-center bg-slate-50/50">
+                    <div className="flex-1"></div> {/* Spacer */}
                     {/* Bulk Actions Bar */}
                     {selectedVideos.size > 0 && (
                         <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -575,7 +569,7 @@ export function AdminVideos() {
 
             {/* Create/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-h-[85vh] overflow-y-auto">
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{isEditing ? 'Editar Vídeo' : 'Novo Vídeo'}</DialogTitle>
                     </DialogHeader>
@@ -705,7 +699,7 @@ export function AdminVideos() {
 
             {/* Bulk Update Category Dialog */}
             <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
-                <DialogContent className="max-h-[85vh] overflow-y-auto">
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Alterar Categoria em Massa</DialogTitle>
                         <DialogDescription>

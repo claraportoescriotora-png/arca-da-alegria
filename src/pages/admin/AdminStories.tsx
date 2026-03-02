@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { AdminStoryQuizDialog } from "@/components/admin/AdminStoryQuizDialog";
 
 interface Story {
     id: string;
@@ -41,6 +42,10 @@ export function AdminStories() {
     const [currentStory, setCurrentStory] = useState<Partial<Story>>({});
     const [isEditing, setIsEditing] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+
+    // Quiz Dialog State
+    const [isQuizDialogOpen, setIsQuizDialogOpen] = useState(false);
+    const [selectedStoryForQuiz, setSelectedStoryForQuiz] = useState<{ id: string, title: string } | null>(null);
 
     useEffect(() => {
         fetchStories();
@@ -190,6 +195,11 @@ export function AdminStories() {
         setIsDialogOpen(true);
     };
 
+    const openQuiz = (story: Story) => {
+        setSelectedStoryForQuiz({ id: story.id, title: story.title });
+        setIsQuizDialogOpen(true);
+    };
+
     const filteredStories = stories.filter(s =>
         s.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -291,6 +301,9 @@ export function AdminStories() {
                                     <TableCell className="text-slate-500">{story.duration}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => openQuiz(story)} className="text-purple-600 border-purple-200 hover:bg-purple-50">
+                                                Quiz
+                                            </Button>
                                             <Button variant="ghost" size="icon" onClick={() => openEdit(story)}>
                                                 <Pencil className="w-4 h-4 text-blue-500" />
                                             </Button>
@@ -336,7 +349,7 @@ export function AdminStories() {
 
             {/* Create/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{isEditing ? 'Editar História' : 'Nova História'}</DialogTitle>
                     </DialogHeader>
@@ -442,6 +455,15 @@ export function AdminStories() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {selectedStoryForQuiz && (
+                <AdminStoryQuizDialog
+                    open={isQuizDialogOpen}
+                    onOpenChange={setIsQuizDialogOpen}
+                    storyId={selectedStoryForQuiz.id}
+                    storyTitle={selectedStoryForQuiz.title}
+                />
+            )}
         </div>
     );
 }

@@ -355,7 +355,7 @@ export default function SkyJumpGame() {
             }
         });
 
-        // Draw Player (Daniel)
+        // Draw Player (Kid)
         ctx.fillStyle = '#f59e0b'; // Amber-500
         // Simple Circle for now or Placeholder
         const px = doodler.current.x;
@@ -476,7 +476,7 @@ export default function SkyJumpGame() {
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-20">
                             <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-xs animate-in zoom-in-95">
                                 <h2 className="text-2xl font-bold text-primary mb-2 font-fredoka">Pronto para subir?</h2>
-                                <p className="text-slate-600 mb-6 font-medium">Toque nos lados da tela para mover Daniel.</p>
+                                <p className="text-slate-600 mb-6 font-medium">Toque nos lados da tela para mover {profile?.full_name?.split(' ')[0] || 'personagem'}.</p>
                                 <button onClick={initGame} className="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-2xl shadow-lg transition-transform active:scale-95 text-lg">
                                     COMEÇAR
                                 </button>
@@ -513,7 +513,7 @@ export default function SkyJumpGame() {
                             <div className="text-center p-8 animate-in fade-in slide-in-from-bottom-10">
                                 <Trophy className="w-24 h-24 text-yellow-500 mx-auto mb-4 animate-bounce" />
                                 <h1 className="text-4xl font-bold text-yellow-600 mb-4 font-fredoka">Glória!</h1>
-                                <p className="text-lg text-yellow-800 font-medium mb-8">Daniel chegou ao céu!</p>
+                                <p className="text-lg text-yellow-800 font-medium mb-8">Parabéns {profile?.full_name?.split(' ')[0] || ''}, você chegou ao céu!</p>
                                 <button onClick={() => navigate('/games')} className="px-8 py-3 bg-white text-yellow-600 font-bold rounded-full shadow-xl hover:shadow-2xl transition-transform active:scale-95">
                                     Voltar para Jogos
                                 </button>

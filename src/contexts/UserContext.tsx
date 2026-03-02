@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from './AuthProvider';
+import { supabase } from '@/lib/supabase';
 
 export interface Notification {
   id: string;
@@ -92,25 +93,34 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => localStorage.setItem('user_xp', xp.toString()), [xp]);
   useEffect(() => localStorage.setItem('user_notifications', JSON.stringify(notifications)), [notifications]);
 
-  const setName = (newName: string) => {
+  const setName = async (newName: string) => {
     setNameState(newName);
   };
 
-  const updateName = (newName: string) => {
+  const updateName = async (newName: string) => {
     setNameState(newName);
-  };
-
-  const setCustomAvatar = (image: string | null) => {
-    setCustomAvatarState(image);
-    if (image) {
-      setAvatarIdState('custom');
+    if (profile?.id) {
+      await supabase.from('profiles').update({ full_name: newName }).eq('id', profile.id);
     }
   };
 
-  const setAvatarId = (newId: string) => {
+  const setCustomAvatar = async (image: string | null) => {
+    setCustomAvatarState(image);
+    if (image) {
+      setAvatarIdState('custom');
+      if (profile?.id) {
+        await supabase.from('profiles').update({ avatar_url: image }).eq('id', profile.id);
+      }
+    }
+  };
+
+  const setAvatarId = async (newId: string) => {
     setAvatarIdState(newId);
     if (newId !== 'custom') {
       setCustomAvatarState(null);
+      if (profile?.id) {
+        await supabase.from('profiles').update({ avatar_url: null }).eq('id', profile.id);
+      }
     }
   };
 

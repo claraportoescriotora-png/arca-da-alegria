@@ -258,7 +258,7 @@ export function AdminGames() {
 
             {/* Create Game Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Novo Jogo</DialogTitle>
                         <DialogDescription>
@@ -303,7 +303,7 @@ export function AdminGames() {
 
             {/* Config Dialog */}
             <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Configurar: {selectedGame?.title}</DialogTitle>
                         <DialogDescription>

@@ -1,4 +1,5 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
     children: ReactNode;
@@ -22,6 +23,33 @@ export class ErrorBoundary extends Component<Props, State> {
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+        // Log silently to Supabase Telemetry
+        this.logErrorToSupabase(error, errorInfo);
+    }
+
+    private async logErrorToSupabase(error: Error, errorInfo: ErrorInfo) {
+        try {
+            // Tentamos pegar o user logado atual via LocalStorage da sessão do Supabase, ou via auth
+            let userId = null;
+            const sessionStr = localStorage.getItem('sb-gypzrzsmxgjtkidznstd-auth-token');
+            if (sessionStr) {
+                try {
+                    const sessionData = JSON.parse(sessionStr);
+                    userId = sessionData?.user?.id || null;
+                } catch (e) { }
+            }
+
+            await supabase.from('system_error_logs').insert([{
+                user_id: userId,
+                error_message: error.message || error.toString(),
+                error_stack: error.stack || null,
+                component_stack: errorInfo.componentStack || null,
+                url: window.location.href
+            }]);
+        } catch (postError) {
+            console.error('Failed to report telemetry:', postError);
+        }
     }
 
     render() {

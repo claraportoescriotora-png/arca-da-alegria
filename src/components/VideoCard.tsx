@@ -13,6 +13,7 @@ interface VideoCardProps {
   category: string;
   duration: string;
   description: string;
+  type?: 'video' | 'movie' | 'episode';
   unlockDelayDays?: number;
   requiredMissionDay?: number;
 }
@@ -24,6 +25,7 @@ export function VideoCard({
   category,
   duration,
   description,
+  type = 'video',
   unlockDelayDays,
   requiredMissionDay
 }: VideoCardProps) {
@@ -42,7 +44,11 @@ export function VideoCard({
       setIsDripDialogOpen(true);
       return;
     }
-    navigate(`/video/${id}`);
+    if (type === 'video') {
+      navigate(`/video/${id}`);
+    } else {
+      navigate(`/video/${id}?type=${type}`);
+    }
   };
 
   const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {

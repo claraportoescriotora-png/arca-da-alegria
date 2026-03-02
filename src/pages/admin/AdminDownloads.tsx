@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, Download, Pencil, Trash2, Upload, FileType, Clock } from "lucide-react";
+import { Loader2, Plus, Download, Pencil, Trash2, Upload, FileType, Clock, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -24,6 +24,10 @@ interface Activity {
 export function AdminDownloads() {
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalActivities, setTotalActivities] = useState(0);
+    const [pageSize] = useState(10);
 
     // Dialog State
     const [isOpen, setIsOpen] = useState(false);
@@ -41,20 +45,28 @@ export function AdminDownloads() {
 
     useEffect(() => {
         fetchActivities();
-    }, []);
+    }, [page, searchTerm]);
 
     const fetchActivities = async () => {
         setLoading(true);
-        const { data, error } = await supabase
+        let query = supabase
             .from('activities')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*', { count: 'exact' });
+
+        if (searchTerm) {
+            query = query.ilike('title', `%${searchTerm}%`);
+        }
+
+        const { data, count, error } = await query
+            .order('created_at', { ascending: false })
+            .range((page - 1) * pageSize, page * pageSize - 1);
 
         if (error) {
             console.error(error);
             toast({ variant: "destructive", title: "Erro ao carregar atividades" });
         } else {
             setActivities(data || []);
+            if (count !== null) setTotalActivities(count);
         }
         setLoading(false);
     };
@@ -192,6 +204,18 @@ export function AdminDownloads() {
                     <p className="text-slate-500">Adicione atividades (PDFs) para as crianças baixarem.</p>
                 </div>
                 <div className="flex gap-2">
+                    <div className="relative w-64 mr-4">
+                        <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                        <Input
+                            placeholder="Buscar atividade..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setPage(1);
+                            }}
+                            className="pl-9"
+                        />
+                    </div>
                     <Button onClick={() => setIsImportOpen(true)} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
                         <Upload className="w-4 h-4 mr-2" />
                         Importar do Drive
@@ -271,6 +295,31 @@ export function AdminDownloads() {
                         )}
                     </TableBody>
                 </Table>
+                {!loading && totalActivities > 0 && (
+                    <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <span className="text-sm text-slate-500">
+                            Mostrando {(page - 1) * pageSize + 1} até {Math.min(page * pageSize, totalActivities)} de {totalActivities} atividades
+                        </span>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage(p => p + 1)}
+                                disabled={page * pageSize >= totalActivities}
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Dialog */}

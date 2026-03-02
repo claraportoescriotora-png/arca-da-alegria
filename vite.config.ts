@@ -1,7 +1,7 @@
-
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -16,6 +16,39 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
+      VitePWA({
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.ts',
+        registerType: 'autoUpdate',
+        devOptions: {
+          enabled: true,
+          type: 'module'
+        },
+        manifest: {
+          name: 'Arca da Alegria',
+          short_name: 'Arca',
+          description: 'Aplicativo Infantil Cristão',
+          theme_color: '#0f172a',
+          background_color: '#0f172a',
+          display: 'standalone',
+          icons: [
+            {
+              src: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
+              sizes: '192x192',
+              type: 'image/webp'
+            },
+            {
+              src: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
+              sizes: '512x512',
+              type: 'image/webp'
+            }
+          ]
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
+        }
+      }),
       {
         name: 'configure-server',
         configureServer(server) {

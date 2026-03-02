@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, PlayCircle, Film, Music, Layers } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Film, Music, Layers, Search, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { CoverCard } from '@/components/CoverCard';
 import { VideoCard } from '@/components/VideoCard';
 import { supabase } from '@/lib/supabase';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface Series {
   id: string;
@@ -32,12 +33,25 @@ interface Video {
   requiredMissionDay: number;
 }
 
+interface Episode {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  description: string;
+  unlockDelayDays: number;
+  requiredMissionDay: number;
+}
+
 export default function Videos() {
   const navigate = useNavigate();
+  const { videoBanners } = useConfig();
   const [series, setSeries] = useState<Series[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchCatalog();
@@ -101,12 +115,38 @@ export default function Videos() {
         })));
       }
 
+      // Fetch Episodes
+      const { data: episodesData } = await supabase
+        .from('episodes')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (episodesData) {
+        setEpisodes(episodesData.map(e => ({
+          id: e.id,
+          title: e.title,
+          thumbnail: e.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
+          duration: e.duration || '0:00',
+          description: e.description || 'Episódio da série',
+          unlockDelayDays: e.unlock_delay_days || 0,
+          requiredMissionDay: e.required_mission_day || 0
+        })));
+      }
+
     } catch (error) {
       console.error('Error loading catalog:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const filteredSeries = series.filter(s => s.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredMovies = movies.filter(m => m.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredVideos = videos.filter(v => v.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredEpisodes = searchTerm ? episodes.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase())) : [];
+
+  const hasResults = filteredSeries.length > 0 || filteredMovies.length > 0 || filteredVideos.length > 0 || filteredEpisodes.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-900 pb-24 text-white">
@@ -130,6 +170,42 @@ export default function Videos() {
 
       {/* Content */}
       <main className="container max-w-md mx-auto py-6 space-y-8 overflow-hidden">
+        {/* Search Bar */}
+        <div className="px-4">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Buscar séries, filmes ou clipes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all font-medium"
+            />
+          </div>
+        </div>
+
+        {/* Banners Carousel */}
+        {!searchTerm && videoBanners && videoBanners.length > 0 && (
+          <section className="px-4">
+            <div className="flex overflow-x-auto gap-4 snap-x hide-scrollbar rounded-2xl">
+              {videoBanners.map((banner, idx) => (
+                <div
+                  key={banner.id || idx}
+                  onClick={() => banner.link_url ? navigate(banner.link_url) : null}
+                  className={`snap-center shrink-0 w-[85%] max-w-[320px] aspect-[21/9] rounded-2xl overflow-hidden relative shadow-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
+                >
+                  <img
+                    src={banner.image_url}
+                    alt={`Banner ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -138,15 +214,15 @@ export default function Videos() {
         ) : (
           <>
             {/* Séries Section */}
-            {series.length > 0 && (
+            {filteredSeries.length > 0 && (
               <section>
                 <div className="px-4 flex items-center gap-2 mb-3">
                   <Layers className="w-5 h-5 text-fuchsia-400" />
                   <h2 className="font-fredoka text-lg font-bold text-white">Séries de Animação</h2>
                 </div>
                 <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x hide-scrollbar">
-                  {series.map(s => (
-                    <div key={s.id} className="snap-start">
+                  {filteredSeries.map(s => (
+                    <div key={s.id} className="snap-start shrink-0">
                       <CoverCard
                         id={s.id}
                         title={s.title}
@@ -160,16 +236,43 @@ export default function Videos() {
               </section>
             )}
 
+            {/* Episódios Encontrados Section (Só aparece na busca) */}
+            {filteredEpisodes.length > 0 && (
+              <section>
+                <div className="px-4 flex items-center gap-2 mb-3 mt-4">
+                  <PlayCircle className="w-5 h-5 text-fuchsia-400" />
+                  <h2 className="font-fredoka text-lg font-bold text-white">Episódios Encontrados</h2>
+                </div>
+                <div className="px-4 grid grid-cols-1 gap-4 pb-4">
+                  {filteredEpisodes.map(ep => (
+                    <div key={ep.id} className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700">
+                      <VideoCard
+                        id={ep.id}
+                        title={ep.title}
+                        thumbnail={ep.thumbnail}
+                        duration={ep.duration}
+                        category="Episódio"
+                        description={ep.description}
+                        type="episode"
+                        unlockDelayDays={ep.unlockDelayDays}
+                        requiredMissionDay={ep.requiredMissionDay}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Filmes Section */}
-            {movies.length > 0 && (
+            {filteredMovies.length > 0 && (
               <section>
                 <div className="px-4 flex items-center gap-2 mb-3">
                   <Film className="w-5 h-5 text-indigo-400" />
                   <h2 className="font-fredoka text-lg font-bold text-white">Filmes e Especiais</h2>
                 </div>
                 <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x hide-scrollbar">
-                  {movies.map(m => (
-                    <div key={m.id} className="snap-start">
+                  {filteredMovies.map(m => (
+                    <div key={m.id} className="snap-start shrink-0">
                       <CoverCard
                         id={m.id}
                         title={m.title}
@@ -186,14 +289,14 @@ export default function Videos() {
             )}
 
             {/* Vídeos Antigos (Músicas etc) */}
-            {videos.length > 0 && (
+            {filteredVideos.length > 0 && (
               <section>
                 <div className="px-4 flex items-center gap-2 mb-3">
                   <Music className="w-5 h-5 text-pink-400" />
                   <h2 className="font-fredoka text-lg font-bold text-white">Clipes e Músicas</h2>
                 </div>
                 <div className="px-4 grid grid-cols-1 gap-4">
-                  {videos.map(video => (
+                  {filteredVideos.map(video => (
                     <div key={video.id} className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700">
                       <VideoCard
                         id={video.id}
@@ -211,9 +314,12 @@ export default function Videos() {
               </section>
             )}
 
-            {series.length === 0 && movies.length === 0 && videos.length === 0 && (
-              <div className="text-center py-12 px-4">
-                <p className="text-slate-400">Nenhum conteúdo no catálogo ainda.</p>
+            {!hasResults && (
+              <div className="text-center py-12 px-4 space-y-4">
+                <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto">
+                  <Search className="w-8 h-8 text-slate-500" />
+                </div>
+                <p className="text-slate-400 text-lg">Nenhum resultado encontrado.</p>
               </div>
             )}
           </>

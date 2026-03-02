@@ -13,6 +13,8 @@ import { AdminMissions } from '@/pages/admin/AdminMissions';
 import { AdminDownloads } from '@/pages/admin/AdminDownloads';
 import { AdminAgent } from '@/pages/admin/AdminAgent';
 import { AdminTestSuite } from '@/pages/admin/AdminTestSuite';
+import { AdminCharades } from '@/pages/admin/AdminCharades';
+import { AdminSettings } from '@/pages/admin/AdminSettings';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -77,9 +79,11 @@ export default function Admin() {
                     <Route path="series" element={<AdminSeries />} />
                     <Route path="games" element={<AdminGames />} />
                     <Route path="missions" element={<AdminMissions />} />
+                    <Route path="charades" element={<AdminCharades />} />
                     <Route path="downloads" element={<AdminDownloads />} />
                     <Route path="agent" element={<AdminAgent />} />
                     <Route path="test-suite" element={<AdminTestSuite />} />
+                    <Route path="settings" element={<AdminSettings />} />
                 </Routes>
             </main>
         </div>

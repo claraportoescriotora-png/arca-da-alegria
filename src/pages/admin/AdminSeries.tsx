@@ -639,7 +639,7 @@ export function AdminSeries() {
 
             {/* Dialog de Importação do Bunny */}
             <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Importar Coleção Bunny.net</DialogTitle>
                     </DialogHeader>

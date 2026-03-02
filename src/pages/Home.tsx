@@ -16,6 +16,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
+import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushSubscription';
 
 interface ContentItem {
   id: string;
@@ -57,6 +58,19 @@ export default function Home() {
     fetchHomeContent();
     if (user) {
       fetchMissionProgress();
+
+      // Request Push Notification Permission
+      const initPush = async () => {
+        if ('Notification' in window && Notification.permission !== 'denied') {
+          const granted = await requestNotificationPermission();
+          if (granted) {
+            await subscribeToPushNotifications(user.id);
+          }
+        }
+      };
+
+      // Delay push request slightly to not block initial render UX
+      setTimeout(initPush, 3000);
     }
   }, [user]);
 
@@ -64,17 +78,56 @@ export default function Home() {
     if (!user) return;
 
     try {
-      // 1. Get the first active pack
+      // 1. Get user's enrollment
+      const { data: enrollments } = await supabase
+        .from('user_mission_enrollments')
+        .select('pack_id')
+        .eq('user_id', user.id);
+
+      // If no enrollment, clear
+      if (!enrollments || enrollments.length === 0) {
+        setDailyProgress(0);
+        setCurrentMission(null);
+        return;
+      }
+
+      // 3. Get user's completed tasks FIRST to determine which enrollment is the "active" unfinished one
+      // If none, we can just show the latest one they were enrolled in.
+      const { data: userProgress } = await supabase
+        .from('user_mission_progress')
+        .select('task_id')
+        .eq('user_id', user.id);
+
+      const completedSet = new Set(userProgress?.map(p => p.task_id));
+
+      let targetPackId = enrollments[0].pack_id;
+
+      // Find the unfinished enrollment if multiple exist (to be safe)
+      for (const e of enrollments) {
+        const { data: mData } = await supabase.from('missions').select('mission_tasks(id)').eq('pack_id', e.pack_id);
+        let finished = true;
+        if (mData) {
+          for (const md of mData) {
+            for (const t of md.mission_tasks) {
+              if (!completedSet.has(t.id)) finished = false;
+            }
+          }
+        }
+        if (!finished) {
+          targetPackId = e.pack_id;
+          break;
+        }
+      }
+
       const { data: pack } = await supabase
         .from('mission_packs')
         .select('id, title')
-        .eq('is_active', true)
-        .limit(1)
+        .eq('id', targetPackId)
         .single();
 
       if (!pack) return;
 
-      // 2. Get all days and tasks for this pack
+      // 2. Get all days and tasks for THIS pack
       const { data: days } = await supabase
         .from('missions')
         .select(`
@@ -88,17 +141,9 @@ export default function Home() {
 
       if (!days || days.length === 0) return;
 
-      // 3. Get user's completed tasks
-      const { data: userProgress } = await supabase
-        .from('user_mission_progress')
-        .select('task_id')
-        .eq('user_id', user.id);
-
-      const completedSet = new Set(userProgress?.map(p => p.task_id));
-
-      // 4. Find current day (first incomplete or partially complete)
-      let activeDay = days[0];
-      let percent = 0;
+      // 4. Find current day
+      let activeDay = days[days.length - 1]; // Fallback to last day
+      let percent = 100;
 
       for (const day of days) {
         const totalTasks = day.mission_tasks.length;
@@ -107,12 +152,10 @@ export default function Home() {
         const completedTasks = day.mission_tasks.filter((t: any) => completedSet.has(t.id)).length;
 
         if (completedTasks < totalTasks) {
+          // Found the unfinished day!
           activeDay = day;
           percent = Math.round((completedTasks / totalTasks) * 100);
           break;
-        } else {
-          activeDay = day;
-          percent = 100;
         }
       }
 

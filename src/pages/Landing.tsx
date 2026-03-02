@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play, Check, Shield } from 'lucide-react';
+import { ArrowRight, Heart, Zap, Brain, Users, BookOpen, Gamepad2, Sparkles, ChevronLeft, ChevronRight, Play, Check, Shield, Trophy } from 'lucide-react';
 
 export default function Landing() {
     const [currentGameIndex, setCurrentGameIndex] = useState(0);
@@ -184,19 +184,19 @@ export default function Landing() {
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Acesso imediato</span>
+                                <span className="text-gray-800 font-medium">Quase 20 horas de conteúdo puro e sem ideologias.</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Conteúdo infantil cristão selecionado por quem vive o ministério</span>
+                                <span className="text-gray-800 font-medium">Missões práticas para tirar seu filho da tela e aproximá-lo de você.</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Experiências para viver juntos e tirar a criança da tela</span>
+                                <span className="text-gray-800 font-medium">Curadoria de quem vive o ministério infantil todos os dias.</span>
                             </div>
                         </div>
                         <button onClick={scrollToOffer} className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg flex items-center gap-2 group">
@@ -270,18 +270,84 @@ export default function Landing() {
                     </div>
 
                     {/* Connection Text */}
-                    <div className="max-w-3xl mx-auto text-center space-y-4 text-gray-700 leading-relaxed">
+                    <div className="max-w-3xl mx-auto text-center space-y-4 text-gray-700 leading-relaxed text-lg">
                         <p>
                             <strong>Isso não acontece por acaso.</strong><br />
-                            Hoje, muitas portas entram dentro de casa através das telas.
-                            E nem sempre aquilo que parece "infantil" carrega valores que edificam.
+                            O algoritmo não é neutro.
                         </p>
                         <p>
-                            Muitos conteúdos confundem, aceleram e afastam daquilo que realmente importa.
+                            Enquanto você tenta ensinar valores, o próximo vídeo sugerido pode estar desconstruindo tudo o que você acredita.
                         </p>
-                        <p>
-                            Como pais, sentimos que precisamos proteger… mas também precisamos <strong>oferecer algo melhor.</strong>
+                        <p className="font-bold text-gray-900 text-xl mt-4">
+                            Seu filho não precisa de mais estímulo; ele precisa de direção.
                         </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Quem é Nathan Lima? */}
+            <section className="py-20 bg-gray-50 border-t border-gray-100">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
+                            <img
+                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/familianatan.webp"
+                                alt="Nathan Lima e sua família"
+                                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
+                            />
+                        </div>
+                        <div className="space-y-6">
+                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                                Quem é Nathan Lima?
+                            </h2>
+                            <h3 className="text-xl text-blue-600 font-bold">
+                                Pai, Marido e Educador: Uma vida dedicada a edificar a próxima geração.
+                            </h3>
+                            <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
+                                <p>
+                                    Nathan não é apenas um rosto no aplicativo; ele é o curador que garante que cada segundo de tela no Meu Amiguito seja uma semente do Reino no coração do seu filho.
+                                </p>
+                                <ul className="space-y-4 mt-6">
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Sparkles className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Criador do Projeto Força Kids:</strong>
+                                            <span className="text-sm md:text-base">Idealizador de um movimento em Quixeramobim focado em levar o Avivamento Espiritual para os pequenos através de missões e ensino bíblico.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Heart className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Pai e Marido:</strong>
+                                            <span className="text-sm md:text-base">Vive diariamente a missão de liderar sua família e educar seu filho, o Bernardo, nos princípios inegociáveis da Palavra.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <BookOpen className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Professor de Escola Dominical:</strong>
+                                            <span className="text-sm md:text-base">Especialista em ensino infantil, com anos de experiência traduzindo verdades profundas em linguagem que as crianças amam e entendem.</span>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                                            <Shield className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <strong className="text-gray-900 block mb-1">Sentinela da Curadoria:</strong>
+                                            <span className="text-sm md:text-base">Responsável por selecionar e validar as quase 20 horas de conteúdo seguro, garantindo que a "janela digital" da sua casa esteja protegida.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -442,12 +508,10 @@ export default function Landing() {
                         <div className="space-y-8">
                             <div className="space-y-4">
                                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-                                    Missões diárias — Crie um padrão de fé e ação no seu filho.
+                                    Missões diárias — A missão começa no app e termina na sala de casa.
                                 </h2>
                                 <h3 className="text-xl text-green-800 font-medium">
-                                    Transforme seu filho em protagonista. Missões diárias sobre:
-                                    <br />
-                                    Cura • Amizade • Família • Gratidão • Propósito
+                                    Não é apenas entretenimento passivo. São gatilhos de ação. Transforme seu filho no herói da própria jornada espiritual.
                                 </h3>
                             </div>
 
@@ -521,6 +585,143 @@ export default function Landing() {
                                 alt="Missões Diárias"
                                 className="relative w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                             />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Transformation Journeys */}
+            <section className="py-20 bg-gradient-to-br from-indigo-50 to-purple-50">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            As Jornadas de Transformação
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Cada uma dessas jornadas foi desenhada para resolver um problema real. No mercado, cada "trilha" dessas custaria o valor de um curso individual, mas no Meu Amiguito, elas já estão inclusas no seu acesso.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {/* Box 1 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+                            <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/box7diascomjesus.webp"
+                                    alt="7 Dias com Jesus"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>🛡️</span> 7 Dias com Jesus (O Coração Calmo)
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                Recupere a conexão com seu filho e elimine as birras e a agitação das telas em apenas uma semana. Aplique o método que o Nathan Lima usa com o Bernardo para restaurar a paz e a autoridade no seu lar com muito amor.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-sm mr-2">De R$ 47,00</span>
+                                <span className="text-green-700 font-bold">por R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        {/* Box 2 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+                            <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/18passosparadefendersuafe.webp"
+                                    alt="18 passos para defender sua Fé"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>⚔️</span> 18 Passos para Defender sua Fé
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                Dê ao seu filho as respostas inteligentes para as perguntas mais difíceis da escola sem ele parecer o "chato". Um guia prático de inteligência bíblica para blindar a mente dos pequenos contra as ideologias do mundo.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-sm mr-2">De R$ 47,00</span>
+                                <span className="text-green-700 font-bold">por R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        {/* Box 3 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+                            <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/3diasparavenceraansiedade.webp"
+                                    alt="3 Dias para Vencer a Ansiedade"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>🧠</span> 3 Dias para Vencer a Ansiedade
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                O protocolo definitivo para quebrar o vício da dopamina digital e devolver o foco e o sono tranquilo ao seu filho. Use armas espirituais e técnicas simples para acalmar o sistema nervoso e restaurar o equilíbrio emocional.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-sm mr-2">De R$ 47,00</span>
+                                <span className="text-green-700 font-bold">por R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Gamification Section */}
+            <section className="py-20 bg-gradient-to-br from-yellow-50 to-orange-100 relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-0 right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+                    <div className="absolute bottom-10 left-10 w-60 h-60 bg-orange-200/40 rounded-full blur-3xl"></div>
+                </div>
+                <div className="container max-w-6xl mx-auto px-6 relative z-10">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-6">
+                            <div className="inline-block bg-orange-100 text-orange-800 font-bold px-4 py-2 rounded-full text-sm mb-2 shadow-sm uppercase tracking-wide">
+                                Meta Gamificada — Sistema de Conquistas e Recompensas
+                            </div>
+                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                                Transforme Obediência em Superpoder com Nosso Sistema de Recompensas
+                            </h2>
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                                O seu filho não vai apenas "assistir". Ele vai conquistar. Criamos um ambiente onde cada tarefa cumprida gera um estímulo positivo real:
+                            </p>
+                            <div className="space-y-6 mt-8">
+                                <div className="flex gap-4 items-start bg-white/60 p-5 rounded-2xl shadow-sm border border-orange-50">
+                                    <div className="text-3xl mt-1">⭐</div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 text-lg mb-1">Ganho de XP e Medalhas</h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            A cada missão concluída (como arrumar o quarto ou orar), ele ganha pontos de experiência.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 items-start bg-white/60 p-5 rounded-2xl shadow-sm border border-orange-50">
+                                    <div className="text-3xl mt-1">🎁</div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 text-lg mb-1">O Grande Banquete da Vitória</h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            Ao final de cada jornada de 7 ou 14 dias, o app libera o acesso a uma recompensa definida pelo pai — um momento especial para a família com jogos exclusivos e celebração.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onClick={scrollToOffer} className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
+                                Quero esse superpoder para meu filho
+                            </button>
+                        </div>
+                        <div className="flex justify-center xl:justify-end">
+                            <div className="relative">
+                                {/* Imagem ilustrativa de um alvo */}
+                                <div className="w-64 h-64 md:w-80 md:h-80 bg-white rounded-full flex items-center justify-center shadow-xl border-8 border-orange-200 relative">
+                                    <div className="w-48 h-48 md:w-60 md:h-60 bg-orange-100 rounded-full flex items-center justify-center border-4 border-orange-300">
+                                        <div className="w-32 h-32 md:w-40 md:h-40 bg-orange-500 rounded-full flex items-center justify-center shadow-inner">
+                                            <Trophy className="w-16 h-16 md:w-20 md:h-20 text-orange-200 fill-orange-400" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -821,6 +1022,128 @@ export default function Landing() {
                 </div>
             </section>
 
+            {/* Exclusive Bonus Section */}
+            <section className="py-20 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-0 right-10 w-64 h-64 bg-yellow-200/40 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 left-10 w-80 h-80 bg-orange-200/30 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="container max-w-6xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-16 space-y-4">
+                        <div className="inline-block bg-orange-100 text-orange-800 font-bold px-4 py-2 rounded-full text-sm mb-2 shadow-sm uppercase tracking-wide">
+                            Bônus Exclusivos: Um Arsenal de Atividades Para a Sua Família
+                        </div>
+                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                            Ganhe R$ 158,00 em Presentes do Tio Natan ao Garantir sua Vaga Hoje
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Não queremos apenas que seu filho assista; queremos que ele viva a Palavra. Por isso, ao entrar agora, você recebe gratuitamente estes materiais premium para imprimir e usar em casa:
+                        </p>
+                    </div>
+
+                    {/* Grid Container */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pt-4">
+
+                        {/* Bonus 1 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
+                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                                Bônus 1
+                            </div>
+                            <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/60atividades.webp"
+                                    alt="60 Atividades Bíblicas"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>🎨</span> 60 Atividades Bíblicas (Combo Completo)
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                O arsenal definitivo para tirar seu filho da frente das telas. Pinte, recorte e monte cenários épicos como a Cova de Daniel ou a Harpa de Davi. Estimule a criatividade e a coordenação motora com propósito bíblico em cada página.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-xs md:text-sm mr-2 block xl:inline">De R$ 47,00</span>
+                                <span className="text-green-700 font-bold block xl:inline">por R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        {/* Bonus 2 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
+                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                                Bônus 2
+                            </div>
+                            <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/17quebra-cabecas.webp"
+                                    alt="17 Quebra-cabeças para Colorir e Montar"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>🧩</span> 17 Quebra-cabeças para Colorir e Montar
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                Treine o raciocínio lógico e a paciência do seu pequeno com desafios visuais que ensinam histórias do Antigo e Novo Testamento. Cada peça montada é uma oportunidade única para fixar um valor cristão e gerar memórias afetivas valiosas entre pais e filhos.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-xs md:text-sm mr-2 block xl:inline">De R$ 37,00</span>
+                                <span className="text-green-700 font-bold block xl:inline">por R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        {/* Bonus 3 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
+                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                                Bônus 3
+                            </div>
+                            <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/boxamaisbela.webp"
+                                    alt="Box: As Mais Belas Histórias da Bíblia"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>📚</span> Box: As Mais Belas Histórias da Bíblia
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                Uma curadoria especial com as narrativas mais impactantes das Escrituras, adaptadas com linguagem simples e envolvente. Perfeito para o momento da leitura antes de dormir, garantindo que a última semente no coração do seu filho, antes do sono, seja do Reino.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-xs md:text-sm mr-2 block xl:inline">De R$ 37,00</span>
+                                <span className="text-green-700 font-bold block xl:inline">por R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        {/* Bonus 4 */}
+                        <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
+                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                                Bônus 4
+                            </div>
+                            <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/animaisdaarca.webp"
+                                    alt="Os Animais da Arca de Noé (Novo!)"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <span>🦁</span> Os Animais da Arca de Noé (Novo!)
+                            </h3>
+                            <p className="text-gray-600 text-sm flex-grow mb-6 leading-relaxed">
+                                Embarque nessa jornada épica de salvação e descubra como Noé protegeu cada espécie sob a direção divina. Um material rico que ensina sobre fidelidade e cuidado com a natureza, ideal para despertar a curiosidade e o amor pelos animais e pela criação.
+                            </p>
+                            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100 mt-auto">
+                                <span className="text-gray-500 line-through text-xs md:text-sm mr-2 block xl:inline">De R$ 37,00</span>
+                                <span className="text-green-700 font-bold block xl:inline">por R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Closing CTA */}
             <section id="oferta" className="py-20 bg-gradient-to-br from-purple-600 to-indigo-700 relative overflow-hidden">
                 {/* Background Decor */}
@@ -833,17 +1156,14 @@ export default function Landing() {
                     <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-white/20">
                         <div className="grid md:grid-cols-2 gap-0">
                             {/* Product Image Side */}
-                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 md:p-12 flex items-center justify-center">
-                                <div className="relative group">
-                                    <div className="absolute inset-0 bg-purple-200 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                                    <img
-                                        src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitotodososprodutos.webp"
-                                        alt="Pacote Completo Meu Amiguito"
-                                        className="relative w-full max-w-md mx-auto drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    <div className="absolute -bottom-6 -right-6 bg-yellow-400 text-purple-900 font-bold px-6 py-3 rounded-xl shadow-lg transform rotate-3 animate-bounce">
-                                        Oferta Especial!
-                                    </div>
+                            <div className="relative group overflow-hidden bg-purple-50 flex items-center justify-center">
+                                <img
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/todososprodutos.webp"
+                                    alt="Pacote Completo Meu Amiguito"
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute bottom-6 right-6 bg-yellow-400 text-purple-900 font-bold px-6 py-3 rounded-xl shadow-2xl transform rotate-3 animate-bounce z-10">
+                                    Oferta Especial!
                                 </div>
                             </div>
 
@@ -854,43 +1174,52 @@ export default function Landing() {
                                         Dê agora o próximo passo e proteja o futuro dos seus filhos.
                                     </h2>
                                     <p className="text-lg text-gray-600 font-medium">
-                                        Veja só tudo o que você vai receber por apenas <span className="text-purple-600 font-bold">R$ 1,86 por semana</span>:
+                                        O que você recebe hoje por apenas <span className="text-purple-600 font-bold">R$ 1,86 por semana</span>:
                                     </p>
                                 </div>
 
                                 <ul className="space-y-3">
                                     {[
-                                        "20h+ de conteúdo Seguro e Sem Ideologias",
-                                        "70+ histórias bíblicas",
-                                        "Jogos que desenvolvem a mente",
-                                        "Missões de oração em família",
-                                        "Atividades para colorir",
-                                        "Zero ideologia, zero bagunça"
+                                        "🎬 20h+ de Conteúdo Seguro: Séries e vídeos sem ideologias (Midinho, Neemias e mais).",
+                                        "📖 70+ Histórias Bíblicas: Uma biblioteca completa com a vida de Jesus e heróis da fé.",
+                                        "🎮 5 Jogos Educativos: Treino de foco e memória com propósito cristão e diversão.",
+                                        "🛡️ 4 Jornadas de Missão: Roteiros práticos para vencer a ansiedade e as birras em casa.",
+                                        "🎨 Kit 60 Atividades (PDF): Materiais para montar, como a Harpa de Davi e a Cova de Daniel.",
+                                        "🎁 4 Bônus Exclusivos: R$ 158,00 em presentes (Quebra-cabeças, Box de Histórias e mais)."
                                     ].map((item, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-gray-700">
-                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                        <li key={i} className="flex items-start gap-3 text-gray-700 text-sm md:text-base">
+                                            <div className="flex-shrink-0 w-6 h-6 mt-0.5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                                 <Check className="w-4 h-4 text-green-600" strokeWidth={3} />
                                             </div>
-                                            <span className="font-medium">{item}</span>
+                                            <span className="font-medium leading-tight">{item}</span>
                                         </li>
                                     ))}
                                 </ul>
+
+                                <div className="space-y-2 mt-4 text-gray-800 font-bold text-center md:text-left">
+                                    <p>Um investimento na eternidade do seu filho.</p>
+                                    <p className="text-blue-600">Zero Ideologia.</p>
+                                    <p className="text-green-600">Zero Bagunça Digital.</p>
+                                </div>
 
                                 <div className="space-y-6 pt-4 border-t border-gray-100">
                                     <div className="flex items-center gap-4 bg-purple-50 p-4 rounded-xl border border-purple-100">
                                         <div className="text-3xl">🛡️</div>
                                         <div>
                                             <p className="font-bold text-gray-900 text-sm">Garantia de 7 dias</p>
-                                            <p className="text-xs text-gray-600">Se não servir, devolvemos cada centavo. Sem perguntas.</p>
+                                            <p className="text-xs text-gray-600">Se não amar, devolvemos seu dinheiro. Sem perguntas.</p>
                                         </div>
                                     </div>
 
                                     <div className="text-center md:text-left">
                                         <div className="mb-4">
                                             <span className="text-gray-500 text-lg line-through mr-3">De R$ 197,00</span>
-                                            <div className="inline-block">
-                                                <span className="text-sm text-gray-600 block">por apenas 12x de</span>
-                                                <span className="text-4xl font-bold text-purple-600">R$ 10,03</span>
+                                            <div className="inline-block align-middle">
+                                                <span className="text-sm text-gray-600 block leading-none">por apenas 12x de</span>
+                                                <span className="text-4xl font-bold text-purple-600 leading-none">R$ 10,03</span>
+                                            </div>
+                                            <div className="mt-1 text-sm text-gray-500 font-medium">
+                                                (Ou R$ 97,00 à vista)
                                             </div>
                                         </div>
 
@@ -914,72 +1243,6 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* Quem é Nathan Lima? */}
-            <section className="py-20 bg-gray-50 border-t border-gray-100">
-                <div className="container max-w-6xl mx-auto px-6">
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
-                            <img
-                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/familianatan.webp"
-                                alt="Nathan Lima e sua família"
-                                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
-                            />
-                        </div>
-                        <div className="space-y-6">
-                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                                Quem é Nathan Lima?
-                            </h2>
-                            <h3 className="text-xl text-blue-600 font-bold">
-                                Pai, Marido e Educador: Uma vida dedicada a edificar a próxima geração.
-                            </h3>
-                            <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
-                                <p>
-                                    Nathan não é apenas um rosto no aplicativo; ele é o curador que garante que cada segundo de tela no Meu Amiguito seja uma semente do Reino no coração do seu filho.
-                                </p>
-                                <ul className="space-y-4 mt-6">
-                                    <li className="flex items-start gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
-                                            <Sparkles className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <strong className="text-gray-900 block mb-1">Criador do Projeto Força Kids:</strong>
-                                            <span className="text-sm md:text-base">Idealizador de um movimento em Quixeramobim focado em levar o Avivamento Espiritual para os pequenos através de missões e ensino bíblico.</span>
-                                        </div>
-                                    </li>
-                                    <li className="flex items-start gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
-                                            <Heart className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <strong className="text-gray-900 block mb-1">Pai e Marido:</strong>
-                                            <span className="text-sm md:text-base">Vive diariamente a missão de liderar sua família e educar seu filho, o Bernardo, nos princípios inegociáveis da Palavra.</span>
-                                        </div>
-                                    </li>
-                                    <li className="flex items-start gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
-                                            <BookOpen className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <strong className="text-gray-900 block mb-1">Professor de Escola Dominical:</strong>
-                                            <span className="text-sm md:text-base">Especialista em ensino infantil, com anos de experiência traduzindo verdades profundas em linguagem que as crianças amam e entendem.</span>
-                                        </div>
-                                    </li>
-                                    <li className="flex items-start gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
-                                            <Shield className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <strong className="text-gray-900 block mb-1">Sentinela da Curadoria:</strong>
-                                            <span className="text-sm md:text-base">Responsável por selecionar e validar as quase 20 horas de conteúdo seguro, garantindo que a "janela digital" da sua casa esteja protegida.</span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Footer */}
             <footer className="bg-purple-900 text-white py-12 border-t border-purple-800">
@@ -994,7 +1257,7 @@ export default function Landing() {
                             © 2026 Meu Amiguito. Todos os direitos reservados.
                         </p>
                         <p>
-                            O Meu Amiguito é uma plataforma de curadoria de conteúdo infantojuvenil. Os vídeos, episódios e músicas disponíveis são de propriedade de seus respectivos criadores e estão originalmente publicados em plataformas como YouTube, em acesso gratuito. O aplicativo mantém todas as atribuições, logomarcas e anúncios originais, garantindo que as visualizações sejam contabilizadas nos canais oficiais. Não nos responsabilizamos por indisponibilidade ou alteração de conteúdos de terceiros. Ao utilizar o aplicativo, você concorda que o serviço prestado é de curadoria e organização, e não de licenciamento das obras.
+                            O Meu Amiguito é uma plataforma de curadoria de conteúdo infantojuvenil. Os vídeos, episódios e músicas disponíveis são de propriedade de seus respectivos criadores e estão originalmente publicados em plataformas como YouTube, em acesso gratuito. O aplicativo mantém todas as atribuições, logomarcas e anúncios originais, garantindo que as visualizações sejam contabilizadas nos canais oficiais. Não nos responsabilizamos por indisponibilidade ou alteração de conteúdos de terceiros. Ao utilizar o aplicativo, você concorda que o serviço prestado é de curadoria e organização, e não de licenciamento das obras. Respeitamos a propriedade intelectual. Se você for o detentor de algum direito e desejar a remoção do conteúdo, entre em contato com contato@meuamiguito.com.br e atenderemos em até 24h.
                         </p>
                     </div>
                 </div>
