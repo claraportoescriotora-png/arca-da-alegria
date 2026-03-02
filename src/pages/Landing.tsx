@@ -12,49 +12,49 @@ export default function Landing() {
             title: "Quebra-Cabeça Cristão",
             description: "Foco e paciência. Montar cenas bíblicas desenvolve a concentração. Enquanto encaixa as peças, ele fixa a Palavra no coração.",
             tag: "Raciocínio",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/quebracabecalp.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/quebracabecalp.webp",
             color: "bg-blue-100 text-blue-800"
         },
         {
             title: "Subindo ao Céu",
             description: "Reflexos e propósito. Pular obstáculos nas nuvens até encontrar Jesus. Coordenação motora e espiritualidade no mesmo jogo.",
             tag: "Coordenação",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/subindoaoceu.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/subindoaoceu.webp",
             color: "bg-sky-100 text-sky-800"
         },
         {
             title: "O Bom Pastor",
             description: "Pensamento rápido. Guiar a ovelha desviando do lobo. Agilidade mental enquanto aprende sobre proteção e cuidado.",
             tag: "Agilidade",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/obompastor.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/obompastor.webp",
             color: "bg-green-100 text-green-800"
         },
         {
             title: "Sinais da Vida de Jesus",
             description: "Memória afiada. Jogo da memória com os milagres de Jesus. A cada par encontrado, um sinal gravado na mente.",
             tag: "Memória",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/sinais.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/sinais.webp",
             color: "bg-purple-100 text-purple-800"
         },
         {
             title: "Encontro com Jesus",
             description: "Resolução de problemas. Labirinto até encontrar Jesus. Raciocínio lógico e busca espiritual em um só desafio.",
             tag: "Lógica",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Encontre%20Jesus.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/Encontre%20Jesus.webp",
             color: "bg-yellow-100 text-yellow-800"
         },
         {
             title: "No Ritmo do Céu",
             description: "Coordenação e ritmo. Sequências de cores e sons. Desenvolvimento motor e musical enquanto louva.",
             tag: "Musicalidade",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/noritimodoceu.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/noritimodoceu.webp",
             color: "bg-pink-100 text-pink-800"
         },
         {
             title: "Quem Estou Imitando?",
             description: "Conexão familiar. Imitar e adivinhar. Riso, afeto e memória afetiva. Pai e filho juntos no mesmo propósito.",
             tag: "Família",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/quem%20estou%20imitando.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/quem%20estou%20imitando.webp",
             color: "bg-orange-100 text-orange-800"
         }
     ];
@@ -64,42 +64,42 @@ export default function Landing() {
             title: "Smilinguido",
             description: "Clássico que marcou época. Aqui seu filho revive as histórias que você amou.",
             tag: "Clássico",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/smiliguido.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/smiliguido.webp",
             color: "bg-orange-100 text-orange-800"
         },
         {
             title: "Midinho, o Pequeno Missionário",
             description: "Missão e coragem. Aventuras que ensinam fé e propósito.",
             tag: "Missão",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/filmemidinho.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/filmemidinho.webp",
             color: "bg-blue-100 text-blue-800"
         },
         {
             title: "Curtas Premiados",
             description: "Snowbear e outros títulos premiados. Arte de qualidade com valores cristãos.",
             tag: "Arte",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/animaceospremiadas%20(1).webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/animaceospremiadas%20(1).webp",
             color: "bg-purple-100 text-purple-800"
         },
         {
             title: "Músicas Cristãs",
             description: "Seleção de músicas infantis que alegram e ensinam a Palavra.",
             tag: "Louvor",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/musicascristas.webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/musicascristas.webp",
             color: "bg-green-100 text-green-800"
         },
         {
             title: "Vídeos Educativos",
             description: "Conteúdo para aprender a ler, escrever e se desenvolver. Sem ideologias.",
             tag: "Educação",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/conteudoeducativo%20(1).webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/conteudoeducativo%20(1).webp",
             color: "bg-yellow-100 text-yellow-800"
         },
         {
             title: "Catálogo Crescente",
             description: "Mais de 20h de conteúdo Seguro e Sem Ideologias. Toda semana, novidades.",
             tag: "Novidades",
-            image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/conteudoeducativo%20(1).webp",
+            image: "https://minha-zona-amiguito.b-cdn.net/landingpages/conteudoeducativo%20(1).webp",
             color: "bg-pink-100 text-pink-800"
         }
     ];
@@ -139,7 +139,7 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
+                            src="https://minha-zona-amiguito.b-cdn.net/landingpages/logo%20meu%20amiguito%20por%20extenso.webp"
                             alt="Meu Amiguito"
                             className="h-12 w-auto"
                         />
@@ -208,7 +208,7 @@ export default function Landing() {
                     {/* Hero Illustration */}
                     <div className="flex items-end justify-center h-full relative xl:translate-x-8">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/natameseufilhoheroamiguito.webp"
+                            src="https://minha-zona-amiguito.b-cdn.net/landingpages/natameseufilhoheroamiguito.webp"
                             alt="Nathan e seu filho"
                             className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
                         />
@@ -227,7 +227,7 @@ export default function Landing() {
                         {/* Card 1 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" />
+                                <img src="https://minha-zona-amiguito.b-cdn.net/landingpages/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais ansiosas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -238,7 +238,7 @@ export default function Landing() {
                         {/* Card 2 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" />
+                                <img src="https://minha-zona-amiguito.b-cdn.net/landingpages/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais agitadas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -249,7 +249,7 @@ export default function Landing() {
                         {/* Card 3 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-pink-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" />
+                                <img src="https://minha-zona-amiguito.b-cdn.net/landingpages/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Menos concentradas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -260,7 +260,7 @@ export default function Landing() {
                         {/* Card 4 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" />
+                                <img src="https://minha-zona-amiguito.b-cdn.net/landingpages/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais distantes da família</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -292,7 +292,7 @@ export default function Landing() {
                         <div className="relative">
                             <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
                             <img
-                                src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/familianatan.webp"
+                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/familianatan.webp"
                                 alt="Nathan Lima e sua família"
                                 className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
                             />
@@ -359,7 +359,7 @@ export default function Landing() {
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                             <div className="bg-yellow-50 rounded-3xl p-8 flex items-center justify-center min-h-[300px]">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daneil%20e%20a%20ovelhinha.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/Daneil%20e%20a%20ovelhinha.webp"
                                     alt="Criança lendo com ovelhinha"
                                     className="w-full max-w-sm h-auto"
                                 />
@@ -447,7 +447,7 @@ export default function Landing() {
                         {/* Phone Mockup */}
                         <div className="flex items-center justify-center">
                             <img
-                                src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/smartphonemockupamiguito.webp"
+                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/smartphonemockupamiguito.webp"
                                 alt="App Meu Amiguito"
                                 className="w-full max-w-md h-auto hover:scale-105 transition-transform duration-500"
                             />
@@ -470,16 +470,16 @@ export default function Landing() {
                     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 border-2 border-blue-200">
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                             {[
-                                { name: 'Zaqueu', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/zaqueunafigueira.webp' },
-                                { name: 'Pedro na Prisão', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pedronaprisao.webp' },
-                                { name: 'Paulo e Silas', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pauloesilas.webp' },
-                                { name: 'O Nascimento de Jesus', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/onascimentodejesus.webp' },
-                                { name: 'Jonas e o Grande Peixe', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/jonaseograndepeixe.webp' },
-                                { name: 'Isaque e Rebeca', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/isaqueerebeca.webp' },
-                                { name: 'O Filho Pródigo', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/filhoprodigo.webp' },
-                                { name: 'Eliseu e o Azeite', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/eliseueoazeite.webp' },
-                                { name: 'O Chamado de Abraão', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/chamadodeabraao.webp' },
-                                { name: 'A Criação do Mundo', image: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/acriacaodomundo.webp' }
+                                { name: 'Zaqueu', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/zaqueunafigueira.webp' },
+                                { name: 'Pedro na Prisão', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/pedronaprisao.webp' },
+                                { name: 'Paulo e Silas', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/pauloesilas.webp' },
+                                { name: 'O Nascimento de Jesus', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/onascimentodejesus.webp' },
+                                { name: 'Jonas e o Grande Peixe', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/jonaseograndepeixe.webp' },
+                                { name: 'Isaque e Rebeca', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/isaqueerebeca.webp' },
+                                { name: 'O Filho Pródigo', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/filhoprodigo.webp' },
+                                { name: 'Eliseu e o Azeite', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/eliseueoazeite.webp' },
+                                { name: 'O Chamado de Abraão', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/chamadodeabraao.webp' },
+                                { name: 'A Criação do Mundo', image: 'https://minha-zona-amiguito.b-cdn.net/landingpages/acriacaodomundo.webp' }
                             ].map((story, i) => (
                                 <div key={i} className="group relative aspect-square rounded-2xl overflow-hidden shadow-soft hover:scale-105 transition-transform duration-300">
                                     <img
@@ -581,7 +581,7 @@ export default function Landing() {
                         <div className="relative">
                             <div className="absolute inset-0 bg-green-200 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
                             <img
-                                src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/mockupmissoes.webp"
+                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/mockupmissoes.webp"
                                 alt="Missões Diárias"
                                 className="relative w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                             />
@@ -607,7 +607,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/box7diascomjesus.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/box7diascomjesus.webp"
                                     alt="7 Dias com Jesus"
                                     className="w-full h-full object-contain"
                                 />
@@ -628,7 +628,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/18passosparadefendersuafe.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/18passosparadefendersuafe.webp"
                                     alt="18 passos para defender sua Fé"
                                     className="w-full h-full object-contain"
                                 />
@@ -649,7 +649,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/3diasparavenceraansiedade.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/3diasparavenceraansiedade.webp"
                                     alt="3 Dias para Vencer a Ansiedade"
                                     className="w-full h-full object-contain"
                                 />
@@ -932,9 +932,9 @@ export default function Landing() {
 
                     <div className="grid md:grid-cols-3 gap-6">
                         {[
-                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Biblia%20para%20Colorir%20A%20historia%20de%20jesus%20-%20Volume%201%20(2).webp", title: "A História de Jesus" },
-                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/bibliajeusnomar.webp", title: "Jesus acalma a tempestade" },
-                            { img: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/pinturasnt.webp", title: "Milagres de Jesus" }
+                            { img: "https://minha-zona-amiguito.b-cdn.net/landingpages/Biblia%20para%20Colorir%20A%20historia%20de%20jesus%20-%20Volume%201%20(2).webp", title: "A História de Jesus" },
+                            { img: "https://minha-zona-amiguito.b-cdn.net/landingpages/bibliajeusnomar.webp", title: "Jesus acalma a tempestade" },
+                            { img: "https://minha-zona-amiguito.b-cdn.net/landingpages/pinturasnt.webp", title: "Milagres de Jesus" }
                         ].map((item, i) => (
                             <div key={i} className="bg-white rounded-3xl p-4 shadow-soft border-2 border-purple-200 group hover:-translate-y-2 transition-transform duration-300">
                                 <div className="rounded-2xl aspect-[3/4] overflow-hidden mb-4 shadow-md">
@@ -1052,7 +1052,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/60atividades.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/60atividades.webp"
                                     alt="60 Atividades Bíblicas"
                                     className="w-full h-full object-contain"
                                 />
@@ -1076,7 +1076,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/17quebra-cabecas.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/17quebra-cabecas.webp"
                                     alt="17 Quebra-cabeças para Colorir e Montar"
                                     className="w-full h-full object-contain"
                                 />
@@ -1100,7 +1100,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/boxamaisbela.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/boxamaisbela.webp"
                                     alt="Box: As Mais Belas Histórias da Bíblia"
                                     className="w-full h-full object-contain"
                                 />
@@ -1124,7 +1124,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/animaisdaarca.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/animaisdaarca.webp"
                                     alt="Os Animais da Arca de Noé (Novo!)"
                                     className="w-full h-full object-contain"
                                 />
@@ -1158,7 +1158,7 @@ export default function Landing() {
                             {/* Product Image Side */}
                             <div className="relative group overflow-hidden bg-purple-50 flex items-center justify-center">
                                 <img
-                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/imageprodutos.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/imageprodutos.webp"
                                     alt="Pacote Completo Meu Amiguito"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
