@@ -1158,7 +1158,7 @@ export default function Landing() {
                             {/* Product Image Side */}
                             <div className="relative group overflow-hidden bg-purple-50 flex items-center justify-center">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/todososprodutos.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/imageprodutos.webp"
                                     alt="Pacote Completo Meu Amiguito"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
