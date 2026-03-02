@@ -208,7 +208,7 @@ export default function Landing() {
                     {/* Hero Illustration */}
                     <div className="flex items-end justify-center h-full relative xl:translate-x-8">
                         <img
-                            src="https://minha-zona-amiguito.b-cdn.net/landingpages/natameseufilhoheroamiguito.webp"
+                            src="https://minha-zona-amiguito.b-cdn.net/natameseufilhoheroamiguito.webp"
                             alt="Nathan e seu filho"
                             className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
                         />
@@ -292,7 +292,7 @@ export default function Landing() {
                         <div className="relative">
                             <div className="absolute inset-0 bg-blue-200 rounded-3xl transform rotate-3 scale-105 opacity-50"></div>
                             <img
-                                src="https://minha-zona-amiguito.b-cdn.net/landingpages/familianatan.webp"
+                                src="https://minha-zona-amiguito.b-cdn.net/familianatan.webp"
                                 alt="Nathan Lima e sua família"
                                 className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
                             />
@@ -607,7 +607,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/box7diascomjesus.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/box7diascomjesus.webp"
                                     alt="7 Dias com Jesus"
                                     className="w-full h-full object-contain"
                                 />
@@ -628,7 +628,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/18passosparadefendersuafe.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/18passosparadefendersuafe.webp"
                                     alt="18 passos para defender sua Fé"
                                     className="w-full h-full object-contain"
                                 />
@@ -649,7 +649,7 @@ export default function Landing() {
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-purple-100 flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
                             <div className="rounded-2xl h-64 overflow-hidden mb-6 shadow-sm flex items-center justify-center">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/3diasparavenceraansiedade.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/3diasparavenceraansiedade.webp"
                                     alt="3 Dias para Vencer a Ansiedade"
                                     className="w-full h-full object-contain"
                                 />
@@ -1052,7 +1052,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/60atividades.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/60atividades.webp"
                                     alt="60 Atividades Bíblicas"
                                     className="w-full h-full object-contain"
                                 />
@@ -1076,7 +1076,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/17quebra-cabecas.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/17quebra-cabecas.webp"
                                     alt="17 Quebra-cabeças para Colorir e Montar"
                                     className="w-full h-full object-contain"
                                 />
@@ -1100,7 +1100,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/boxamaisbela.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/boxamaisbela.webp"
                                     alt="Box: As Mais Belas Histórias da Bíblia"
                                     className="w-full h-full object-contain"
                                 />
@@ -1124,7 +1124,7 @@ export default function Landing() {
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/animaisdaarca.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/animaisdaarca.webp"
                                     alt="Os Animais da Arca de Noé (Novo!)"
                                     className="w-full h-full object-contain"
                                 />
@@ -1158,7 +1158,7 @@ export default function Landing() {
                             {/* Product Image Side */}
                             <div className="relative group overflow-hidden bg-purple-50 flex items-center justify-center">
                                 <img
-                                    src="https://minha-zona-amiguito.b-cdn.net/landingpages/imageprodutos.webp"
+                                    src="https://minha-zona-amiguito.b-cdn.net/imageprodutos.webp"
                                     alt="Pacote Completo Meu Amiguito"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
