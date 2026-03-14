@@ -12,6 +12,9 @@ const TRIAL_CONTENT_TYPES = [
     { value: 'movie', label: 'Filmes', table: 'movies' },
     { value: 'story', label: 'Histórias', table: 'stories' },
     { value: 'episode', label: 'Episódios', table: 'episodes' },
+    { value: 'game', label: 'Jogos', table: 'games' },
+    { value: 'activity', label: 'Tarefas (Imprimir)', table: 'activities' },
+    { value: 'mission_pack', label: 'Missões', table: 'mission_packs' },
 ];
 
 export function AdminSettings() {
@@ -383,8 +386,8 @@ export function AdminSettings() {
                                         key={t.value}
                                         onClick={() => setTrialTab(t.value)}
                                         className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${trialTab === t.value
-                                                ? 'bg-amber-500 text-white'
-                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            ? 'bg-amber-500 text-white'
+                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                             }`}
                                     >
                                         {t.label}
