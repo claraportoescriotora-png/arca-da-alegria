@@ -100,6 +100,50 @@ export default defineConfig(({ mode }) => {
               res.end(JSON.stringify({ error: err?.message || "Unknown Error" }));
             }
           });
+
+          server.middlewares.use('/api/import-drive-pdfs', async (req, res, next) => {
+            if (req.method !== 'POST') {
+              res.statusCode = 405;
+              res.end('Method Not Allowed');
+              return;
+            }
+
+            const chunks: any[] = [];
+            for await (const chunk of req) {
+              chunks.push(chunk);
+            }
+            const bodyText = Buffer.concat(chunks).toString();
+
+            try {
+              // Inject Env Vars into process.env for the handler to see
+              Object.assign(process.env, env);
+
+              // Dynamic import
+              const { default: handler } = await import('./api/import-drive-pdfs.ts');
+
+              // Mock Request
+              const webReq = new Request('http://localhost:8080/api/import-drive-pdfs', {
+                method: 'POST',
+                headers: req.headers as any,
+                body: bodyText
+              });
+
+              const handlerFn = handler as any;
+              const webRes = await (handlerFn.length > 1 ? handlerFn(webReq, res) : handlerFn(webReq));
+
+              if (!webRes) return;
+
+              res.statusCode = webRes.status;
+              (webRes.headers as Headers).forEach((val: string, key: string) => res.setHeader(key, val));
+              const responseText = await webRes.text();
+              res.end(responseText);
+
+            } catch (err: any) {
+              console.error("API Proxy Error:", err);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: err?.message || "Unknown Error" }));
+            }
+          });
         }
       }
     ],

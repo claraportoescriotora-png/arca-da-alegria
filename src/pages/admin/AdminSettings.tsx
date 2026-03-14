@@ -2,25 +2,93 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images } from "lucide-react";
+import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images, Clock, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useConfig } from "@/contexts/ConfigContext";
+
+const TRIAL_CONTENT_TYPES = [
+    { value: 'video', label: 'Vídeos', table: 'videos' },
+    { value: 'movie', label: 'Filmes', table: 'movies' },
+    { value: 'story', label: 'Histórias', table: 'stories' },
+    { value: 'episode', label: 'Episódios', table: 'episodes' },
+];
 
 export function AdminSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const { toast } = useToast();
-    // Use the context mostly to check if it's there, but we manage our own form state so we can edit it
     const [formData, setFormData] = useState({
         logo_url: '',
         favicon_url: ''
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
+    // Trial config state
+    const [trialDays, setTrialDays] = useState(7);
+    const [trialContent, setTrialContent] = useState<{ type: string; id: string }[]>([]);
+    const [trialTab, setTrialTab] = useState('video');
+    const [trialContentList, setTrialContentList] = useState<{ id: string; title: string }[]>([]);
+    const [loadingTrialContent, setLoadingTrialContent] = useState(false);
+    const [savingTrial, setSavingTrial] = useState(false);
+
     useEffect(() => {
         fetchConfigs();
+        fetchTrialConfig();
     }, []);
+
+    const fetchTrialConfig = async () => {
+        try {
+            const { data } = await supabase
+                .from('trial_config')
+                .select('trial_days, trial_content')
+                .limit(1)
+                .single();
+            if (data) {
+                setTrialDays(data.trial_days);
+                setTrialContent(Array.isArray(data.trial_content) ? data.trial_content : []);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const fetchTrialContentList = async (type: string) => {
+        const def = TRIAL_CONTENT_TYPES.find(t => t.value === type);
+        if (!def) return;
+        setLoadingTrialContent(true);
+        const { data } = await supabase.from(def.table).select('id, title').limit(100);
+        setTrialContentList(data || []);
+        setLoadingTrialContent(false);
+    };
+
+    useEffect(() => {
+        fetchTrialContentList(trialTab);
+    }, [trialTab]);
+
+    const toggleTrialContent = (id: string, type: string) => {
+        const exists = trialContent.some(c => c.id === id && c.type === type);
+        if (exists) {
+            setTrialContent(trialContent.filter(c => !(c.id === id && c.type === type)));
+        } else {
+            setTrialContent([...trialContent, { type, id }]);
+        }
+    };
+
+    const handleSaveTrial = async () => {
+        setSavingTrial(true);
+        try {
+            await supabase.from('trial_config').upsert(
+                { id: 1, trial_days: trialDays, trial_content: trialContent, updated_at: new Date().toISOString() },
+                { onConflict: 'id' }
+            );
+            toast({ title: 'Configuração de trial salva!' });
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Erro ao salvar trial', description: e.message });
+        } finally {
+            setSavingTrial(false);
+        }
+    };
 
     const fetchConfigs = async () => {
         setLoading(true);
@@ -277,6 +345,85 @@ export function AdminSettings() {
                                 <Save className="w-4 h-4 mr-2" />
                             )}
                             Salvar Alterações
+                        </Button>
+                    </div>
+                </section>
+
+                {/* Trial Config Section */}
+                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
+                            <Clock className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-slate-800">Trial Gratuito</h3>
+                            <p className="text-sm text-slate-500">Configure o período e os conteúdos do acesso gratuito.</p>
+                        </div>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        <div className="space-y-2">
+                            <Label className="text-base font-semibold text-slate-700">Duração do trial (dias)</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={365}
+                                value={trialDays}
+                                onChange={e => setTrialDays(Number(e.target.value))}
+                                className="w-32"
+                            />
+                            <p className="text-xs text-slate-400">Defina 0 para desativar o acesso trial.</p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <Label className="text-base font-semibold text-slate-700">Conteúdos liberados no trial ({trialContent.length} selecionados)</Label>
+                            <div className="flex gap-2 flex-wrap">
+                                {TRIAL_CONTENT_TYPES.map(t => (
+                                    <button
+                                        key={t.value}
+                                        onClick={() => setTrialTab(t.value)}
+                                        className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${trialTab === t.value
+                                                ? 'bg-amber-500 text-white'
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        {t.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="border border-slate-200 rounded-xl max-h-64 overflow-y-auto">
+                                {loadingTrialContent ? (
+                                    <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-amber-500" /></div>
+                                ) : trialContentList.length === 0 ? (
+                                    <p className="text-center text-slate-400 text-sm py-6">Nenhum conteúdo deste tipo encontrado.</p>
+                                ) : (
+                                    trialContentList.map(item => {
+                                        const selected = trialContent.some(c => c.id === item.id && c.type === trialTab);
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => toggleTrialContent(item.id, trialTab)}
+                                                className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm border-b border-slate-100 last:border-0 transition-colors ${selected ? 'bg-amber-50 text-amber-800' : 'hover:bg-slate-50 text-slate-700'
+                                                    }`}
+                                            >
+                                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${selected ? 'bg-amber-500 border-amber-500' : 'border-slate-300'
+                                                    }`}>
+                                                    {selected && <Check className="w-2.5 h-2.5 text-white" />}
+                                                </div>
+                                                <span className="truncate">{item.title}</span>
+                                            </button>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <Button onClick={handleSaveTrial} disabled={savingTrial} className="bg-amber-500 hover:bg-amber-600 text-white min-w-32">
+                            {savingTrial ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar Trial
                         </Button>
                     </div>
                 </section>

@@ -1,12 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Trophy, BookOpen, PlayCircle, Gamepad2 } from "lucide-react";
+import { Home, Trophy, BookOpen, PlayCircle, ShoppingCart } from "lucide-react";
 
 const navItems = [
   { path: "/home", icon: Home, label: "Início" },
   { path: "/missions", icon: Trophy, label: "Missões" },
   { path: "/stories", icon: BookOpen, label: "Histórias" },
   { path: "/videos", icon: PlayCircle, label: "Vídeos" },
-  { path: "/games", icon: Gamepad2, label: "Jogos" },
+  { path: "/store", icon: ShoppingCart, label: "Loja" },
 ];
 
 export function BottomNav() {
@@ -28,8 +28,8 @@ export function BottomNav() {
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
               className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 ${isActive
-                  ? "text-primary scale-110 -translate-y-1"
-                  : "text-muted-foreground hover:text-primary active:scale-95"
+                ? "text-primary scale-110 -translate-y-1"
+                : "text-muted-foreground hover:text-primary active:scale-95"
                 }`}
             >
               <div className={`p-2 rounded-2xl transition-all duration-300 ${isActive ? "bg-primary/10" : ""}`}>

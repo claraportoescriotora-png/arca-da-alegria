@@ -40,6 +40,7 @@ import Admin from "./pages/admin/Admin";
 import Landing from "./pages/Landing";
 import Welcome from "./pages/Welcome";
 import ThankYou from "./pages/ThankYou";
+import Store from "./pages/Store";
 
 const queryClient = new QueryClient();
 
@@ -88,7 +89,7 @@ const App = () => (
                     <Route path="/notifications" element={<ProtectedRoute><SubscriptionGuard><Notifications /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/privacy" element={<ProtectedRoute><SubscriptionGuard><Privacy /></SubscriptionGuard></ProtectedRoute>} />
                     <Route path="/help" element={<ProtectedRoute><SubscriptionGuard><Help /></SubscriptionGuard></ProtectedRoute>} />
-                    <Route path="/help" element={<ProtectedRoute><SubscriptionGuard><Help /></SubscriptionGuard></ProtectedRoute>} />
+                    <Route path="/store" element={<ProtectedRoute><SubscriptionGuard><Store /></SubscriptionGuard></ProtectedRoute>} />
 
                     {/* Admin Route - Checks permission inside the component */}
                     <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />

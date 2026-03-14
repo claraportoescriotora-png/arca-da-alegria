@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { isContentLocked } from '@/lib/drip';
 import { DripLockModal } from '@/components/DripLockModal';
 import { cn } from '@/lib/utils';
+import { ContentAccessGuard } from '@/components/ContentAccessGuard';
 
 interface Story {
   id: string;
@@ -282,149 +283,151 @@ export default function StoryDetail() {
 
       {/* Content */}
       <main className="container max-w-md mx-auto px-4 -mt-8 relative z-10 pb-8">
-        <div className="bg-card rounded-3xl p-6 shadow-lg">
-          <span className="inline-block px-3 py-1 text-xs font-medium bg-secondary/10 text-secondary rounded-full mb-3">
-            {story.category}
-          </span>
+        <ContentAccessGuard contentType="story" contentId={id ?? ''}>
+          <div className="bg-card rounded-3xl p-6 shadow-lg">
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-secondary/10 text-secondary rounded-full mb-3">
+              {story.category}
+            </span>
 
-          <h1 className="font-fredoka text-2xl font-bold text-foreground mb-2">{story.title}</h1>
+            <h1 className="font-fredoka text-2xl font-bold text-foreground mb-2">{story.title}</h1>
 
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-            <span>📖 {story.duration} de leitura</span>
-          </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+              <span>📖 {story.duration} de leitura</span>
+            </div>
 
-          {/* Audio Player Button */}
-          <button
-            onClick={handleSpeak}
-            disabled={isDripLocked}
-            className={cn(
-              "w-full flex items-center justify-center gap-3 p-4 rounded-2xl font-semibold mb-6 transition-all duration-300",
-              isPlaying ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : 'gradient-primary text-white hover:opacity-90',
-              isDripLocked && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            {isPlaying ? (
-              <>
-                <Square className="w-5 h-5 fill-current" />
-                Parar Leitura
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-5 h-5" />
-                Ouvir História
-              </>
-            )}
-          </button>
-
-          {/* Story Content */}
-          <div className="prose prose-sm max-w-none">
-            <p className="text-foreground leading-relaxed whitespace-pre-line text-lg">
-              {isDripLocked ? "Conteúdo bloqueado. Retorne em breve para ler esta história!" : story.content}
-            </p>
-          </div>
-
-          {/* Progress & Actions */}
-          <div className="mt-8 pt-6 border-t border-border space-y-4">
-
-            {/* Dynamic Quiz Button */}
-            <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
-              <DialogTrigger asChild>
-                <button
-                  disabled={isDripLocked}
-                  className={cn(
-                    "w-full flex items-center justify-center gap-2 p-4 bg-yellow-100 text-yellow-700 rounded-2xl font-bold hover:bg-yellow-200 transition-colors",
-                    isDripLocked && "opacity-50 cursor-not-allowed"
-                  )}>
-                  <HelpCircle className="w-5 h-5" />
-                  Responder Quiz
-                </button>
-              </DialogTrigger>
-              <DialogContent className="rounded-3xl sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Quiz: {story.title}</DialogTitle>
-                  <DialogDescription>
-                    Teste seus conhecimentos sobre esta história!
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="py-4">
-                  {loadingQuiz ? (
-                    <div className="flex justify-center p-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  ) : quizQuestions.length === 0 ? (
-                    <div className="text-center p-4">
-                      <p className="text-muted-foreground">Nenhuma pergunta encontrada para esta história.</p>
-                      <Button onClick={() => setShowQuiz(false)} className="mt-4">Fechar</Button>
-                    </div>
-                  ) : quizCompleted ? (
-                    <div className="text-center space-y-4 py-6 animate-in zoom-in duration-500">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-20 rounded-full animate-pulse"></div>
-                        <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto shadow-xl relative z-10 animate-bounce">
-                          <Trophy className="w-12 h-12 text-white drop-shadow-md" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">
-                          PARABÉNS!
-                        </h3>
-                        <p className="text-lg font-medium text-muted-foreground">
-                          Você completou o desafio!
-                        </p>
-                      </div>
-
-                      <div className="bg-secondary/10 rounded-xl p-4 border border-secondary/20">
-                        <span className="block text-sm text-muted-foreground uppercase tracking-wider font-semibold">Sua Pontuação</span>
-                        <span className="block text-4xl font-black text-secondary mt-1">
-                          {score}/{quizQuestions.length}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Questão {currentQuestionIndex + 1} de {quizQuestions.length}</span>
-                        <span>Pontos: {score}</span>
-                      </div>
-
-                      <p className="font-medium text-lg text-center">
-                        {quizQuestions[currentQuestionIndex].question}
-                      </p>
-
-                      <div className="grid gap-3">
-                        {quizQuestions[currentQuestionIndex].quiz_alternatives.map((alt: any) => (
-                          <Button
-                            key={alt.id}
-                            variant="outline"
-                            className="justify-start h-auto py-3 px-4 text-left whitespace-normal hover:bg-primary/5 hover:text-primary transition-colors"
-                            onClick={() => handleAnswer(alt.is_correct)}
-                          >
-                            {alt.text}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-
+            {/* Audio Player Button */}
             <button
-              onClick={handleFinish}
+              onClick={handleSpeak}
               disabled={isDripLocked}
               className={cn(
-                "w-full flex items-center justify-center gap-2 p-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-colors",
+                "w-full flex items-center justify-center gap-3 p-4 rounded-2xl font-semibold mb-6 transition-all duration-300",
+                isPlaying ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : 'gradient-primary text-white hover:opacity-90',
                 isDripLocked && "opacity-50 cursor-not-allowed"
               )}
             >
-              <CheckCircle className="w-5 h-5" />
-              Terminei de Ler!
+              {isPlaying ? (
+                <>
+                  <Square className="w-5 h-5 fill-current" />
+                  Parar Leitura
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-5 h-5" />
+                  Ouvir História
+                </>
+              )}
             </button>
-          </div>
 
-        </div>
+            {/* Story Content */}
+            <div className="prose prose-sm max-w-none">
+              <p className="text-foreground leading-relaxed whitespace-pre-line text-lg">
+                {isDripLocked ? "Conteúdo bloqueado. Retorne em breve para ler esta história!" : story.content}
+              </p>
+            </div>
+
+            {/* Progress & Actions */}
+            <div className="mt-8 pt-6 border-t border-border space-y-4">
+
+              {/* Dynamic Quiz Button */}
+              <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
+                <DialogTrigger asChild>
+                  <button
+                    disabled={isDripLocked}
+                    className={cn(
+                      "w-full flex items-center justify-center gap-2 p-4 bg-yellow-100 text-yellow-700 rounded-2xl font-bold hover:bg-yellow-200 transition-colors",
+                      isDripLocked && "opacity-50 cursor-not-allowed"
+                    )}>
+                    <HelpCircle className="w-5 h-5" />
+                    Responder Quiz
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="rounded-3xl sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Quiz: {story.title}</DialogTitle>
+                    <DialogDescription>
+                      Teste seus conhecimentos sobre esta história!
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="py-4">
+                    {loadingQuiz ? (
+                      <div className="flex justify-center p-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      </div>
+                    ) : quizQuestions.length === 0 ? (
+                      <div className="text-center p-4">
+                        <p className="text-muted-foreground">Nenhuma pergunta encontrada para esta história.</p>
+                        <Button onClick={() => setShowQuiz(false)} className="mt-4">Fechar</Button>
+                      </div>
+                    ) : quizCompleted ? (
+                      <div className="text-center space-y-4 py-6 animate-in zoom-in duration-500">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-20 rounded-full animate-pulse"></div>
+                          <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto shadow-xl relative z-10 animate-bounce">
+                            <Trophy className="w-12 h-12 text-white drop-shadow-md" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">
+                            PARABÉNS!
+                          </h3>
+                          <p className="text-lg font-medium text-muted-foreground">
+                            Você completou o desafio!
+                          </p>
+                        </div>
+
+                        <div className="bg-secondary/10 rounded-xl p-4 border border-secondary/20">
+                          <span className="block text-sm text-muted-foreground uppercase tracking-wider font-semibold">Sua Pontuação</span>
+                          <span className="block text-4xl font-black text-secondary mt-1">
+                            {score}/{quizQuestions.length}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>Questão {currentQuestionIndex + 1} de {quizQuestions.length}</span>
+                          <span>Pontos: {score}</span>
+                        </div>
+
+                        <p className="font-medium text-lg text-center">
+                          {quizQuestions[currentQuestionIndex].question}
+                        </p>
+
+                        <div className="grid gap-3">
+                          {quizQuestions[currentQuestionIndex].quiz_alternatives.map((alt: any) => (
+                            <Button
+                              key={alt.id}
+                              variant="outline"
+                              className="justify-start h-auto py-3 px-4 text-left whitespace-normal hover:bg-primary/5 hover:text-primary transition-colors"
+                              onClick={() => handleAnswer(alt.is_correct)}
+                            >
+                              {alt.text}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <button
+                onClick={handleFinish}
+                disabled={isDripLocked}
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 p-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-colors",
+                  isDripLocked && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <CheckCircle className="w-5 h-5" />
+                Terminei de Ler!
+              </button>
+            </div>
+
+          </div>
+        </ContentAccessGuard>
       </main>
 
       <DripLockModal

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, CheckCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, CheckCircle } from 'lucide-react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
 import { useState, useEffect } from 'react';
@@ -12,6 +12,8 @@ import { DripLockModal } from '@/components/DripLockModal';
 import { cn } from '@/lib/utils';
 import { VideoCard } from '@/components/VideoCard';
 import ReactPlayer from 'react-player';
+import { ContentAccessGuard } from '@/components/ContentAccessGuard';
+import { useProductAccess } from '@/hooks/useProductAccess';
 
 // Bypassing strict typing bug in react-player v3
 const Player = ReactPlayer as React.FC<any>;
@@ -50,6 +52,9 @@ export default function VideoDetail() {
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
     const [unlockDelayDays, setUnlockDelayDays] = useState(0);
     const [requiredMissionDay, setRequiredMissionDay] = useState(0);
+
+    // Product / trial access guard
+    const { isProductGated, hasAccess: hasProductAccess, loading: accessLoading } = useProductAccess(type, id ?? '');
 
     useEffect(() => {
         fetchVideoAndRecommendations();
@@ -182,43 +187,46 @@ export default function VideoDetail() {
 
                 {/* Video Player Area */}
                 <div className="w-full bg-black aspect-video relative flex items-center justify-center">
-                    {isDripLocked ? (
-                        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-4 text-center z-10">
-                            <p className="font-bold text-lg mb-2">Conteúdo Bloqueado</p>
-                            <p className="text-sm text-gray-300">Continue suas missões para desbloquear!</p>
-                        </div>
-                    ) : videoError ? (
-                        <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-4 text-center z-10 border border-slate-800">
-                            <p className="font-bold text-lg mb-2 text-white">Ops, vídeo indisponível 💔</p>
-                            <p className="text-sm">Parece que o link deste conteúdo saiu do ar ou está quebrado. Nossa equipe já foi notificada!</p>
-                        </div>
-                    ) : (
-                        video.video_url && (video.video_url.includes('mediadelivery.net') || video.video_url.includes('b-cdn.net') || video.video_url.includes('bunny.net')) ? (
-                            <iframe
-                                src={video.video_url}
-                                loading="lazy"
-                                style={{ border: 'none', position: 'absolute', top: 0, height: '100%', width: '100%' }}
-                                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                                allowFullScreen={true}
-                                onError={() => setVideoError(true)}
-                            ></iframe>
+                    {/* Content Access Guard — handles product gating and trial access */}
+                    <ContentAccessGuard contentType={type} contentId={id ?? ''}>
+                        {isDripLocked ? (
+                            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-4 text-center z-10">
+                                <p className="font-bold text-lg mb-2">Conteúdo Bloqueado</p>
+                                <p className="text-sm text-gray-300">Continue suas missões para desbloquear!</p>
+                            </div>
+                        ) : videoError ? (
+                            <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-4 text-center z-10 border border-slate-800">
+                                <p className="font-bold text-lg mb-2 text-white">Ops, vídeo indisponível 💔</p>
+                                <p className="text-sm">Parece que o link deste conteúdo saiu do ar ou está quebrado. Nossa equipe já foi notificada!</p>
+                            </div>
                         ) : (
-                            <Player
-                                url={video.video_url}
-                                width="100%"
-                                height="100%"
-                                controls={true}
-                                playing={false}
-                                onError={() => setVideoError(true)}
-                                config={{
-                                    youtube: {
-                                        origin: 'https://www.youtube.com'
-                                    }
-                                }}
-                                fallback={<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-500"></div>}
-                            />
-                        )
-                    )}
+                            video.video_url && (video.video_url.includes('mediadelivery.net') || video.video_url.includes('b-cdn.net') || video.video_url.includes('bunny.net')) ? (
+                                <iframe
+                                    src={video.video_url}
+                                    loading="lazy"
+                                    style={{ border: 'none', position: 'absolute', top: 0, height: '100%', width: '100%' }}
+                                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                                    allowFullScreen={true}
+                                    onError={() => setVideoError(true)}
+                                ></iframe>
+                            ) : (
+                                <Player
+                                    url={video.video_url}
+                                    width="100%"
+                                    height="100%"
+                                    controls={true}
+                                    playing={false}
+                                    onError={() => setVideoError(true)}
+                                    config={{
+                                        youtube: {
+                                            origin: 'https://www.youtube.com'
+                                        }
+                                    }}
+                                    fallback={<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-500"></div>}
+                                />
+                            )
+                        )}
+                    </ContentAccessGuard>
                 </div>
 
                 {/* Video Info Card */}
