@@ -6,29 +6,29 @@ export const config = {
     runtime: 'nodejs',
 };
 
-export default async function handler(request: Request) {
-    if (request.method !== 'POST') {
-        return new Response('Method not allowed', { status: 405 });
+export default async function handler(req: any, res: any) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email } = await request.json();
+    const email = req.body?.email;
 
     if (!email) {
-        return new Response('Email is required', { status: 400 });
+        return res.status(400).json({ error: 'Email is required' });
     }
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
-        return new Response('Server Configuration Error', { status: 500 });
+        return res.status(500).json({ error: 'Server Configuration Error' });
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     try {
         // Generate a magic link via admin API
-        let origin = new URL(request.url).origin;
+        let origin = req.headers.origin || 'https://www.meuamiguito.com.br';
         if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
             origin = 'https://www.meuamiguito.com.br';
         }
@@ -43,28 +43,19 @@ export default async function handler(request: Request) {
 
         if (linkError) {
             console.error('Error generating link:', linkError);
-            return new Response(JSON.stringify({ error: linkError.message }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return res.status(400).json({ error: linkError.message });
         }
 
         if (linkData?.properties?.action_link) {
             // Send the premium email via Resend
             await sendMagicLinkEmail(email, linkData.properties.action_link);
 
-            return new Response(JSON.stringify({ success: true }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return res.status(200).json({ success: true });
         }
 
-        return new Response('Internal error sending link', { status: 500 });
+        return res.status(500).json({ error: 'Internal error sending link' });
     } catch (error: any) {
         console.error('Login Link API Error:', error.message);
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return res.status(500).json({ error: error.message });
     }
 }
