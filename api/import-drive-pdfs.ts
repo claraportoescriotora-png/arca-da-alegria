@@ -130,12 +130,16 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
 
-    // 0. Security Check (Internal Secret)
-    const internalSecret = process.env.INTERNAL_API_SECRET;
-    const authHeader = req.headers['x-internal-secret'];
+    // 0. Security Check (Supabase Auth)
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ success: false, error: 'Unauthorized - Missing Token' });
+    }
+    const token = authHeader.split(' ')[1];
 
-    if (!internalSecret || authHeader !== internalSecret) {
-        return res.status(401).json({ success: false, error: 'Unauthorized - Invalid Internal Secret' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+        return res.status(401).json({ success: false, error: 'Unauthorized - Invalid Token' });
     }
 
     try {
