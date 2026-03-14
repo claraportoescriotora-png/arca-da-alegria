@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { sendMagicLinkEmail } from '../lib/resend';
+import { sendMagicLinkEmail } from '../lib/resend.js';
 
 export const config = {
     runtime: 'nodejs',
