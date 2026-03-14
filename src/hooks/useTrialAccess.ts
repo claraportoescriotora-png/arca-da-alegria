@@ -26,7 +26,7 @@ interface TrialAccess {
 let cachedConfig: TrialConfig | null = null;
 
 export function useTrialAccess(): TrialAccess {
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const [config, setConfig] = useState<TrialConfig | null>(cachedConfig);
     const [loading, setLoading] = useState(!cachedConfig);
 
@@ -71,6 +71,7 @@ export function useTrialAccess(): TrialAccess {
     const isTrial = isPending && !isActiveSubscription;
 
     const canAccess = (type: string, id: string): boolean => {
+        if (isAdmin) return true;
         if (isActiveSubscription) return true;
         if (!isTrial) return false;
         if (isTrialExpired) return false;

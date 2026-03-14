@@ -21,6 +21,7 @@ interface AuthContextType {
     session: Session | null;
     user: User | null;
     profile: Profile | null;
+    isAdmin: boolean;
     loading: boolean;
     signOut: () => Promise<void>;
 }
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -59,8 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(session?.user ?? null);
             if (session?.user) {
                 fetchProfile(session.user.id);
+                checkAdmin();
             } else {
                 setProfile(null);
+                setIsAdmin(false);
                 setLoading(false);
             }
         });
@@ -109,13 +113,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const checkAdmin = async () => {
+        try {
+            const { data, error } = await supabase.rpc('is_admin');
+            if (!error && data) {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+            }
+        } catch (error) {
+            console.error('Error checking admin state:', error);
+            setIsAdmin(false);
+        }
+    };
+
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) toast.error('Erro ao sair: ' + error.message);
     };
 
     return (
-        <AuthContext.Provider value={{ session, user, profile, loading, signOut }}>
+        <AuthContext.Provider value={{ session, user, profile, isAdmin, loading, signOut }}>
             {children}
         </AuthContext.Provider>
     );

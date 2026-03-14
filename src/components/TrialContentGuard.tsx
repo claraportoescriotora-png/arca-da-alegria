@@ -12,9 +12,14 @@ interface TrialContentGuardProps {
 }
 
 export function TrialContentGuard({ contentType, contentId, children, productTitle }: TrialContentGuardProps) {
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { isTrial, canAccess, isTrialExpired } = useTrialAccess();
     const navigate = useNavigate();
+
+    // Admins have full access
+    if (isAdmin) {
+        return <>{children}</>;
+    }
 
     // Active subscribers have full access
     if (profile?.subscription_status === 'active') {

@@ -43,7 +43,7 @@ interface ProductAccessResult {
 const cache = new Map<string, Omit<ProductAccessResult, 'loading'>>();
 
 export function useProductAccess(contentType: string, contentId: string): ProductAccessResult {
-    const { user, profile } = useAuth();
+    const { user, profile, isAdmin } = useAuth();
     const [loading, setLoading] = useState(true);
     const [result, setResult] = useState<Omit<ProductAccessResult, 'loading'>>({
         isProductGated: false,
@@ -57,7 +57,7 @@ export function useProductAccess(contentType: string, contentId: string): Produc
             return;
         }
 
-        const cacheKey = `${contentType}:${contentId}:${user?.id ?? 'anon'}`;
+        const cacheKey = `${contentType}:${contentId}:${user?.id ?? 'anon'}:${isAdmin}`;
         if (cache.has(cacheKey)) {
             setResult(cache.get(cacheKey)!);
             setLoading(false);
@@ -66,6 +66,15 @@ export function useProductAccess(contentType: string, contentId: string): Produc
 
         const check = async () => {
             setLoading(true);
+
+            // ─── ADMIN BYPASS ──────────────────────────────────────────────
+            if (isAdmin) {
+                const r = { isProductGated: false, hasAccess: true, product: null };
+                cache.set(cacheKey, r);
+                setResult(r);
+                setLoading(false);
+                return;
+            }
             try {
                 // 1. Find any product containing this content item
                 const { data: allProducts } = await supabase
@@ -149,7 +158,7 @@ export function useProductAccess(contentType: string, contentId: string): Produc
         };
 
         check();
-    }, [contentType, contentId, user?.id, profile?.subscription_status]);
+    }, [contentType, contentId, user?.id, profile?.subscription_status, isAdmin]);
 
     return { loading, ...result };
 }

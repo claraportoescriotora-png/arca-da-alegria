@@ -7,13 +7,18 @@ interface SubscriptionGuardProps {
 }
 
 const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
-    const { profile, loading } = useAuth();
+    const { profile, loading, isAdmin } = useAuth();
     const { isTrial, isTrialExpired, loading: trialLoading } = useTrialAccess();
 
     if (loading || trialLoading) {
         return <div className="min-h-screen flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>;
+    }
+
+    // Admins → full access everywhere
+    if (isAdmin) {
+        return <>{children}</>;
     }
 
     // Active subscribers → full access

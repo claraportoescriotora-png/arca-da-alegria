@@ -21,13 +21,16 @@ interface ContentAccessGuardProps {
 }
 
 export function ContentAccessGuard({ contentType, contentId, children }: ContentAccessGuardProps) {
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { isTrial, canAccess, isTrialExpired } = useTrialAccess();
     const { loading: productLoading, isProductGated, hasAccess: hasProductAccess, product } = useProductAccess(contentType, contentId);
     const navigate = useNavigate();
 
     // While checking product access, show nothing (or let children show loading)
     if (productLoading) return <>{children}</>;
+
+    // 0. ADMIN BYPASS — Admins see everything
+    if (isAdmin) return <>{children}</>;
 
     // 1. PRODUCT GATE — this content belongs to a specific product
     //    Even active subscribers must purchase the product
@@ -91,8 +94,8 @@ function LockedOverlay({ reason, productTitle, productPrice, productPaymentUrl, 
             <div className="relative z-10 flex flex-col items-center text-center gap-4 p-6 max-w-xs">
                 {/* Icon */}
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 ${reason === 'product'
-                        ? 'bg-amber-500/15 border-amber-500/40'
-                        : 'bg-blue-500/15 border-blue-500/40'
+                    ? 'bg-amber-500/15 border-amber-500/40'
+                    : 'bg-blue-500/15 border-blue-500/40'
                     }`}>
                     <Lock className={`w-7 h-7 ${reason === 'product' ? 'text-amber-400' : 'text-blue-400'}`} />
                 </div>
