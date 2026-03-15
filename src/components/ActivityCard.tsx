@@ -55,10 +55,10 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
 
     if (isLocked) {
       if (isPremiumLocked) {
-        if (product?.payment_url) {
-          window.open(product.payment_url, '_blank');
+        if (product?.id) {
+          navigate('/store', { state: { productId: product.id } });
         } else {
-          navigate('/paywall');
+          navigate('/store');
         }
       } else {
         setIsDripDialogOpen(true);
@@ -106,12 +106,12 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
             <button
               onClick={(e) => handleAction(e, 'download')}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-colors ${isPremiumLocked ? 'bg-amber-500 hover:bg-amber-600 text-white cursor-pointer' :
-                  isLocked ? 'bg-slate-200 text-slate-500 cursor-not-allowed' :
-                    'bg-primary text-primary-foreground hover:bg-primary/90'
+                isLocked ? 'bg-slate-200 text-slate-500 cursor-not-allowed' :
+                  'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
             >
               {isPremiumLocked ? <Lock className="w-4 h-4" /> : isLocked ? <Lock className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-              {isPremiumLocked ? (product?.price_label ? product.price_label : 'Comprar') : 'Baixar'}
+              {isPremiumLocked ? 'Ver Pacote Premium' : 'Baixar'}
             </button>
             <button
               onClick={(e) => handleAction(e, 'print')}

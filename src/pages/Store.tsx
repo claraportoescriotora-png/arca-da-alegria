@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { ShoppingCart, Check, Star, ExternalLink, Loader2, PackageOpen, X, PlayCircle, Trophy, BookOpen, Clock, Info } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { TrialBanner } from '@/components/TrialBanner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
 interface Product {
@@ -21,6 +21,7 @@ interface Product {
 export default function Store() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [products, setProducts] = useState<Product[]>([]);
     const [userProductIds, setUserProductIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
@@ -51,6 +52,18 @@ export default function Store() {
             setLoading(false);
         }
     };
+
+    // Auto-open product from navigation state if available
+    useEffect(() => {
+        if (products.length > 0 && location.state?.productId) {
+            const productToOpen = products.find(p => p.id === location.state.productId);
+            if (productToOpen) {
+                setSelectedProduct(productToOpen);
+                // Clear the state so it doesn't re-open on refresh
+                navigate('.', { replace: true, state: {} });
+            }
+        }
+    }, [products, location.state, navigate]);
 
     const handleBuy = (product: Product) => {
         if (!product.payment_url) {
@@ -87,8 +100,8 @@ export default function Store() {
                         <button
                             onClick={() => setActiveTab('novidades')}
                             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${activeTab === 'novidades'
-                                    ? 'bg-amber-500 text-white shadow'
-                                    : 'text-slate-400 hover:text-slate-200'
+                                ? 'bg-amber-500 text-white shadow'
+                                : 'text-slate-400 hover:text-slate-200'
                                 }`}
                         >
                             Novidades
@@ -96,8 +109,8 @@ export default function Store() {
                         <button
                             onClick={() => setActiveTab('seus_produtos')}
                             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${activeTab === 'seus_produtos'
-                                    ? 'bg-amber-500 text-white shadow'
-                                    : 'text-slate-400 hover:text-slate-200'
+                                ? 'bg-amber-500 text-white shadow'
+                                : 'text-slate-400 hover:text-slate-200'
                                 }`}
                         >
                             Acervo ({userProductIds.size})
@@ -128,8 +141,8 @@ export default function Store() {
                                     key={product.id}
                                     onClick={() => setSelectedProduct(product)}
                                     className={`relative flex flex-col rounded-2xl overflow-hidden border cursor-pointer group transition-all duration-300 ${owned
-                                            ? 'border-green-500/40 bg-gradient-to-b from-slate-800 to-green-900/10'
-                                            : 'border-white/10 bg-slate-800 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1'
+                                        ? 'border-green-500/40 bg-gradient-to-b from-slate-800 to-green-900/10'
+                                        : 'border-white/10 bg-slate-800 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1'
                                         }`}
                                 >
                                     {/* Cover Image */}
@@ -191,15 +204,15 @@ export default function Store() {
                         className="w-full max-w-md bg-slate-900 sm:rounded-3xl rounded-t-3xl border sm:border-slate-800 border-t-slate-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-5"
                     >
                         {/* Modal Header */}
-                        <div className="relative aspect-video flex-shrink-0 bg-slate-800 border-b border-slate-800">
+                        <div className="relative flex-shrink-0 bg-black border-b border-slate-800">
                             {selectedProduct.cover_url ? (
                                 <img
                                     src={selectedProduct.cover_url}
                                     alt={selectedProduct.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full max-h-[40vh] object-contain"
                                 />
                             ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-slate-600">
+                                <div className="w-full h-48 flex flex-col items-center justify-center text-slate-600">
                                     <ShoppingCart className="w-12 h-12 opacity-20" />
                                 </div>
                             )}
@@ -214,7 +227,7 @@ export default function Store() {
                         </div>
 
                         {/* Modal Content */}
-                        <div className="p-6 overflow-y-auto no-scrollbar pb-24 space-y-5">
+                        <div className="p-6 overflow-y-auto no-scrollbar space-y-6">
                             <div>
                                 <h2 className="font-fredoka text-2xl font-bold text-white mb-2 leading-tight">
                                     {selectedProduct.title}
@@ -237,29 +250,29 @@ export default function Store() {
                                     {selectedProduct.description || "Nenhuma descrição fornecida para este pacote."}
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Modal Footer / Purchase Bar */}
-                        <div className="absolute flex-shrink-0 bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-md border-t border-slate-800">
-                            {userProductIds.has(selectedProduct.id) ? (
-                                <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl font-bold">
-                                    <Check className="w-5 h-5" />
-                                    Conteúdo Desbloqueado
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => handleBuy(selectedProduct)}
-                                    className="w-full flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white rounded-xl font-bold transition-all active:scale-[0.98] shadow-lg shadow-amber-500/25 group"
-                                >
-                                    <div className="flex items-center gap-2 text-lg">
-                                        <ShoppingCart className="w-5 h-5" />
-                                        <span>Comprar Agora</span>
+                            {/* Purchase Action inside modal content */}
+                            <div className="pt-4 border-t border-slate-800/50 mt-4">
+                                {userProductIds.has(selectedProduct.id) ? (
+                                    <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl font-bold">
+                                        <Check className="w-5 h-5" />
+                                        Conteúdo Desbloqueado
                                     </div>
-                                    <div className="bg-white/20 px-3 py-1 rounded-lg border border-white/20 group-hover:bg-white/30 transition-colors">
-                                        {selectedProduct.price_label || 'Acessar'}
-                                    </div>
-                                </button>
-                            )}
+                                ) : (
+                                    <button
+                                        onClick={() => handleBuy(selectedProduct)}
+                                        className="w-full flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white rounded-xl font-bold transition-all active:scale-[0.98] shadow-lg shadow-amber-500/25 group"
+                                    >
+                                        <div className="flex items-center gap-2 text-lg">
+                                            <ShoppingCart className="w-5 h-5" />
+                                            <span>Comprar Agora</span>
+                                        </div>
+                                        <div className="bg-white/20 px-3 py-1 rounded-lg border border-white/20 group-hover:bg-white/30 transition-colors">
+                                            {selectedProduct.price_label || 'Acessar'}
+                                        </div>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

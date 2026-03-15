@@ -2,6 +2,7 @@ import { Play, Lock, Clock, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
+import { useProductAccess } from '@/hooks/useProductAccess';
 import { isContentLocked } from '@/lib/drip';
 import { DripLockModal } from '@/components/DripLockModal';
 import { cn } from '@/lib/utils';
@@ -34,14 +35,27 @@ export function VideoCard({
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
   const [isImageFinal, setIsImageFinal] = useState(false);
 
-  const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+  const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess(type, id);
+  const isPremiumLocked = isProductGated && !hasProductAccess;
+
+  const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
   });
 
+  const isLocked = isPremiumLocked || isDripLocked;
+
   const handlePlay = () => {
     if (isLocked) {
-      setIsDripDialogOpen(true);
+      if (isPremiumLocked) {
+        if (product?.id) {
+          navigate('/store', { state: { productId: product.id } });
+        } else {
+          navigate('/store');
+        }
+      } else {
+        setIsDripDialogOpen(true);
+      }
       return;
     }
     if (type === 'video') {
@@ -93,7 +107,11 @@ export function VideoCard({
 
             {isLocked && (
               <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center">
-                <Lock className="w-8 h-8 mb-2 opacity-80" />
+                {isPremiumLocked ? (
+                  <Lock className="w-8 h-8 mb-2 opacity-90 text-amber-400" />
+                ) : (
+                  <Lock className="w-8 h-8 mb-2 opacity-80" />
+                )}
               </div>
             )}
 
