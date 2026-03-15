@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
 import { useTrialAccess } from '@/hooks/useTrialAccess';
+import { TrialBanner } from '@/components/TrialBanner';
 
 interface SubscriptionGuardProps {
     children: React.ReactNode;
@@ -28,7 +29,14 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
 
     // Pending users within trial window → access with trial restrictions
     if (isTrial && !isTrialExpired) {
-        return <>{children}</>;
+        return (
+            <div className="flex flex-col min-h-screen">
+                <TrialBanner />
+                <div className="flex-1">
+                    {children}
+                </div>
+            </div>
+        );
     }
 
     // Canceled or expired trial → paywall

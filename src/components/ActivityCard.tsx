@@ -76,7 +76,7 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
   return (
     <>
       <div
-        className={`bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 ${isLocked ? 'grayscale opacity-80' : 'card-hover'}`}
+        className={`bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 ${!isPremiumLocked && isLocked ? 'grayscale opacity-80' : 'card-hover'}`}
         onClick={(e) => isLocked && handleAction(e, 'download')}
       >
         <div className="aspect-[4/3] overflow-hidden relative">

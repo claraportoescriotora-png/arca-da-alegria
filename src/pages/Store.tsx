@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
 import { ShoppingCart, Check, Star, ExternalLink, Loader2, PackageOpen, X, PlayCircle, Trophy, BookOpen, Clock, Info } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
-import { TrialBanner } from '@/components/TrialBanner';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -80,8 +79,6 @@ export default function Store() {
 
     return (
         <div className="min-h-screen bg-slate-900 pb-28 text-slate-100">
-            <TrialBanner />
-
             {/* Header */}
             <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-white/10 pt-safe">
                 <div className="container max-w-md mx-auto px-4 py-4">

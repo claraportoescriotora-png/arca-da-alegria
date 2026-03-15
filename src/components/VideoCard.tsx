@@ -77,7 +77,7 @@ export function VideoCard({
       <div
         className={cn(
           "group bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer border border-border/50",
-          isLocked && "grayscale"
+          !isPremiumLocked && isLocked && "grayscale"
         )}
         onClick={handlePlay}
       >

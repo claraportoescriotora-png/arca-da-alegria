@@ -2,6 +2,7 @@ import { Play, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
+import { useProductAccess } from '@/hooks/useProductAccess';
 import { isContentLocked } from '@/lib/drip';
 import { DripLockModal } from '@/components/DripLockModal';
 import { cn } from '@/lib/utils';
@@ -28,14 +29,27 @@ export function CoverCard({
     const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
     const [isImageFinal, setIsImageFinal] = useState(false);
 
-    const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+    const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess(type, id);
+    const isPremiumLocked = isProductGated && !hasProductAccess;
+
+    const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
         unlockDelayDays,
         requiredMissionDay
     });
 
+    const isLocked = isDripLocked || isPremiumLocked;
+
     const handlePlay = () => {
         if (isLocked) {
-            setIsDripDialogOpen(true);
+            if (isPremiumLocked) {
+                if (product?.id) {
+                    navigate('/store', { state: { productId: product.id } });
+                } else {
+                    navigate('/store');
+                }
+            } else {
+                setIsDripDialogOpen(true);
+            }
             return;
         }
 
@@ -58,7 +72,7 @@ export function CoverCard({
             <div
                 className={cn(
                     "group relative rounded-lg overflow-hidden shrink-0 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 w-[120px] sm:w-[140px]",
-                    isLocked && "grayscale"
+                    !isPremiumLocked && isLocked && "grayscale"
                 )}
                 onClick={handlePlay}
             >
@@ -87,7 +101,11 @@ export function CoverCard({
 
                     {isLocked && (
                         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center">
-                            <Lock className="w-6 h-6 mb-2 opacity-80" />
+                            {isPremiumLocked ? (
+                                <Lock className="w-6 h-6 mb-2 opacity-90 text-amber-400" />
+                            ) : (
+                                <Lock className="w-6 h-6 mb-2 opacity-80" />
+                            )}
                         </div>
                     )}
                 </div>
