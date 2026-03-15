@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images, Check } from "lucide-react";
+import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images, Check, Clock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useConfig } from "@/contexts/ConfigContext";
@@ -12,6 +12,8 @@ import { useConfig } from "@/contexts/ConfigContext";
 export function AdminSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [trialDays, setTrialDays] = useState<number>(7);
+    const [savingTrial, setSavingTrial] = useState(false);
     const { toast } = useToast();
     const [formData, setFormData] = useState({
         logo_url: '',
@@ -48,6 +50,14 @@ export function AdminSettings() {
             }
 
             setFormData(initialForm);
+
+            // Fetch trial config
+            const { data: trialData } = await supabase
+                .from('trial_config')
+                .select('trial_days')
+                .limit(1)
+                .single();
+            if (trialData?.trial_days) setTrialDays(trialData.trial_days);
         } catch (error: any) {
             console.error('Error fetching settings:', error);
             toast({ variant: "destructive", title: "Erro ao carregar configurações" });
@@ -101,6 +111,27 @@ export function AdminSettings() {
         }
     };
 
+    const handleSaveTrial = async () => {
+        const days = Number(trialDays);
+        if (isNaN(days) || days < 1 || days > 365) {
+            toast({ variant: 'destructive', title: 'Valor inválido', description: 'Digite um número entre 1 e 365.' });
+            return;
+        }
+        setSavingTrial(true);
+        try {
+            const { error } = await supabase
+                .from('trial_config')
+                .update({ trial_days: days })
+                .eq('id', 1);
+            if (error) throw error;
+            toast({ title: 'Dias de trial atualizados!' });
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Erro ao salvar', description: e.message });
+        } finally {
+            setSavingTrial(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[50vh]">
@@ -117,7 +148,44 @@ export function AdminSettings() {
             </div>
 
             <div className="space-y-8">
+                {/* Trial Config Section */}
+                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-amber-50/50">
+                        <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
+                            <Clock className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-slate-800">Período de Acesso Gratuito</h3>
+                            <p className="text-slate-500 text-sm">Configure quantos dias o usuário tem de trial grátis ao se cadastrar.</p>
+                        </div>
+                    </div>
+                    <div className="p-6 flex items-end gap-4">
+                        <div className="flex-1 max-w-xs">
+                            <Label htmlFor="trial_days" className="text-sm font-medium text-slate-700 mb-2 block">
+                                Dias de acesso gratuito
+                            </Label>
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    id="trial_days"
+                                    type="number"
+                                    min={1}
+                                    max={365}
+                                    value={trialDays}
+                                    onChange={(e) => setTrialDays(Number(e.target.value))}
+                                    className="w-28 text-center text-lg font-bold"
+                                />
+                                <span className="text-slate-500 text-sm">dias</span>
+                            </div>
+                        </div>
+                        <Button onClick={handleSaveTrial} disabled={savingTrial} className="bg-amber-500 hover:bg-amber-600 text-white">
+                            {savingTrial ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar
+                        </Button>
+                    </div>
+                </section>
+
                 {/* Branding Section */}
+
                 <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
                         <div className="p-2 bg-blue-100 rounded-lg text-blue-600">

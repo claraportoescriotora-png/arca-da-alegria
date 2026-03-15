@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
-import { differenceInDays, parseISO } from 'date-fns';
+import { parseISO, startOfDay, differenceInCalendarDays } from 'date-fns';
 
 export interface TrialContentItem {
     type: 'video' | 'movie' | 'story' | 'episode' | 'series' | 'game';
@@ -57,9 +57,10 @@ export function useTrialAccess(): TrialAccess {
     const isActiveSubscription = profile?.subscription_status === 'active';
     const isPending = profile?.subscription_status === 'pending';
 
-    // Calculate days since registration
+    // Calendar-day difference: counts how many calendar dates separate the two days,
+    // regardless of the exact time (so day 14 → day 15 = 1, even if < 24h elapsed)
     const daysSinceReg = profile?.created_at
-        ? differenceInDays(new Date(), parseISO(profile.created_at))
+        ? differenceInCalendarDays(startOfDay(new Date()), startOfDay(parseISO(profile.created_at)))
         : 0;
 
     const trialDaysTotal = config?.trial_days ?? 7;
