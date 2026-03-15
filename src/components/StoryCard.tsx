@@ -1,8 +1,9 @@
 import { Play, Heart, Lock } from 'lucide-react';
+import { useState } from 'react';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthProvider';
+import { useProductAccess } from '@/hooks/useProductAccess';
 import { isContentLocked } from '@/lib/drip';
 import { DripLockModal } from '@/components/DripLockModal';
 
@@ -23,18 +24,31 @@ export function StoryCard({
 }: StoryCardProps) {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { profile } = useAuth();
+  const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('story', id);
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
   const navigate = useNavigate();
   const favorite = isFavorite(id);
 
-  const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+  const isPremiumLocked = isProductGated && !hasProductAccess;
+
+  const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
   });
 
+  const isLocked = isDripLocked || isPremiumLocked;
+
   const handleClick = () => {
     if (isLocked) {
-      setIsDripDialogOpen(true);
+      if (isPremiumLocked) {
+        if (product?.id) {
+          navigate('/store', { state: { productId: product.id } });
+        } else {
+          navigate('/store');
+        }
+      } else {
+        setIsDripDialogOpen(true);
+      }
     } else {
       navigate(`/story/${id}`);
     }
@@ -43,7 +57,7 @@ export function StoryCard({
   return (
     <>
       <div
-        className={`relative bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 cursor-pointer group ${isLocked ? 'grayscale opacity-80' : 'card-hover'
+        className={`relative bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 cursor-pointer group ${!isPremiumLocked && isLocked ? 'grayscale opacity-80' : 'card-hover'
           }`}
         onClick={handleClick}
       >
@@ -56,7 +70,11 @@ export function StoryCard({
           {isLocked ? (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="bg-white/90 p-3 rounded-full shadow-lg">
-                <Lock className="w-6 h-6 text-slate-700" />
+                {isPremiumLocked ? (
+                  <Lock className="w-6 h-6 text-amber-500" />
+                ) : (
+                  <Lock className="w-6 h-6 text-slate-700" />
+                )}
               </div>
             </div>
           ) : (
@@ -74,8 +92,8 @@ export function StoryCard({
             toggleFavorite(id, 'story');
           }}
           className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 z-10 ${favorite
-              ? 'bg-danger text-danger-foreground'
-              : 'bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-danger'
+            ? 'bg-danger text-danger-foreground'
+            : 'bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-danger'
             }`}
         >
           <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} />

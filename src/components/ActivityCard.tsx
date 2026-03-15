@@ -71,7 +71,7 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
     } else {
       handlePrint();
     }
-  }, [isLocked, handleDownload, handlePrint]);
+  }, [isLocked, isPremiumLocked, product, navigate, handleDownload, handlePrint]);
 
   return (
     <>
