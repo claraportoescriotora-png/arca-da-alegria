@@ -2,6 +2,7 @@ import { Download, Printer, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
+import { useProductAccess } from '@/hooks/useProductAccess';
 import { isContentLocked } from '@/lib/drip';
 import { DripLockModal } from '@/components/DripLockModal';
 
@@ -20,11 +21,17 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
   const navigate = useNavigate();
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
 
-  // Check locking
-  const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+  // Check product gating
+  const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('activity', id);
+  const isPremiumLocked = isProductGated && !hasProductAccess;
+
+  // Check drip locking (only if not premium locked)
+  const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
   });
+
+  const isLocked = isPremiumLocked || isDripLocked;
 
   const handleDownload = useCallback(() => {
     if (!pdfUrl) return;
@@ -47,7 +54,15 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
     e.stopPropagation();
 
     if (isLocked) {
-      setIsDripDialogOpen(true);
+      if (isPremiumLocked) {
+        if (product?.payment_url) {
+          window.open(product.payment_url, '_blank');
+        } else {
+          navigate('/paywall');
+        }
+      } else {
+        setIsDripDialogOpen(true);
+      }
       return;
     }
 
@@ -62,7 +77,7 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
     <>
       <div
         className={`bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 ${isLocked ? 'grayscale opacity-80' : 'card-hover'}`}
-        onClick={() => isLocked && setIsDripDialogOpen(true)}
+        onClick={(e) => isLocked && handleAction(e, 'download')}
       >
         <div className="aspect-[4/3] overflow-hidden relative">
           <img
@@ -72,7 +87,11 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
           />
           {isLocked && (
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center">
-              <Lock className="w-8 h-8 mb-2 opacity-80" />
+              {isPremiumLocked ? (
+                <Lock className="w-8 h-8 mb-2 opacity-90 text-amber-400" />
+              ) : (
+                <Lock className="w-8 h-8 mb-2 opacity-80" />
+              )}
             </div>
           )}
         </div>
@@ -86,11 +105,13 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
           <div className="flex gap-2 mt-3">
             <button
               onClick={(e) => handleAction(e, 'download')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-colors ${isLocked ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-colors ${isPremiumLocked ? 'bg-amber-500 hover:bg-amber-600 text-white cursor-pointer' :
+                  isLocked ? 'bg-slate-200 text-slate-500 cursor-not-allowed' :
+                    'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
             >
-              {isLocked ? <Lock className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-              Baixar
+              {isPremiumLocked ? <Lock className="w-4 h-4" /> : isLocked ? <Lock className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+              {isPremiumLocked ? (product?.price_label ? product.price_label : 'Comprar') : 'Baixar'}
             </button>
             <button
               onClick={(e) => handleAction(e, 'print')}

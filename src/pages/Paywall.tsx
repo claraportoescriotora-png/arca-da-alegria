@@ -26,7 +26,7 @@ const Paywall = () => {
                         <Lock className="w-10 h-10 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl font-bold text-blue-900">
-                        Acesso Exclusivo Daniel Kids
+                        Acesso Exclusivo Meu Amiguito
                     </CardTitle>
                     <CardDescription className="text-blue-700 text-lg">
                         Desbloqueie a jornada completa!
@@ -88,7 +88,7 @@ const Paywall = () => {
 
                 </CardFooter>
             </Card>
-        </div>
+        </div >
     );
 };
 
