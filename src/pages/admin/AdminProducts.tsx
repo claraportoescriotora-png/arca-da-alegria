@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-    Loader2, Plus, Trash2, Save, Edit2, ExternalLink,
-    ShoppingCart, X, Check, Package, Users, Link, Copy, Info, Shield
+    Loader2, Plus, Trash2, Save, ExternalLink,
+    ShoppingCart, X, Check, Package, Users, Search, Link, Copy, Info, Shield
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -67,9 +67,11 @@ function ProductForm({
     const [selectedType, setSelectedType] = useState<string>('video');
     const [contentList, setContentList] = useState<ContentItem[]>([]);
     const [loadingContent, setLoadingContent] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchContentByType(selectedType);
+        setSearchQuery('');
     }, [selectedType]);
 
     const fetchContentByType = async (type: string) => {
@@ -79,7 +81,7 @@ function ProductForm({
         const { data } = await supabase
             .from(typeDef.table)
             .select('id, title')
-            .limit(100);
+            .order('created_at', { ascending: false }); // Fetch all items, no limit, to allow correct searching
         setContentList((data || []).map((item: any) => ({ type: type as any, id: item.id, title: item.title })));
         setLoadingContent(false);
     };
@@ -165,45 +167,88 @@ function ProductForm({
 
                     {/* Content selector */}
                     <div className="border border-slate-200 rounded-xl overflow-hidden">
-                        <div className="p-4 bg-slate-50 border-b border-slate-200">
-                            <h3 className="font-semibold text-slate-700 mb-3">Conteúdos do Pacote ({form.content.length} selecionados)</h3>
-                            <div className="flex gap-2 flex-wrap">
-                                {CONTENT_TYPES.map((t) => (
-                                    <button
-                                        key={t.value}
-                                        onClick={() => setSelectedType(t.value)}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${selectedType === t.value ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                                    >
-                                        {t.label}
-                                    </button>
-                                ))}
+                        <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-4">
+                            <h3 className="font-semibold text-slate-700">Conteúdos do Pacote ({form.content.filter(c => c.type === selectedType).length} selecionados nesta categoria)</h3>
+
+                            {/* Tabs and Search */}
+                            <div className="flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center">
+                                <div className="flex gap-2 flex-wrap flex-1">
+                                    {CONTENT_TYPES.map((t) => (
+                                        <button
+                                            key={t.value}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setSelectedType(t.value);
+                                            }}
+                                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${selectedType === t.value ? 'bg-blue-600 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                                        >
+                                            {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="relative w-full xl:w-64 flex-shrink-0">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        placeholder="Buscar conteúdo..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-9 h-9 bg-white"
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className="p-3 max-h-52 overflow-y-auto space-y-1">
+                        <div className="p-3 max-h-72 overflow-y-auto space-y-1 bg-white">
                             {loadingContent ? (
-                                <div className="flex items-center justify-center py-6">
-                                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                <div className="flex flex-col justify-center items-center py-10 text-slate-400">
+                                    <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
+                                    <span className="text-sm">Carregando conteúdos...</span>
                                 </div>
-                            ) : contentList.length === 0 ? (
-                                <p className="text-center text-slate-400 text-sm py-4">Nenhum conteúdo encontrado</p>
-                            ) : (
-                                contentList.map((item) => {
-                                    const selected = form.content.some((c) => c.id === item.id && c.type === item.type);
+                            ) : (() => {
+                                const filteredList = contentList.filter(item =>
+                                    (item.title || item.id).toLowerCase().includes(searchQuery.toLowerCase())
+                                );
+
+                                if (filteredList.length === 0) {
                                     return (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => toggleContent(item)}
-                                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm transition-all ${selected ? 'bg-blue-50 text-blue-800 font-medium' : 'hover:bg-slate-50 text-slate-700'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${selected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
-                                                {selected && <Check className="w-2.5 h-2.5 text-white" />}
-                                            </div>
-                                            <span className="truncate">{item.title || item.id}</span>
-                                        </button>
+                                        <div className="text-center py-8">
+                                            <p className="text-slate-500 font-medium">Nenhum conteúdo encontrado</p>
+                                            {searchQuery && <p className="text-sm text-slate-400 mt-1">Tente buscar com outros termos.</p>}
+                                        </div>
                                     );
-                                })
-                            )}
+                                }
+
+                                return (
+                                    <>
+                                        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-2">
+                                            Mostrando {filteredList.length} itens encontrados
+                                        </div>
+                                        {filteredList.map((item) => {
+                                            const selected = form.content.some((c) => c.id === item.id && c.type === item.type);
+                                            return (
+                                                <button
+                                                    key={item.id}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        toggleContent(item);
+                                                    }}
+                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-all border ${selected ? 'bg-blue-50 border-blue-200 text-blue-900 font-medium shadow-sm' : 'border-transparent hover:bg-slate-50 hover:border-slate-200 text-slate-700'}`}
+                                                >
+                                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'}`}>
+                                                        {selected && <Check className="w-3 h-3 text-white" />}
+                                                    </div>
+                                                    <span className="truncate flex-1">{item.title || item.id}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </>
+                                );
+                            })()}
                         </div>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center text-sm mt-4">
+                        <span className="text-slate-500 font-medium">Total Geral Selecionado:</span>
+                        <span className="text-blue-600 font-bold bg-blue-100 px-3 py-1 rounded-full">{form.content.length} itens</span>
                     </div>
 
                     {/* Access type toggle */}
