@@ -7,15 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useConfig } from "@/contexts/ConfigContext";
 
-const TRIAL_CONTENT_TYPES = [
-    { value: 'video', label: 'Vídeos', table: 'videos' },
-    { value: 'movie', label: 'Filmes', table: 'movies' },
-    { value: 'story', label: 'Histórias', table: 'stories' },
-    { value: 'episode', label: 'Episódios', table: 'episodes' },
-    { value: 'game', label: 'Jogos', table: 'games' },
-    { value: 'activity', label: 'Tarefas (Imprimir)', table: 'activities' },
-    { value: 'mission_pack', label: 'Missões', table: 'mission_packs' },
-];
+
 
 export function AdminSettings() {
     const [loading, setLoading] = useState(true);
@@ -29,10 +21,6 @@ export function AdminSettings() {
 
     // Trial config state
     const [trialDays, setTrialDays] = useState(7);
-    const [trialContent, setTrialContent] = useState<{ type: string; id: string }[]>([]);
-    const [trialTab, setTrialTab] = useState('video');
-    const [trialContentList, setTrialContentList] = useState<{ id: string; title: string }[]>([]);
-    const [loadingTrialContent, setLoadingTrialContent] = useState(false);
     const [savingTrial, setSavingTrial] = useState(false);
 
     useEffect(() => {
@@ -44,45 +32,24 @@ export function AdminSettings() {
         try {
             const { data } = await supabase
                 .from('trial_config')
-                .select('trial_days, trial_content')
+                .select('trial_days')
                 .limit(1)
                 .single();
             if (data) {
                 setTrialDays(data.trial_days);
-                setTrialContent(Array.isArray(data.trial_content) ? data.trial_content : []);
             }
         } catch (e) {
             console.error(e);
         }
     };
 
-    const fetchTrialContentList = async (type: string) => {
-        const def = TRIAL_CONTENT_TYPES.find(t => t.value === type);
-        if (!def) return;
-        setLoadingTrialContent(true);
-        const { data } = await supabase.from(def.table).select('id, title').limit(100);
-        setTrialContentList(data || []);
-        setLoadingTrialContent(false);
-    };
 
-    useEffect(() => {
-        fetchTrialContentList(trialTab);
-    }, [trialTab]);
-
-    const toggleTrialContent = (id: string, type: string) => {
-        const exists = trialContent.some(c => c.id === id && c.type === type);
-        if (exists) {
-            setTrialContent(trialContent.filter(c => !(c.id === id && c.type === type)));
-        } else {
-            setTrialContent([...trialContent, { type, id }]);
-        }
-    };
 
     const handleSaveTrial = async () => {
         setSavingTrial(true);
         try {
             await supabase.from('trial_config').upsert(
-                { id: 1, trial_days: trialDays, trial_content: trialContent, updated_at: new Date().toISOString() },
+                { id: 1, trial_days: trialDays, updated_at: new Date().toISOString() },
                 { onConflict: 'id' }
             );
             toast({ title: 'Configuração de trial salva!' });
@@ -378,49 +345,7 @@ export function AdminSettings() {
                             <p className="text-xs text-slate-400">Defina 0 para desativar o acesso trial.</p>
                         </div>
 
-                        <div className="space-y-3">
-                            <Label className="text-base font-semibold text-slate-700">Conteúdos liberados no trial ({trialContent.length} selecionados)</Label>
-                            <div className="flex gap-2 flex-wrap">
-                                {TRIAL_CONTENT_TYPES.map(t => (
-                                    <button
-                                        key={t.value}
-                                        onClick={() => setTrialTab(t.value)}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${trialTab === t.value
-                                            ? 'bg-amber-500 text-white'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                            }`}
-                                    >
-                                        {t.label}
-                                    </button>
-                                ))}
-                            </div>
 
-                            <div className="border border-slate-200 rounded-xl max-h-64 overflow-y-auto">
-                                {loadingTrialContent ? (
-                                    <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-amber-500" /></div>
-                                ) : trialContentList.length === 0 ? (
-                                    <p className="text-center text-slate-400 text-sm py-6">Nenhum conteúdo deste tipo encontrado.</p>
-                                ) : (
-                                    trialContentList.map(item => {
-                                        const selected = trialContent.some(c => c.id === item.id && c.type === trialTab);
-                                        return (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => toggleTrialContent(item.id, trialTab)}
-                                                className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm border-b border-slate-100 last:border-0 transition-colors ${selected ? 'bg-amber-50 text-amber-800' : 'hover:bg-slate-50 text-slate-700'
-                                                    }`}
-                                            >
-                                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${selected ? 'bg-amber-500 border-amber-500' : 'border-slate-300'
-                                                    }`}>
-                                                    {selected && <Check className="w-2.5 h-2.5 text-white" />}
-                                                </div>
-                                                <span className="truncate">{item.title}</span>
-                                            </button>
-                                        );
-                                    })
-                                )}
-                            </div>
-                        </div>
                     </div>
 
                     <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">

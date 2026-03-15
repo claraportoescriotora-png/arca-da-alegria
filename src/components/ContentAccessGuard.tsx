@@ -52,7 +52,7 @@ export function ContentAccessGuard({ contentType, contentId, children }: Content
     }
 
     // 3. TRIAL GATE — non-paying user, check if this content is in their trial
-    if (isTrial && !isTrialExpired && canAccess(contentType, contentId)) {
+    if (isTrial && !isTrialExpired && canAccess()) {
         return <>{children}</>;
     }
 

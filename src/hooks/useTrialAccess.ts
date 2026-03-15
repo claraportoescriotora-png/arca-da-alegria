@@ -10,7 +10,6 @@ export interface TrialContentItem {
 
 interface TrialConfig {
     trial_days: number;
-    trial_content: TrialContentItem[];
 }
 
 interface TrialAccess {
@@ -18,8 +17,7 @@ interface TrialAccess {
     trialDaysLeft: number;
     trialDaysTotal: number;
     isTrialExpired: boolean;
-    canAccess: (type: string, id: string) => boolean;
-    trialContent: TrialContentItem[];
+    canAccess: () => boolean;
     loading: boolean;
 }
 
@@ -42,7 +40,6 @@ export function useTrialAccess(): TrialAccess {
                 if (data) {
                     const cfg: TrialConfig = {
                         trial_days: data.trial_days,
-                        trial_content: Array.isArray(data.trial_content) ? data.trial_content : [],
                     };
                     cachedConfig = cfg;
                     setConfig(cfg);
@@ -70,14 +67,12 @@ export function useTrialAccess(): TrialAccess {
     const isTrialExpired = daysSinceReg >= trialDaysTotal;
     const isTrial = isPending && !isActiveSubscription;
 
-    const canAccess = (type: string, id: string): boolean => {
+    const canAccess = (): boolean => {
         if (isAdmin) return true;
         if (isActiveSubscription) return true;
         if (!isTrial) return false;
         if (isTrialExpired) return false;
-        // Check if this specific content is in the trial list
-        const trialContent = config?.trial_content ?? [];
-        return trialContent.some((item) => item.type === type && item.id === id);
+        return true;
     };
 
     return {
@@ -86,7 +81,6 @@ export function useTrialAccess(): TrialAccess {
         trialDaysTotal,
         isTrialExpired,
         canAccess,
-        trialContent: config?.trial_content ?? [],
         loading,
     };
 }

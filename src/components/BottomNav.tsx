@@ -1,12 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Trophy, BookOpen, PlayCircle, ShoppingCart, Gamepad2 } from "lucide-react";
+import { Home, Trophy, BookOpen, PlayCircle, ShoppingCart } from "lucide-react";
 
 const navItems = [
   { path: "/home", icon: Home, label: "Início" },
   { path: "/missions", icon: Trophy, label: "Missões" },
   { path: "/stories", icon: BookOpen, label: "Histórias" },
   { path: "/videos", icon: PlayCircle, label: "Vídeos" },
-  { path: "/games", icon: Gamepad2, label: "Jogos" },
   { path: "/store", icon: ShoppingCart, label: "Loja" },
 ];
 
@@ -14,10 +13,10 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
+    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <nav
         aria-label="Navegação principal"
-        className="w-full max-w-md h-16 bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.2)] rounded-[2rem] flex items-center justify-between px-2 overflow-x-auto no-scrollbar pointer-events-auto"
+        className="w-[95%] max-w-md h-16 bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.2)] rounded-[2rem] flex items-center justify-around px-2 pointer-events-auto"
       >
         {navItems.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname === path;
@@ -28,7 +27,7 @@ export function BottomNav() {
               to={path}
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
-              className={`relative flex flex-col items-center justify-center min-w-[64px] flex-1 py-1 transition-all duration-300 ${isActive
+              className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 ${isActive
                 ? "text-primary scale-110 -translate-y-1"
                 : "text-muted-foreground hover:text-primary active:scale-95"
                 }`}

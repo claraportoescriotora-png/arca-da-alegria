@@ -27,7 +27,7 @@ export function TrialContentGuard({ contentType, contentId, children, productTit
     }
 
     // Trial user: check if this specific content is allowed
-    if (isTrial && !isTrialExpired && canAccess(contentType, contentId)) {
+    if (isTrial && !isTrialExpired && canAccess()) {
         return <>{children}</>;
     }
 
