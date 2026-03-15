@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images, Clock, Check } from "lucide-react";
+import { Loader2, Save, Image as ImageIcon, Plus, Trash2, Link as LinkIcon, Images, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useConfig } from "@/contexts/ConfigContext";
@@ -19,46 +19,7 @@ export function AdminSettings() {
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
-    // Trial config state
-    const [trialDays, setTrialDays] = useState(7);
-    const [savingTrial, setSavingTrial] = useState(false);
 
-    useEffect(() => {
-        fetchConfigs();
-        fetchTrialConfig();
-    }, []);
-
-    const fetchTrialConfig = async () => {
-        try {
-            const { data } = await supabase
-                .from('trial_config')
-                .select('trial_days')
-                .limit(1)
-                .single();
-            if (data) {
-                setTrialDays(data.trial_days);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-
-
-    const handleSaveTrial = async () => {
-        setSavingTrial(true);
-        try {
-            await supabase.from('trial_config').upsert(
-                { id: 1, trial_days: trialDays, updated_at: new Date().toISOString() },
-                { onConflict: 'id' }
-            );
-            toast({ title: 'Configuração de trial salva!' });
-        } catch (e: any) {
-            toast({ variant: 'destructive', title: 'Erro ao salvar trial', description: e.message });
-        } finally {
-            setSavingTrial(false);
-        }
-    };
 
     const fetchConfigs = async () => {
         setLoading(true);
@@ -319,42 +280,7 @@ export function AdminSettings() {
                     </div>
                 </section>
 
-                {/* Trial Config Section */}
-                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-                        <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
-                            <Clock className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-lg text-slate-800">Trial Gratuito</h3>
-                            <p className="text-sm text-slate-500">Configure o período e os conteúdos do acesso gratuito.</p>
-                        </div>
-                    </div>
 
-                    <div className="p-6 space-y-6">
-                        <div className="space-y-2">
-                            <Label className="text-base font-semibold text-slate-700">Duração do trial (dias)</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                max={365}
-                                value={trialDays}
-                                onChange={e => setTrialDays(Number(e.target.value))}
-                                className="w-32"
-                            />
-                            <p className="text-xs text-slate-400">Defina 0 para desativar o acesso trial.</p>
-                        </div>
-
-
-                    </div>
-
-                    <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <Button onClick={handleSaveTrial} disabled={savingTrial} className="bg-amber-500 hover:bg-amber-600 text-white min-w-32">
-                            {savingTrial ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                            Salvar Trial
-                        </Button>
-                    </div>
-                </section>
             </div>
         </div>
     );
