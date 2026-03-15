@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Lock, Clock, Trophy, Calendar, ArrowRight, Star, ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Pagination } from '@/components/Pagination';
+import { useProductAccess } from '@/hooks/useProductAccess';
+import { DripLockModal } from '@/components/DripLockModal';
+import { toast } from 'sonner';
 
 interface MissionPack {
     id: string;
@@ -18,6 +21,131 @@ interface MissionPack {
     cover_url: string;
     total_days: number;
     unlock_delay_days: number;
+}
+
+function MissionItem({
+    pack,
+    profile,
+    isEnrolled,
+    hasOtherActiveMission,
+}: {
+    pack: MissionPack;
+    profile: any;
+    isEnrolled: boolean;
+    hasOtherActiveMission: boolean;
+}) {
+    const navigate = useNavigate();
+    const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('mission_pack', pack.id);
+    const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
+
+    const isPremiumLocked = isProductGated && !hasProductAccess;
+    const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
+        unlockDelayDays: pack.unlock_delay_days
+    });
+
+    const isLocked = isDripLocked || isPremiumLocked;
+
+    const handleClick = () => {
+        if (isPremiumLocked) {
+            if (product?.id) {
+                navigate('/store', { state: { productId: product.id } });
+            } else {
+                navigate('/store');
+            }
+            return;
+        }
+
+        if (isDripLocked) {
+            setIsDripDialogOpen(true);
+            return;
+        }
+
+        navigate(`/missions/${pack.id}`);
+    };
+
+    return (
+        <>
+            <div
+                onClick={handleClick}
+                className={cn(
+                    "group bg-card transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
+                    isEnrolled ? "border-primary/50 bg-primary/5" : "border-border",
+                    !isPremiumLocked && isLocked && "grayscale opacity-80"
+                )}
+            >
+                <div className="flex gap-4">
+                    <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 relative">
+                        <img
+                            src={pack.cover_url || 'https://images.unsplash.com/photo-1615714652285-d72b2576dd20?w=200'}
+                            alt={pack.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        {isEnrolled && (
+                            <div className="absolute bottom-0 w-full bg-green-500/90 text-white text-[10px] font-bold text-center py-0.5">
+                                ATIVO
+                            </div>
+                        )}
+                        {isLocked && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <div className="bg-white/90 p-2 rounded-full shadow-lg">
+                                    {isPremiumLocked ? (
+                                        <Lock className="w-5 h-5 text-amber-500" />
+                                    ) : (
+                                        <Lock className="w-5 h-5 text-slate-700" />
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-lg text-foreground mb-1 truncate">{pack.title}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                            {pack.description}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
+                            <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md">
+                                <Calendar className="w-3 h-3" />
+                                {pack.total_days} Dias
+                            </span>
+                            {isPremiumLocked && (
+                                <span className="flex items-center gap-1 text-amber-600 bg-amber-500/10 px-2 py-1 rounded-md">
+                                    <Star className="w-3 h-3 fill-current" />
+                                    Premium
+                                </span>
+                            )}
+                            {isDripLocked && (
+                                <span className="flex items-center gap-1 text-orange-600 bg-orange-500/10 px-2 py-1 rounded-md">
+                                    <Clock className="w-3 h-3" />
+                                    Libera em {daysRemaining}d
+                                </span>
+                            )}
+                            {hasOtherActiveMission && !isEnrolled && (
+                                <span className="flex items-center gap-1 text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                                    Outra Missão em Andamento
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="self-center">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            {isLocked ? (
+                                <Lock className={cn("w-4 h-4", isPremiumLocked ? "text-amber-500" : "text-slate-500")} />
+                            ) : (
+                                <ArrowRight className="w-4 h-4" />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <DripLockModal
+                isOpen={isDripDialogOpen}
+                onOpenChange={setIsDripDialogOpen}
+                daysRemaining={daysRemaining}
+                unlockDelayDays={pack.unlock_delay_days}
+            />
+        </>
+    );
 }
 
 export default function Missions() {
@@ -111,113 +239,20 @@ export default function Missions() {
                         <>
                             {packs.map(pack => {
                                 const isEnrolled = enrolledPackIds.has(pack.id);
-                                const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
-                                    unlockDelayDays: pack.unlock_delay_days
-                                });
+                                const hasOtherActiveMission = enrolledPackIds.size > 0 && !isEnrolled;
 
                                 return (
-                                    <div
+                                    <MissionItem
                                         key={pack.id}
-                                        onClick={() => {
-                                            if (isLocked) {
-                                                setSelectedLockedPack(pack);
-                                                setIsDripDialogOpen(true);
-                                            } else {
-                                                navigate(`/missions/${pack.id}`);
-                                            }
-                                        }}
-                                        className={cn(
-                                            "group bg-card transition-all duration-300 rounded-2xl p-4 border shadow-sm cursor-pointer active:scale-95",
-                                            isEnrolled ? "border-primary/50 bg-primary/5" : "border-border",
-                                            isLocked && "grayscale opacity-80"
-                                        )}
-                                    >
-                                        <div className="flex gap-4">
-                                            <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 relative">
-                                                <img
-                                                    src={pack.cover_url || 'https://images.unsplash.com/photo-1615714652285-d72b2576dd20?w=200'}
-                                                    alt={pack.title}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                />
-                                                {isEnrolled && (
-                                                    <div className="absolute bottom-0 w-full bg-green-500/90 text-white text-[10px] font-bold text-center py-0.5">
-                                                        ATIVO
-                                                    </div>
-                                                )}
-                                                {isLocked && (
-                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                                        <Lock className="w-6 h-6 text-white" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-lg text-foreground mb-1 truncate">{pack.title}</h3>
-                                                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                                    {pack.description}
-                                                </p>
-                                                <div className="flex items-center gap-3 text-xs font-medium">
-                                                    <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md">
-                                                        <Calendar className="w-3 h-3" />
-                                                        {pack.total_days} Dias
-                                                    </span>
-                                                    {isLocked ? (
-                                                        <span className="flex items-center gap-1 text-orange-600 bg-orange-500/10 px-2 py-1 rounded-md">
-                                                            <Clock className="w-3 h-3" />
-                                                            Libera em {daysRemaining}d
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center gap-1 text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-md">
-                                                            <Star className="w-3 h-3 fill-current" />
-                                                            Premium
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="self-center">
-                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                                    {isLocked ? <Lock className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        pack={pack}
+                                        profile={profile}
+                                        isEnrolled={isEnrolled}
+                                        hasOtherActiveMission={hasOtherActiveMission}
+                                    />
                                 );
                             })}
 
-                            {/* Drip Locked Info Modal */}
-                            <Dialog open={isDripDialogOpen} onOpenChange={setIsDripDialogOpen}>
-                                <DialogContent className="sm:max-w-md bg-white border-none rounded-3xl overflow-hidden p-0">
-                                    <div className="bg-primary/10 p-8 flex flex-col items-center text-center">
-                                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-                                            <Lock className="w-10 h-10 text-primary" />
-                                        </div>
-                                        <DialogTitle className="font-fredoka text-2xl text-slate-800">Caminho Bloqueado!</DialogTitle>
-                                        <DialogDescription className="text-slate-600 mt-2">
-                                            Esta jornada "{selectedLockedPack?.title}" será liberada em breve para você!
-                                        </DialogDescription>
-                                    </div>
 
-                                    <div className="p-6 space-y-4">
-                                        <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl text-blue-700">
-                                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                                                <Clock className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-sm">Tempo de Preparação</p>
-                                                <p className="text-xs opacity-80">
-                                                    O conteúdo está sendo preparado. Continue entrando todos os dias para desbloquear!
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <Button
-                                            className="w-full h-12 rounded-full font-bold text-lg"
-                                            onClick={() => setIsDripDialogOpen(false)}
-                                        >
-                                            Entendi
-                                        </Button>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
 
                             {packs.length === 0 && (
                                 <div className="text-center py-12 bg-card rounded-3xl border border-dashed border-border">

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { format, addDays, isAfter, setHours, setMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { isContentLocked } from '@/lib/drip';
+import { useProductAccess } from '@/hooks/useProductAccess';
 import { DripLockModal } from '@/components/DripLockModal';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,9 @@ export default function MissionDetail() {
     const [days, setDays] = useState<MissionDay[]>([]);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const { isProductGated, hasAccess: hasProductAccess, product: gatedProduct } = useProductAccess('mission_pack', id || '');
+    const isPremiumLocked = isProductGated && !hasProductAccess;
 
     const [isDripLocked, setIsDripLocked] = useState(false);
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
@@ -244,6 +248,16 @@ export default function MissionDetail() {
 
     const handleStartMission = async () => {
         if (!profile || !id) return;
+
+        if (isPremiumLocked) {
+            if (gatedProduct?.id) {
+                navigate('/store', { state: { productId: gatedProduct.id } });
+            } else {
+                navigate('/store');
+            }
+            return;
+        }
+
         try {
             const { error } = await supabase
                 .from('user_mission_enrollments')
@@ -375,19 +389,30 @@ export default function MissionDetail() {
                     {!enrolledAt ? (
                         <button
                             onClick={handleStartMission}
-                            disabled={isDripLocked || hasOtherActiveMission}
+                            disabled={(isDripLocked && !isPremiumLocked) || hasOtherActiveMission}
                             className={cn(
                                 "text-white px-8 py-3 rounded-xl font-bold flex flex-col items-center justify-center gap-1 shadow-lg transition w-full md:w-fit mx-auto",
-                                isDripLocked || hasOtherActiveMission
-                                    ? "bg-slate-600 opacity-70 cursor-not-allowed hover:bg-slate-600 hover:scale-100"
-                                    : "bg-green-500 hover:bg-green-600 hover:scale-105"
+                                isPremiumLocked
+                                    ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:scale-105"
+                                    : (isDripLocked || hasOtherActiveMission)
+                                        ? "bg-slate-600 opacity-70 cursor-not-allowed hover:bg-slate-600 hover:scale-100"
+                                        : "bg-green-500 hover:bg-green-600 hover:scale-105"
                             )}
                         >
                             <span className="flex items-center gap-2">
-                                <Play className="fill-current w-5 h-5" />
-                                {isDripLocked ? "Aguardando Liberação" : hasOtherActiveMission ? "Outra Missão em Andamento " : "Iniciar Missão Agora"}
+                                {isPremiumLocked ? (
+                                    <>
+                                        <Star className="fill-current w-5 h-5 text-white" />
+                                        Ver Pacote Premium
+                                    </>
+                                ) : (
+                                    <>
+                                        <Play className="fill-current w-5 h-5" />
+                                        {isDripLocked ? "Aguardando Liberação" : hasOtherActiveMission ? "Outra Missão em Andamento " : "Iniciar Missão Agora"}
+                                    </>
+                                )}
                             </span>
-                            {hasOtherActiveMission && (
+                            {hasOtherActiveMission && !isPremiumLocked && (
                                 <span className="text-[10px] uppercase tracking-wider font-semibold opacity-80">(Complete-a primeiro)</span>
                             )}
                         </button>
