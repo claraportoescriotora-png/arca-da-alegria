@@ -105,29 +105,23 @@ export default async function handler(req: any, res: any) {
         }
 
         // Bypass / Security Check
-        const bypassKey = req.headers['x-test-bypass'];
+        const bypassKey = req.headers['x-test-bypass'] || req.headers['X-TEST-BYPASS'];
         const urlToken = req.query?.token;
         const productKey = req.query?.p || payload.key;
 
-        // Fetch valid URL token from database (extra protection layer)
-        const { data: tokenConfig } = await supabase
-            .from('app_config')
-            .select('value')
-            .eq('key', 'webhook_token')
-            .maybeSingle();
-
-        const validUrlToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN;
-        const isUrlTokenValid = (urlToken === validUrlToken);
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
         if (!isBypass) {
-            // First check the URL protection token
-            if (!isUrlTokenValid) {
-                console.warn(`Webhook blocked: Invalid URL token (${urlToken})`);
-                return res.status(401).json({ error: 'Unauthorized URL Token' });
-            }
+            // 1. Fetch valid URL token from database (extra protection layer)
+            const { data: tokenConfig } = await supabase
+                .from('app_config')
+                .select('value')
+                .eq('key', 'webhook_token')
+                .maybeSingle();
 
-            // Determine which Signature Secret to use
+            const globalUrlToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN;
+
+            // 2. Determine which Signature Secret to use
             let targetSecret = signatureSecret; // Default fallback to env var
 
             if (productKey) {
@@ -153,15 +147,26 @@ export default async function handler(req: any, res: any) {
                 }
             }
 
-            // Verify Kiwify Signature
+            // 3. Validate URL token
+            // Kiwify often uses the same value for URL Token and Secret. We accept either.
+            const isUrlTokenValid = (urlToken && (urlToken === globalUrlToken || urlToken === targetSecret));
+
+            // First check the URL protection token
+            if (!isUrlTokenValid) {
+                console.warn(`Webhook blocked: Unauthorized URL Token (${urlToken}). Global expected: ${globalUrlToken}, Product secret expected: ${targetSecret?.slice(-4)}`);
+                return res.status(401).json({ error: 'Unauthorized URL Token' });
+            }
+
+            // 4. Verify Kiwify Signature (HMAC-SHA1)
             const signature = req.headers['x-kiwify-signature'] || req.query?.signature;
             if (signature && targetSecret) {
-                const hmac = crypto.createHmac('sha256', targetSecret);
+                // Use SH1 as per Kiwify standard
+                const hmac = crypto.createHmac('sha1', targetSecret);
                 hmac.update(rawBody);
                 const expectedSignature = hmac.digest('hex');
 
                 if (signature !== expectedSignature) {
-                    console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Expected: ${expectedSignature.slice(0, 8)}... Secret ends in ...${targetSecret.slice(-4)}`);
+                    console.error(`Webhook blocked: HMAC mismatch (SHA1). Got: ${signature?.slice(0, 8)}... Expected: ${expectedSignature.slice(0, 8)}... Secret ends in ...${targetSecret.slice(-4)}`);
                     return res.status(401).json({ error: 'Invalid HMAC Signature' });
                 }
             } else if (!signature && targetSecret) {
