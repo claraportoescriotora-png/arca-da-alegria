@@ -91,29 +91,68 @@ export default async function handler(req: any, res: any) {
         // Bypass / Security Check
         const bypassKey = req.headers['x-test-bypass'];
         const urlToken = req.query?.token;
+        const productKey = req.query?.p || payload.key;
 
-        // Fetch valid token from database
+        // Fetch valid URL token from database (extra protection layer)
         const { data: tokenConfig } = await supabase
             .from('app_config')
             .select('value')
             .eq('key', 'webhook_token')
             .maybeSingle();
 
-        const validToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN || '7p9u8wegntp';
+        const validUrlToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN || '7p9u8wegntp';
+        const isUrlTokenValid = (urlToken === validUrlToken);
+        const isBypass = (internalSecret && bypassKey === internalSecret);
 
-        const isInternalTest = (internalSecret && bypassKey === internalSecret) || (urlToken === validToken);
+        if (!isBypass) {
+            // First check the URL protection token
+            if (!isUrlTokenValid) {
+                console.warn(`Webhook blocked: Invalid URL token (${urlToken})`);
+                return res.status(401).json({ error: 'Unauthorized URL Token' });
+            }
 
-        if (!isInternalTest && signatureSecret) {
+            // Determine which Signature Secret to use
+            let targetSecret = signatureSecret; // Default fallback to env var
+
+            if (productKey) {
+                const { data: product } = await supabase
+                    .from('products')
+                    .select('webhook_secret')
+                    .eq('webhook_key', productKey)
+                    .maybeSingle();
+
+                if (product?.webhook_secret) {
+                    targetSecret = product.webhook_secret;
+                }
+            } else {
+                // Main subscription - check app_config
+                const { data: subSecretConfig } = await supabase
+                    .from('app_config')
+                    .select('value')
+                    .eq('key', 'subscription_webhook_secret')
+                    .maybeSingle();
+
+                if (subSecretConfig?.value) {
+                    targetSecret = subSecretConfig.value;
+                }
+            }
+
+            // Verify Kiwify Signature
             const signature = req.headers['x-kiwify-signature'];
-            if (signature) {
+            if (signature && targetSecret) {
                 const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-                const hmac = crypto.createHmac('sha256', signatureSecret);
+                const hmac = crypto.createHmac('sha256', targetSecret);
                 hmac.update(rawBody);
                 const expectedSignature = hmac.digest('hex');
 
                 if (signature !== expectedSignature) {
+                    console.error(`Webhook blocked: HMAC mismatch for secret ending in ...${targetSecret.slice(-4)}`);
                     return res.status(401).json({ error: 'Invalid HMAC Signature' });
                 }
+            } else if (!signature && targetSecret) {
+                // If a secret is defined but no signature is provided, it's a security risk
+                console.warn('Webhook blocked: Missing signature header while secret is defined');
+                return res.status(401).json({ error: 'Missing HMAC Signature' });
             }
         }
 
@@ -129,7 +168,7 @@ export default async function handler(req: any, res: any) {
         const orderStatus = payload.order_status || payload.status;
         const eventType = payload.webhook_event_type || payload.event_type || orderStatus;
 
-        console.log(`Webhook Event: ${eventType} for ${email} (Test: ${!!isInternalTest})`);
+        console.log(`Webhook Event: ${eventType} for ${email} (Bypass: ${!!isBypass})`);
 
         // A. Handle Successful Payments / Renewals
         if (orderStatus === 'paid' || eventType === 'order_approved' || eventType === 'subscription_renewed') {
@@ -145,7 +184,7 @@ export default async function handler(req: any, res: any) {
                     email_confirm: true,
                     user_metadata: {
                         source: 'kiwify',
-                        is_test: isInternalTest,
+                        is_test: isBypass,
                         full_name: fullName // This is caught by the DB trigger
                     }
                 });

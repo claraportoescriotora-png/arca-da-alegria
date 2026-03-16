@@ -10,6 +10,7 @@ export interface VideoBanner {
 interface ConfigContextType {
     logoUrl: string;
     webhookToken: string;
+    subscriptionWebhookSecret: string;
     videoBanners: VideoBanner[];
     loading: boolean;
 }
@@ -20,6 +21,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     const [logoUrl, setLogoUrl] = useState<string>(''); // Start empty to prevent flicker
     const [faviconUrl, setFaviconUrl] = useState<string>(''); // Start empty
     const [webhookToken, setWebhookToken] = useState<string>('');
+    const [subscriptionWebhookSecret, setSubscriptionWebhookSecret] = useState<string>('');
     const [videoBanners, setVideoBanners] = useState<VideoBanner[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -44,7 +46,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret']);
 
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
@@ -53,6 +55,8 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
 
                 if (logo) setLogoUrl(logo.value);
                 if (favicon) setFaviconUrl(favicon.value);
+                if (webhook) setWebhookToken(webhook.value);
+                if (subSecret) setSubscriptionWebhookSecret(subSecret.value);
 
                 if (banners && banners.value) {
                     try {
@@ -72,7 +76,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ConfigContext.Provider value={{ logoUrl, webhookToken, videoBanners, loading }}>
+        <ConfigContext.Provider value={{ logoUrl, webhookToken, subscriptionWebhookSecret, videoBanners, loading }}>
             {children}
         </ConfigContext.Provider>
     );

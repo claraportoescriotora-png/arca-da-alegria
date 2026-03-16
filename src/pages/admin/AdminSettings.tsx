@@ -18,7 +18,8 @@ export function AdminSettings() {
     const [formData, setFormData] = useState({
         logo_url: '',
         favicon_url: '',
-        webhook_token: ''
+        webhook_token: '',
+        subscription_webhook_secret: ''
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
@@ -30,7 +31,7 @@ export function AdminSettings() {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret']);
 
             if (error) throw error;
 
@@ -39,11 +40,13 @@ export function AdminSettings() {
                 const logo = data.find(item => item.key === 'logo_url');
                 const favicon = data.find(item => item.key === 'favicon_url');
                 const webhook = data.find(item => item.key === 'webhook_token');
+                const subSecret = data.find(item => item.key === 'subscription_webhook_secret');
                 const banners = data.find(item => item.key === 'video_banners');
 
                 if (logo) initialForm.logo_url = logo.value;
                 if (favicon) initialForm.favicon_url = favicon.value;
                 if (webhook) (initialForm as any).webhook_token = webhook.value;
+                if (subSecret) (initialForm as any).subscription_webhook_secret = subSecret.value;
                 if (banners && banners.value) {
                     try {
                         const parsed = typeof banners.value === 'string' ? JSON.parse(banners.value) : banners.value;
@@ -99,14 +102,13 @@ export function AdminSettings() {
                 );
             if (webhookError) throw webhookError;
 
-            // Upsert video_banners
-            const { error: bannersError } = await supabase
-                .from('app_config')
-                .upsert(
-                    { key: 'video_banners', value: JSON.stringify(videoBanners) },
-                    { onConflict: 'key' }
-                );
             if (bannersError) throw bannersError;
+
+            // Upsert webhook_token
+            await supabase.from('app_config').upsert({ key: 'webhook_token', value: (formData as any).webhook_token }, { onConflict: 'key' });
+
+            // Upsert subscription_webhook_secret
+            await supabase.from('app_config').upsert({ key: 'subscription_webhook_secret', value: (formData as any).subscription_webhook_secret }, { onConflict: 'key' });
 
             toast({ title: "Configurações salvas com sucesso!" });
 
@@ -360,6 +362,52 @@ export function AdminSettings() {
                     </div>
                 </section>
 
+
+                {/* Kiwify Integration Section */}
+                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-indigo-50/50">
+                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                            <LinkIcon className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-slate-800">Integração Kiwify / Hotmart</h3>
+                            <p className="text-slate-500 text-sm">Configurações de segurança para os webhooks de vendas.</p>
+                        </div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        {/* URL Token */}
+                        <div className="space-y-2">
+                            <Label htmlFor="webhook_token" className="text-sm font-medium text-slate-700">Token de Acesso à URL (Proteção Extra)</Label>
+                            <Input
+                                id="webhook_token"
+                                placeholder="Ex: 7p9u8wegntp"
+                                value={formData.webhook_token}
+                                onChange={e => setFormData({ ...formData, webhook_token: e.target.value })}
+                                className="bg-slate-50 font-mono"
+                            />
+                            <p className="text-[11px] text-slate-500 italic uppercase">
+                                * Este token deve ser incluído na URL do webhook (ex: ?token=7p9u8...) para o app aceitar o sinal.
+                            </p>
+                        </div>
+
+                        <hr className="border-slate-100" />
+
+                        {/* Subscription Signature Secret */}
+                        <div className="space-y-2">
+                            <Label htmlFor="subscription_webhook_secret" className="text-sm font-medium text-slate-700">Segredo da Assinatura (Kiwify Token)</Label>
+                            <Input
+                                id="subscription_webhook_secret"
+                                placeholder="Ex: a4spwioc187"
+                                value={formData.subscription_webhook_secret}
+                                onChange={e => setFormData({ ...formData, subscription_webhook_secret: e.target.value })}
+                                className="bg-slate-50 font-mono"
+                            />
+                            <p className="text-[11px] text-slate-500 italic">
+                                * Este é o "Token" que a Kiwify fornece na aba de Webhooks para a sua **Assinatura Principal**.
+                            </p>
+                        </div>
+                    </div>
+                </section>
 
             </div>
         </div>

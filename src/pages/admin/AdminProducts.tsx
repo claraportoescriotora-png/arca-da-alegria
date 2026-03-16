@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { useConfig } from "@/contexts/ConfigContext";
 
 interface ContentItem {
     type: 'video' | 'movie' | 'story' | 'episode' | 'series' | 'game' | 'activity' | 'mission_pack';
@@ -27,6 +28,7 @@ interface Product {
     is_active: boolean;
     requires_separate_purchase: boolean;
     webhook_key: string;
+    webhook_secret?: string;
     created_at: string;
 }
 
@@ -60,6 +62,7 @@ function ProductForm({
         payment_url: product?.payment_url || '',
         is_active: product?.is_active !== false,
         requires_separate_purchase: (product as any)?.requires_separate_purchase ?? false,
+        webhook_secret: product?.webhook_secret || '',
         content: (product?.content || []) as ContentItem[],
     });
 
@@ -110,6 +113,7 @@ function ProductForm({
                 payment_url: form.payment_url,
                 is_active: form.is_active,
                 requires_separate_purchase: form.requires_separate_purchase,
+                webhook_secret: form.webhook_secret,
                 content: form.content.map(({ type, id }) => ({ type, id })),
             };
             if (product?.id) {
@@ -160,8 +164,16 @@ function ProductForm({
                             )}
                         </div>
                         <div className="col-span-2 space-y-1">
-                            <Label>Descrição</Label>
-                            <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descreva o que está incluído neste pacote..." rows={3} />
+                            <Label>Segredo do Webhook (Kiwify Token)</Label>
+                            <Input
+                                value={form.webhook_secret}
+                                onChange={(e) => setForm({ ...form, webhook_secret: e.target.value })}
+                                placeholder="Ex: a4spwioc187"
+                                className="font-mono bg-slate-50"
+                            />
+                            <p className="text-[10px] text-slate-500 italic">
+                                * Este é o "Token" único gerado pela Kiwify na aba Webhooks especificamente para este produto.
+                            </p>
                         </div>
                     </div>
 
@@ -577,6 +589,7 @@ export function AdminProducts() {
                                             <button
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(`https://arca-da-alegria.vercel.app/api/webhook?token=${webhookToken || '7p9u8wegntp'}&p=${product.webhook_key}`);
+                                                    toast({ title: 'URL Copiada!' });
                                                 }}
                                                 className="p-1 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded flex-shrink-0"
                                                 title="Copiar URL"
