@@ -115,7 +115,8 @@ export default async function handler(req: any, res: any) {
         const urlProductKey = fullUrl.searchParams.get('p');
         const productKey = urlProductKey || payload.key;
 
-        const isBypass = (internalSecret && bypassKey?.trim() === internalSecret.trim());
+        const sanitize = (s: any) => s?.toString().replace(/[\r\n\s]/g, '');
+        const isBypass = (internalSecret && sanitize(bypassKey) === sanitize(internalSecret));
 
         if (!isBypass && bypassKey) {
             console.warn(`Simulation bypass header provided but signature validation failed. Falling back to Token requirements.`);
