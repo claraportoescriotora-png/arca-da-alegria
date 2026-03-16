@@ -106,8 +106,14 @@ export default async function handler(req: any, res: any) {
 
         // Bypass / Security Check
         const bypassKey = req.headers['x-test-bypass'] || req.headers['X-TEST-BYPASS'];
-        const urlToken = req.query?.token;
-        const productKey = req.query?.p || payload.key;
+
+        // Use modern URL API to avoid deprecation warning
+        const protocol = req.headers['x-forwarded-proto'] || 'http';
+        const host = req.headers.host || 'localhost';
+        const fullUrl = new URL(req.url, `${protocol}://${host}`);
+        const urlToken = fullUrl.searchParams.get('token');
+        const urlProductKey = fullUrl.searchParams.get('p');
+        const productKey = urlProductKey || payload.key;
 
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
@@ -167,7 +173,11 @@ export default async function handler(req: any, res: any) {
             }
 
             // 4. Verify Kiwify Signature (HMAC-SHA1)
-            const signature = req.headers['x-kiwify-signature'] || req.query?.signature;
+            const signature = req.headers['x-kiwify-signature'] || fullUrl.searchParams.get('signature');
+
+            // Allow simulation bypassing signature verification if the GLOBAL token matches
+            const isInternalSimulation = (urlToken === globalUrlToken);
+
             if (signature && targetSecret) {
                 // Use SHA1 as per Kiwify standard
                 const hmac = crypto.createHmac('sha1', targetSecret);
@@ -187,8 +197,9 @@ export default async function handler(req: any, res: any) {
                         return res.status(401).json({ error: 'Invalid HMAC Signature' });
                     }
                 }
-            } else if (!signature && targetSecret) {
+            } else if (!signature && targetSecret && !isInternalSimulation) {
                 // If a secret is defined but no signature is provided, it's a security risk
+                // EXCEPT if it's our internal simulator identified by the global token
                 console.warn('Webhook blocked: Missing signature header while secret is defined');
                 return res.status(401).json({ error: 'Missing HMAC Signature' });
             }
