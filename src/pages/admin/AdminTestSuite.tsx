@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabase";
 import { Loader2, CheckCircle2, AlertCircle, ShoppingCart, Mail, Database, Send } from 'lucide-react';
 
 export function AdminTestSuite() {
@@ -51,15 +52,20 @@ export function AdminTestSuite() {
 
             const bypassSecret = import.meta.env.VITE_INTERNAL_API_SECRET;
 
-            if (!bypassSecret) {
-                throw new Error('Chave de simulação (VITE_INTERNAL_API_SECRET) não configurada no ambiente.');
-            }
+            // Fetch current token for additional authorization
+            const { data: tokenConfig } = await supabase
+                .from('app_config')
+                .select('value')
+                .eq('key', 'webhook_token')
+                .maybeSingle();
 
-            const response = await fetch('/api/webhook', {
+            const currentToken = tokenConfig?.value || '';
+
+            const response = await fetch(`/api/webhook?token=${currentToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-test-bypass': bypassSecret
+                    'x-test-bypass': bypassSecret || ''
                 },
                 body: JSON.stringify(payload)
             });

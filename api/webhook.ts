@@ -111,6 +111,10 @@ export default async function handler(req: any, res: any) {
 
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
+        if (!isBypass && bypassKey) {
+            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Falling back to Token/Signature validation.`);
+        }
+
         if (!isBypass) {
             // 1. Fetch valid URL token from database (extra protection layer)
             const { data: tokenConfig } = await supabase
