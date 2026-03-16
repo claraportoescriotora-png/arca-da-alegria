@@ -35,7 +35,12 @@ export function AdminSettings() {
 
             if (error) throw error;
 
-            const initialForm = { logo_url: '', favicon_url: '' };
+            const initialForm = {
+                logo_url: '',
+                favicon_url: '',
+                webhook_token: '',
+                subscription_webhook_secret: ''
+            };
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
                 const favicon = data.find(item => item.key === 'favicon_url');
@@ -45,8 +50,8 @@ export function AdminSettings() {
 
                 if (logo) initialForm.logo_url = logo.value;
                 if (favicon) initialForm.favicon_url = favicon.value;
-                if (webhook) (initialForm as any).webhook_token = webhook.value;
-                if (subSecret) (initialForm as any).subscription_webhook_secret = subSecret.value;
+                if (webhook) initialForm.webhook_token = webhook.value;
+                if (subSecret) initialForm.subscription_webhook_secret = subSecret.value;
                 if (banners && banners.value) {
                     try {
                         const parsed = typeof banners.value === 'string' ? JSON.parse(banners.value) : banners.value;
@@ -102,13 +107,14 @@ export function AdminSettings() {
                 );
             if (webhookError) throw webhookError;
 
-            if (bannersError) throw bannersError;
-
-            // Upsert webhook_token
-            await supabase.from('app_config').upsert({ key: 'webhook_token', value: (formData as any).webhook_token }, { onConflict: 'key' });
-
             // Upsert subscription_webhook_secret
-            await supabase.from('app_config').upsert({ key: 'subscription_webhook_secret', value: (formData as any).subscription_webhook_secret }, { onConflict: 'key' });
+            const { error: subSecretError } = await supabase
+                .from('app_config')
+                .upsert(
+                    { key: 'subscription_webhook_secret', value: (formData as any).subscription_webhook_secret },
+                    { onConflict: 'key' }
+                );
+            if (subSecretError) throw subSecretError;
 
             toast({ title: "Configurações salvas com sucesso!" });
 

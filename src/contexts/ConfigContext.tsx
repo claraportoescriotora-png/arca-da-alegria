@@ -55,6 +55,10 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
 
                 if (logo) setLogoUrl(logo.value);
                 if (favicon) setFaviconUrl(favicon.value);
+
+                const webhook = data.find(item => item.key === 'webhook_token');
+                const subSecret = data.find(item => item.key === 'subscription_webhook_secret');
+
                 if (webhook) setWebhookToken(webhook.value);
                 if (subSecret) setSubscriptionWebhookSecret(subSecret.value);
 

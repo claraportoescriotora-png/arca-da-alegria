@@ -70,7 +70,7 @@ export default async function handler(req: any, res: any) {
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const internalSecret = process.env.INTERNAL_API_SECRET;
         const signatureSecret = process.env.KIWIFY_SIGNATURE_SECRET;
-        const webhookToken = process.env.WEBHOOK_TOKEN || '7p9u8wegntp'; // Fallback to user's current token
+        const webhookToken = process.env.WEBHOOK_TOKEN;
 
         if (!supabaseServiceKey) {
             return res.status(500).json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY' });
@@ -100,7 +100,7 @@ export default async function handler(req: any, res: any) {
             .eq('key', 'webhook_token')
             .maybeSingle();
 
-        const validUrlToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN || '7p9u8wegntp';
+        const validUrlToken = tokenConfig?.value || process.env.WEBHOOK_TOKEN;
         const isUrlTokenValid = (urlToken === validUrlToken);
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
