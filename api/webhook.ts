@@ -115,10 +115,10 @@ export default async function handler(req: any, res: any) {
         const urlProductKey = fullUrl.searchParams.get('p');
         const productKey = urlProductKey || payload.key;
 
-        const isBypass = (internalSecret && bypassKey === internalSecret);
+        const isBypass = (internalSecret && bypassKey?.trim() === internalSecret.trim());
 
         if (!isBypass && bypassKey) {
-            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Received: ${bypassKey?.slice(0, 3)}... Expected: ${internalSecret?.slice(0, 3)}... Falling back to Token/Signature validation.`);
+            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Received: ${bypassKey?.toString().slice(0, 8)} (${bypassKey?.length}) vs Expected: ${internalSecret?.toString().slice(0, 8)} (${internalSecret?.length}). Falling back to Token/Signature validation.`);
         }
 
         if (!isBypass) {
@@ -167,9 +167,11 @@ export default async function handler(req: any, res: any) {
                 return res.status(401).json({ error: 'Unauthorized URL Token', detail: `Token ${urlToken} invalid` });
             }
 
-            // --- CRITICAL FIX: If the token in the URL matches our record, IT is the secret Kiwify uses for signing ---
-            if (urlToken && (urlToken === globalUrlToken || urlToken === targetSecret)) {
-                targetSecret = urlToken;
+            // --- Candidates for Signature Secret ---
+            // We'll try the secret found in DB first, then the URL token as fallback
+            const candidateSecrets = [targetSecret];
+            if (urlToken && urlToken !== targetSecret) {
+                candidateSecrets.push(urlToken);
             }
 
             // 4. Verify Kiwify Signature (HMAC-SHA1)
@@ -178,26 +180,38 @@ export default async function handler(req: any, res: any) {
             // Allow simulation bypassing signature verification if the GLOBAL token matches
             const isInternalSimulation = (urlToken === globalUrlToken);
 
-            if (signature && targetSecret) {
-                // Use SHA1 as per Kiwify standard
-                const hmac = crypto.createHmac('sha1', targetSecret);
-                hmac.update(rawBody);
-                const expectedSignature = hmac.digest('hex');
+            let verified = false;
+            let lastErrorMsg = '';
 
-                if (signature !== expectedSignature) {
-                    // Fail-safe: try SHA256 just in case some Kiwify accounts use it
-                    const hmac256 = crypto.createHmac('sha256', targetSecret);
+            if (signature) {
+                for (const secret of candidateSecrets) {
+                    if (!secret) continue;
+
+                    // Try SHA1
+                    const hmac = crypto.createHmac('sha1', secret);
+                    hmac.update(rawBody);
+                    if (signature === hmac.digest('hex')) {
+                        verified = true;
+                        targetSecret = secret; // Capture the correct one for later if needed
+                        break;
+                    }
+
+                    // Try SHA256 fallback
+                    const hmac256 = crypto.createHmac('sha256', secret);
                     hmac256.update(rawBody);
-                    const expected256 = hmac256.digest('hex');
-
-                    if (signature === expected256) {
-                        console.log('Signature verified using SHA256 fallback');
-                    } else {
-                        console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Expected(SHA1): ${expectedSignature.slice(0, 8)}... Expected(SHA256): ${expected256.slice(0, 8)}... Secret used: ${targetSecret.slice(0, 4)}...`);
-                        return res.status(401).json({ error: 'Invalid HMAC Signature' });
+                    if (signature === hmac256.digest('hex')) {
+                        console.log(`Signature verified using SHA256 fallback for secret ${secret.slice(0, 4)}...`);
+                        verified = true;
+                        targetSecret = secret;
+                        break;
                     }
                 }
-            } else if (!signature && targetSecret && !isInternalSimulation) {
+            }
+
+            if (signature && !verified) {
+                console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Secrets tried: ${candidateSecrets.map(s => s?.slice(0, 4)).join(', ')}`);
+                return res.status(401).json({ error: 'Invalid HMAC Signature' });
+            } else if (!signature && !isInternalSimulation && targetSecret) {
                 // If a secret is defined but no signature is provided, it's a security risk
                 // EXCEPT if it's our internal simulator identified by the global token
                 console.warn('Webhook blocked: Missing signature header while secret is defined');
