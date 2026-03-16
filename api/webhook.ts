@@ -6,7 +6,19 @@ import crypto from 'crypto';
 // Combined Configuration
 export const config = {
     runtime: 'nodejs',
+    api: {
+        bodyParser: false,
+    },
 };
+
+// Helper to get raw body for signature verification
+async function getRawBody(req: any): Promise<string> {
+    const chunks = [];
+    for await (const chunk of req) {
+        chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    }
+    return Buffer.concat(chunks).toString('utf-8');
+}
 
 // --- Email Logic (Merged from lib/resend to avoid path issues on production) ---
 const PWA_INSTRUCTIONS = `
@@ -78,10 +90,14 @@ export default async function handler(req: any, res: any) {
 
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        // Body Parsing
-        let payload = req.body;
-        if (typeof payload === 'string') {
-            try { payload = JSON.parse(payload); } catch (e) { /* silent */ }
+        // Body Parsing - Manual for HMAC accuracy
+        const rawBody = await getRawBody(req);
+        let payload: any;
+        try {
+            payload = JSON.parse(rawBody);
+        } catch (e) {
+            console.error('Failed to parse webhook JSON:', e);
+            return res.status(400).json({ error: 'Invalid JSON payload' });
         }
 
         if (!payload || Object.keys(payload).length === 0) {
@@ -140,7 +156,6 @@ export default async function handler(req: any, res: any) {
             // Verify Kiwify Signature
             const signature = req.headers['x-kiwify-signature'] || req.query?.signature;
             if (signature && targetSecret) {
-                const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
                 const hmac = crypto.createHmac('sha256', targetSecret);
                 hmac.update(rawBody);
                 const expectedSignature = hmac.digest('hex');
