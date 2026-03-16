@@ -17,7 +17,8 @@ export function AdminSettings() {
     const { toast } = useToast();
     const [formData, setFormData] = useState({
         logo_url: '',
-        favicon_url: ''
+        favicon_url: '',
+        webhook_token: ''
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
@@ -29,7 +30,7 @@ export function AdminSettings() {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token']);
 
             if (error) throw error;
 
@@ -37,10 +38,12 @@ export function AdminSettings() {
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
                 const favicon = data.find(item => item.key === 'favicon_url');
+                const webhook = data.find(item => item.key === 'webhook_token');
                 const banners = data.find(item => item.key === 'video_banners');
 
                 if (logo) initialForm.logo_url = logo.value;
                 if (favicon) initialForm.favicon_url = favicon.value;
+                if (webhook) (initialForm as any).webhook_token = webhook.value;
                 if (banners && banners.value) {
                     try {
                         const parsed = typeof banners.value === 'string' ? JSON.parse(banners.value) : banners.value;
@@ -86,6 +89,15 @@ export function AdminSettings() {
                     { onConflict: 'key' }
                 );
             if (faviconError) throw faviconError;
+
+            // Upsert webhook_token
+            const { error: webhookError } = await supabase
+                .from('app_config')
+                .upsert(
+                    { key: 'webhook_token', value: (formData as any).webhook_token },
+                    { onConflict: 'key' }
+                );
+            if (webhookError) throw webhookError;
 
             // Upsert video_banners
             const { error: bannersError } = await supabase

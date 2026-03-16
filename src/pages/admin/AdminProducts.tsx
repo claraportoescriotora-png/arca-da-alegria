@@ -291,7 +291,7 @@ function ProductForm({
                             </p>
                             <div className="flex items-center gap-2">
                                 <code className="text-xs font-mono text-slate-600 bg-white border border-slate-200 rounded px-2 py-2 flex-1 truncate select-all">
-                                    {`https://arca-da-alegria.vercel.app/api/webhook?token=7p9u8wegntp&p=${(product as any).webhook_key}`}
+                                    {`https://arca-da-alegria.vercel.app/api/webhook?token=${webhookToken || '7p9u8wegntp'}&p=${(product as any).webhook_key}`}
                                 </code>
                                 <Button
                                     type="button"
@@ -299,7 +299,7 @@ function ProductForm({
                                     size="sm"
                                     className="px-3 flex-shrink-0"
                                     onClick={() => {
-                                        navigator.clipboard.writeText(`https://arca-da-alegria.vercel.app/api/webhook?token=7p9u8wegntp&p=${(product as any).webhook_key}`);
+                                        navigator.clipboard.writeText(`https://arca-da-alegria.vercel.app/api/webhook?token=${webhookToken || '7p9u8wegntp'}&p=${(product as any).webhook_key}`);
                                         toast({ title: 'URL Copiada!' });
                                     }}
                                 >
@@ -450,6 +450,7 @@ function UserGrantModal({ product, onClose }: { product: Product; onClose: () =>
 
 export function AdminProducts() {
     const { toast } = useToast();
+    const { webhookToken } = useConfig();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Partial<Product> | null | undefined>(undefined);
@@ -571,11 +572,11 @@ export function AdminProducts() {
                                         </p>
                                         <div className="flex items-center gap-1">
                                             <code className="text-[10px] text-slate-600 bg-white border border-slate-200 rounded px-1.5 py-0.5 flex-1 truncate">
-                                                {`https://arca-da-alegria.vercel.app/api/webhook?token=7p9u8wegntp&p=${product.webhook_key}`}
+                                                {`https://arca-da-alegria.vercel.app/api/webhook?token=${webhookToken || '7p9u8wegntp'}&p=${product.webhook_key}`}
                                             </code>
                                             <button
                                                 onClick={() => {
-                                                    navigator.clipboard.writeText(`https://arca-da-alegria.vercel.app/api/webhook?token=7p9u8wegntp&p=${product.webhook_key}`);
+                                                    navigator.clipboard.writeText(`https://arca-da-alegria.vercel.app/api/webhook?token=${webhookToken || '7p9u8wegntp'}&p=${product.webhook_key}`);
                                                 }}
                                                 className="p-1 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded flex-shrink-0"
                                                 title="Copiar URL"

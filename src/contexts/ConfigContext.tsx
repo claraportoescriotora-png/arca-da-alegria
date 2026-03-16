@@ -9,6 +9,7 @@ export interface VideoBanner {
 
 interface ConfigContextType {
     logoUrl: string;
+    webhookToken: string;
     videoBanners: VideoBanner[];
     loading: boolean;
 }
@@ -18,6 +19,7 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
     const [logoUrl, setLogoUrl] = useState<string>(''); // Start empty to prevent flicker
     const [faviconUrl, setFaviconUrl] = useState<string>(''); // Start empty
+    const [webhookToken, setWebhookToken] = useState<string>('');
     const [videoBanners, setVideoBanners] = useState<VideoBanner[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -42,7 +44,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token']);
 
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
@@ -70,7 +72,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ConfigContext.Provider value={{ logoUrl, videoBanners, loading }}>
+        <ConfigContext.Provider value={{ logoUrl, webhookToken, videoBanners, loading }}>
             {children}
         </ConfigContext.Provider>
     );
