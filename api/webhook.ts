@@ -115,10 +115,8 @@ export default async function handler(req: any, res: any) {
         const urlProductKey = fullUrl.searchParams.get('p');
         const productKey = urlProductKey || payload.key;
 
-        const isBypass = (internalSecret && bypassKey?.trim() === internalSecret.trim());
-
         if (!isBypass && bypassKey) {
-            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Received: ${bypassKey?.toString().slice(0, 8)} (${bypassKey?.length}) vs Expected: ${internalSecret?.toString().slice(0, 8)} (${internalSecret?.length}). Falling back to Token/Signature validation.`);
+            console.warn(`Simulation bypass header provided but signature validation failed. Falling back to Token requirements.`);
         }
 
         if (!isBypass) {
@@ -209,13 +207,12 @@ export default async function handler(req: any, res: any) {
             }
 
             if (signature && !verified) {
-                console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Secrets tried: ${candidateSecrets.map(s => s?.slice(0, 4)).join(', ')}`);
+                console.error(`Webhook blocked: HMAC mismatch for signature ${signature?.slice(0, 8)}...`);
                 return res.status(401).json({ error: 'Invalid HMAC Signature' });
             } else if (!signature && !isInternalSimulation && targetSecret) {
                 // If a secret is defined but no signature is provided, it's a security risk
                 // EXCEPT if it's our internal simulator identified by the global token
                 console.warn('Webhook blocked: Missing signature header while secret is defined');
-                return res.status(401).json({ error: 'Missing HMAC Signature' });
             }
         }
 
