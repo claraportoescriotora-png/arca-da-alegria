@@ -138,7 +138,7 @@ export default async function handler(req: any, res: any) {
             }
 
             // Verify Kiwify Signature
-            const signature = req.headers['x-kiwify-signature'];
+            const signature = req.headers['x-kiwify-signature'] || req.query?.signature;
             if (signature && targetSecret) {
                 const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
                 const hmac = crypto.createHmac('sha256', targetSecret);
@@ -146,7 +146,7 @@ export default async function handler(req: any, res: any) {
                 const expectedSignature = hmac.digest('hex');
 
                 if (signature !== expectedSignature) {
-                    console.error(`Webhook blocked: HMAC mismatch for secret ending in ...${targetSecret.slice(-4)}`);
+                    console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Expected: ${expectedSignature.slice(0, 8)}... Secret ends in ...${targetSecret.slice(-4)}`);
                     return res.status(401).json({ error: 'Invalid HMAC Signature' });
                 }
             } else if (!signature && targetSecret) {
