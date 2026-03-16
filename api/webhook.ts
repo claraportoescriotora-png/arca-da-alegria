@@ -80,7 +80,7 @@ export default async function handler(req: any, res: any) {
         // Essential Env Vars
         const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://gypzrzsmxgjtkidznstd.supabase.co';
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        const internalSecret = process.env.INTERNAL_API_SECRET;
+        const internalSecret = process.env.INTERNAL_API_SECRET || process.env.VITE_INTERNAL_API_SECRET;
         const signatureSecret = process.env.KIWIFY_SIGNATURE_SECRET;
         const webhookToken = process.env.WEBHOOK_TOKEN;
 
@@ -109,8 +109,6 @@ export default async function handler(req: any, res: any) {
         const urlToken = req.query?.token;
         const productKey = req.query?.p || payload.key;
 
-        // Try both server-side and VITE_ prefixed env var for bypass
-        const internalSecret = process.env.INTERNAL_API_SECRET || process.env.VITE_INTERNAL_API_SECRET;
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
         if (!isBypass) {
