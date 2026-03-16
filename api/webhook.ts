@@ -146,6 +146,10 @@ export default async function handler(req: any, res: any) {
                     // Generate Login Link
                     const origin = payload.origin || 'https://www.meuamiguito.com.br';
 
+                    // Determine if we are granting a specific product or main subscription
+                    // The key can come from query param 'p' or body 'key'
+                    const productKey = req.query?.p || payload.key;
+
                     const { data: linkData } = await supabase.auth.admin.generateLink({
                         type: 'magiclink',
                         email: email,
@@ -162,24 +166,47 @@ export default async function handler(req: any, res: any) {
                 }
             }
 
-            // Update Profile Status (Always do this to ensure access)
+            // Update Profile Status or Product Access
             if (userId) {
-                console.log(`Updating profile for user ${userId} (${email}) to active`);
-                const { error: upsertError } = await supabase.from('profiles').upsert({
-                    id: userId,
-                    email: email,
-                    full_name: fullName,
-                    subscription_status: 'active',
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'id' });
+                const productKey = req.query?.p || payload.key;
 
-                if (upsertError) {
-                    console.error('Error upserting profile:', upsertError);
-                    // Fallback to email update if id-based upsert fails (e.g. if id is not the primary key)
-                    await supabase.from('profiles').update({
+                if (productKey) {
+                    // Grant specific product access
+                    console.log(`Granting product access for ${productKey} to ${userId}`);
+
+                    // 1. Find product ID
+                    const { data: product } = await supabase
+                        .from('products')
+                        .select('id')
+                        .eq('webhook_key', productKey)
+                        .maybeSingle();
+
+                    if (product) {
+                        await supabase.from('user_products').upsert({
+                            user_id: userId,
+                            product_id: product.id
+                        }, { onConflict: 'user_id,product_id' });
+                    } else {
+                        console.error(`Product not found for key: ${productKey}`);
+                    }
+                } else {
+                    // Standard Subscription Grant
+                    console.log(`Updating profile for user ${userId} (${email}) to active`);
+                    const { error: upsertError } = await supabase.from('profiles').upsert({
+                        id: userId,
+                        email: email,
+                        full_name: fullName,
                         subscription_status: 'active',
                         updated_at: new Date().toISOString()
-                    }).eq('email', email);
+                    }, { onConflict: 'id' });
+
+                    if (upsertError) {
+                        console.error('Error upserting profile:', upsertError);
+                        await supabase.from('profiles').update({
+                            subscription_status: 'active',
+                            updated_at: new Date().toISOString()
+                        }).eq('email', email);
+                    }
                 }
             }
 

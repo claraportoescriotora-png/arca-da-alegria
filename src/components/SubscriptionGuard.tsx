@@ -2,16 +2,39 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthProvider';
 import { useTrialAccess } from '@/hooks/useTrialAccess';
 import { TrialBanner } from '@/components/TrialBanner';
+import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
 
 interface SubscriptionGuardProps {
     children: React.ReactNode;
 }
 
 const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
-    const { profile, loading, isAdmin } = useAuth();
+    const { profile, loading, isAdmin, user } = useAuth();
     const { isTrial, isTrialExpired, loading: trialLoading } = useTrialAccess();
+    const [hasProducts, setHasProducts] = useState(false);
+    const [productsLoading, setProductsLoading] = useState(true);
 
-    if (loading || trialLoading) {
+    useEffect(() => {
+        if (!user) {
+            setProductsLoading(false);
+            return;
+        }
+
+        const checkProducts = async () => {
+            const { count } = await supabase
+                .from('user_products')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id);
+
+            setHasProducts(!!(count && count > 0));
+            setProductsLoading(false);
+        };
+
+        checkProducts();
+    }, [user]);
+
+    if (loading || trialLoading || productsLoading) {
         return <div className="min-h-screen flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>;
@@ -22,8 +45,8 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
         return <>{children}</>;
     }
 
-    // Active subscribers → full access
-    if (profile?.subscription_status === 'active') {
+    // Active subscribers OR Product owners → full access to the shell
+    if (profile?.subscription_status === 'active' || hasProducts) {
         return <>{children}</>;
     }
 
