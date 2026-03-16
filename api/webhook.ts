@@ -109,6 +109,8 @@ export default async function handler(req: any, res: any) {
         const urlToken = req.query?.token;
         const productKey = req.query?.p || payload.key;
 
+        // Try both server-side and VITE_ prefixed env var for bypass
+        const internalSecret = process.env.INTERNAL_API_SECRET || process.env.VITE_INTERNAL_API_SECRET;
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
         if (!isBypass) {
@@ -148,26 +150,40 @@ export default async function handler(req: any, res: any) {
             }
 
             // 3. Validate URL token
-            // Kiwify often uses the same value for URL Token and Secret. We accept either.
+            // Kiwify uses the same value for URL Token and Secret. 
+            // We accept the token if it matches the global token OR the specific product secret to verify authenticity.
             const isUrlTokenValid = (urlToken && (urlToken === globalUrlToken || urlToken === targetSecret));
 
-            // First check the URL protection token
             if (!isUrlTokenValid) {
                 console.warn(`Webhook blocked: Unauthorized URL Token (${urlToken}). Global expected: ${globalUrlToken}, Product secret expected: ${targetSecret?.slice(-4)}`);
-                return res.status(401).json({ error: 'Unauthorized URL Token' });
+                return res.status(401).json({ error: 'Unauthorized URL Token', detail: `Token ${urlToken} invalid` });
+            }
+
+            // --- CRITICAL FIX: If the token in the URL matches our record, IT is the secret Kiwify uses for signing ---
+            if (urlToken && (urlToken === globalUrlToken || urlToken === targetSecret)) {
+                targetSecret = urlToken;
             }
 
             // 4. Verify Kiwify Signature (HMAC-SHA1)
             const signature = req.headers['x-kiwify-signature'] || req.query?.signature;
             if (signature && targetSecret) {
-                // Use SH1 as per Kiwify standard
+                // Use SHA1 as per Kiwify standard
                 const hmac = crypto.createHmac('sha1', targetSecret);
                 hmac.update(rawBody);
                 const expectedSignature = hmac.digest('hex');
 
                 if (signature !== expectedSignature) {
-                    console.error(`Webhook blocked: HMAC mismatch (SHA1). Got: ${signature?.slice(0, 8)}... Expected: ${expectedSignature.slice(0, 8)}... Secret ends in ...${targetSecret.slice(-4)}`);
-                    return res.status(401).json({ error: 'Invalid HMAC Signature' });
+                    // Fail-safe: try SHA256 just in case some Kiwify accounts use it
+                    const hmac256 = crypto.createHmac('sha256', targetSecret);
+                    hmac256.update(rawBody);
+                    const expected256 = hmac256.digest('hex');
+
+                    if (signature === expected256) {
+                        console.log('Signature verified using SHA256 fallback');
+                    } else {
+                        console.error(`Webhook blocked: HMAC mismatch. Got: ${signature?.slice(0, 8)}... Expected(SHA1): ${expectedSignature.slice(0, 8)}... Expected(SHA256): ${expected256.slice(0, 8)}... Secret used: ${targetSecret.slice(0, 4)}...`);
+                        return res.status(401).json({ error: 'Invalid HMAC Signature' });
+                    }
                 }
             } else if (!signature && targetSecret) {
                 // If a secret is defined but no signature is provided, it's a security risk
