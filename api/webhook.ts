@@ -118,7 +118,7 @@ export default async function handler(req: any, res: any) {
         const isBypass = (internalSecret && bypassKey === internalSecret);
 
         if (!isBypass && bypassKey) {
-            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Falling back to Token/Signature validation.`);
+            console.warn(`Simulation bypass header provided but didn't match server internalSecret. Received: ${bypassKey?.slice(0, 3)}... Expected: ${internalSecret?.slice(0, 3)}... Falling back to Token/Signature validation.`);
         }
 
         if (!isBypass) {
@@ -248,7 +248,7 @@ export default async function handler(req: any, res: any) {
 
                     // Determine if we are granting a specific product or main subscription
                     // The key can come from query param 'p' or body 'key'
-                    const productKey = req.query?.p || payload.key;
+                    const productKey = fullUrl.searchParams.get('p') || payload.key;
 
                     const { data: linkData } = await supabase.auth.admin.generateLink({
                         type: 'magiclink',
@@ -268,7 +268,7 @@ export default async function handler(req: any, res: any) {
 
             // Update Profile Status or Product Access
             if (userId) {
-                const productKey = req.query?.p || payload.key;
+                const productKey = fullUrl.searchParams.get('p') || payload.key;
 
                 if (productKey) {
                     // Grant specific product access
