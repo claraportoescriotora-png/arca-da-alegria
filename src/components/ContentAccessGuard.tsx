@@ -32,9 +32,13 @@ export function ContentAccessGuard({ contentType, contentId, children }: Content
     // 0. ADMIN BYPASS — Admins see everything
     if (isAdmin) return <>{children}</>;
 
-    // 1. PRODUCT GATE — this content belongs to a specific product
-    //    Even active subscribers must purchase the product
-    if (isProductGated && !hasProductAccess) {
+    // 1. PRODUCT GATE & ACCESS
+    // If content is gated by a product:
+    // - If they have it: Grant access (permanent)
+    // - If they don't have it: Lock it (Buy CTA)
+    if (isProductGated) {
+        if (hasProductAccess) return <>{children}</>;
+
         return (
             <LockedOverlay
                 reason="product"
@@ -52,6 +56,7 @@ export function ContentAccessGuard({ contentType, contentId, children }: Content
     }
 
     // 3. TRIAL GATE — non-paying user, check if this content is in their trial
+    // This only applies to content NOT gated by a specific product (handled above)
     if (isTrial && !isTrialExpired && canAccess()) {
         return <>{children}</>;
     }

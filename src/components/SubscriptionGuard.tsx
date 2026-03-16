@@ -40,17 +40,13 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
         </div>;
     }
 
-    // Admins → full access everywhere
+    // 1. Admins → full access everywhere
     if (isAdmin) {
         return <>{children}</>;
     }
 
-    // Active subscribers OR Product owners → full access to the shell
-    if (profile?.subscription_status === 'active' || hasProducts) {
-        return <>{children}</>;
-    }
-
-    // Pending users within trial window → access with trial restrictions
+    // 2. Pending users within trial window → access with trial banner (platform trial)
+    // We show the banner even if they have products, so they know platform-wide access is temporary
     if (isTrial && !isTrialExpired) {
         return (
             <div className="flex flex-col min-h-screen">
@@ -62,7 +58,14 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
         );
     }
 
-    // Canceled or expired trial → paywall
+    // 3. Active subscribers OR Product owners (Trial expired) → access to the shell
+    // If trial is expired, they don't see the banner anymore, but get into the shell
+    // ContentAccessGuard inside pages will handle individual piece locking
+    if (profile?.subscription_status === 'active' || hasProducts) {
+        return <>{children}</>;
+    }
+
+    // 4. Default: No subscription, no products, and expired/no trial → absolute paywall
     return <Navigate to="/paywall" replace />;
 };
 

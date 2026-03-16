@@ -11,6 +11,7 @@ import { Lock, Clock, Trophy, Calendar, ArrowRight, Star, ChevronRight } from 'l
 import { cn } from "@/lib/utils";
 import { Pagination } from '@/components/Pagination';
 import { useProductAccess } from '@/hooks/useProductAccess';
+import { useTrialAccess } from '@/hooks/useTrialAccess';
 import { DripLockModal } from '@/components/DripLockModal';
 import { toast } from 'sonner';
 
@@ -36,7 +37,11 @@ function MissionItem({
 }) {
     const navigate = useNavigate();
     const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('mission_pack', pack.id);
+    const { isTrial, isTrialExpired } = useTrialAccess();
     const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
+
+    const isActive = profile?.subscription_status === 'active';
+    const canSeeReleaseInfo = isActive || (isTrial && !isTrialExpired);
 
     const isPremiumLocked = isProductGated && !hasProductAccess;
     const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
@@ -114,9 +119,12 @@ function MissionItem({
                                 </span>
                             )}
                             {isDripLocked && (
-                                <span className="flex items-center gap-1 text-orange-600 bg-orange-500/10 px-2 py-1 rounded-md">
+                                <span className={cn(
+                                    "flex items-center gap-1 px-2 py-1 rounded-md",
+                                    canSeeReleaseInfo ? "text-orange-600 bg-orange-500/10" : "text-slate-600 bg-slate-100"
+                                )}>
                                     <Clock className="w-3 h-3" />
-                                    Libera em {daysRemaining}d
+                                    {canSeeReleaseInfo ? `Libera em ${daysRemaining}d` : "Assinatura Necessária"}
                                 </span>
                             )}
                             {hasOtherActiveMission && !isEnrolled && (
