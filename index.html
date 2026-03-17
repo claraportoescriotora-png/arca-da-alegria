@@ -3,6 +3,60 @@
 
 <head>
   <meta charset="UTF-8" />
+  <script>
+    /**
+     * Robust Data Layer Structure
+     * Prepared for high scalability and professional tracking.
+     * Loads before GTM. Safe for persistence.
+     */
+    window.dataLayer = window.dataLayer || [];
+
+    (function () {
+      // 1. Capture Identity (Cookie: LeadUserIndex)
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+      const userIndex = getCookie('LeadUserIndex');
+
+      // 2. Capture Metadata
+      const timestamp = new Date().toISOString();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const language = navigator.language || navigator.userLanguage;
+
+      // 3. Capture Origin (UTMs and fbclid)
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source');
+      const utmMedium = urlParams.get('utm_medium');
+      const utmCampaign = urlParams.get('utm_campaign');
+      const utmTerm = urlParams.get('utm_term');
+      const utmContent = urlParams.get('utm_content');
+      const fbclid = urlParams.get('fbclid');
+
+      // Bonus: visitor_name if &name= is present
+      const visitorName = urlParams.get('name');
+
+      // 4. Data Layer Push
+      window.dataLayer.push({
+        event: 'page_data_loaded',
+        user_index: userIndex,
+        page_type: 'landing_page',
+        product_name: 'Meu Amiguito',
+        event_timestamp: timestamp,
+        user_timezone: timezone,
+        user_browser_language: language,
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+        utm_term: utmTerm,
+        utm_content: utmContent,
+        fbclid: fbclid,
+        visitor_name: visitorName
+      });
+    })();
+  </script>
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self' https://*.supabase.co https://*.google.com https://*.googleapis.com https://*.youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://*.youtube.com https://*.google.com https://*.mediadelivery.net https://*.b-cdn.net; connect-src 'self' https: wss://*.supabase.co;" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -41,6 +95,71 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+  <script>
+    (function () {
+      var checkoutPrefixes = ["pay.kiwify.com.br"];
+      var allowedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid"];
+
+      function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+      }
+
+      function updateLinks() {
+        try {
+          var userIndex = getCookie('LeadUserIndex');
+          var currentUrlParams = new URLSearchParams(window.location.search);
+
+          document.querySelectorAll('a').forEach(function (el) {
+            var href = el.href;
+            if (!href || (href.indexOf('http') !== 0)) return;
+
+            var isCheckoutLink = checkoutPrefixes.some(function (prefix) {
+              return href.indexOf(prefix) !== -1;
+            });
+
+            if (isCheckoutLink) {
+              try {
+                var checkoutUrl = new URL(href);
+                // Validar se o protocolo é seguro
+                if (checkoutUrl.protocol !== 'http:' && checkoutUrl.protocol !== 'https:') return;
+
+                // 1. Injetar apenas parâmetros permitidos (Privacidade/LGPD)
+                currentUrlParams.forEach(function (value, key) {
+                  if (allowedParams.indexOf(key.toLowerCase()) !== -1) {
+                    checkoutUrl.searchParams.set(key, value);
+                  }
+                });
+
+                // 2. Injetar UserIndex no utm_term (Prioridade para segurança)
+                if (userIndex) {
+                  // Garantir que userIndex seja tratado apenas como string
+                  checkoutUrl.searchParams.set('utm_term', String(userIndex));
+                }
+
+                el.href = checkoutUrl.toString();
+              } catch (e) {
+                console.warn("Falha ao processar link de checkout: ", e);
+              }
+            }
+          });
+        } catch (err) {
+          console.error("Erro na execução do script de transporte: ", err);
+        }
+      }
+
+      if (document.readyState === 'complete') {
+        updateLinks();
+      } else {
+        window.addEventListener('load', updateLinks);
+      }
+
+      // Reforços para Lazy Load e carregamento dinâmico
+      setTimeout(updateLinks, 1500);
+      setTimeout(updateLinks, 3000);
+    })();
+  </script>
 </body>
 
 </html>
