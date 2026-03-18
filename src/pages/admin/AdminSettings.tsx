@@ -24,7 +24,9 @@ export function AdminSettings() {
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
-
+    useEffect(() => {
+        fetchConfigs();
+    }, []);
 
     const fetchConfigs = async () => {
         setLoading(true);
