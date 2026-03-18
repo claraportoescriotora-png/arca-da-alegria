@@ -19,7 +19,8 @@ export function AdminSettings() {
         logo_url: '',
         favicon_url: '',
         webhook_token: '',
-        subscription_webhook_secret: ''
+        subscription_webhook_secret: '',
+        google_tag_manager_id: ''
     });
     const [videoBanners, setVideoBanners] = useState<{ id: string, image_url: string, link_url: string }[]>([]);
 
@@ -31,7 +32,7 @@ export function AdminSettings() {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret', 'google_tag_manager_id']);
 
             if (error) throw error;
 
@@ -39,19 +40,22 @@ export function AdminSettings() {
                 logo_url: '',
                 favicon_url: '',
                 webhook_token: '',
-                subscription_webhook_secret: ''
+                subscription_webhook_secret: '',
+                google_tag_manager_id: ''
             };
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
                 const favicon = data.find(item => item.key === 'favicon_url');
                 const webhook = data.find(item => item.key === 'webhook_token');
                 const subSecret = data.find(item => item.key === 'subscription_webhook_secret');
+                const gtm = data.find(item => item.key === 'google_tag_manager_id');
                 const banners = data.find(item => item.key === 'video_banners');
 
                 if (logo) initialForm.logo_url = logo.value;
                 if (favicon) initialForm.favicon_url = favicon.value;
                 if (webhook) initialForm.webhook_token = webhook.value;
                 if (subSecret) initialForm.subscription_webhook_secret = subSecret.value;
+                if (gtm) initialForm.google_tag_manager_id = gtm.value;
                 if (banners && banners.value) {
                     try {
                         const parsed = typeof banners.value === 'string' ? JSON.parse(banners.value) : banners.value;
@@ -115,6 +119,15 @@ export function AdminSettings() {
                     { onConflict: 'key' }
                 );
             if (subSecretError) throw subSecretError;
+
+            // Upsert google_tag_manager_id
+            const { error: gtmError } = await supabase
+                .from('app_config')
+                .upsert(
+                    { key: 'google_tag_manager_id', value: formData.google_tag_manager_id },
+                    { onConflict: 'key' }
+                );
+            if (gtmError) throw gtmError;
 
             toast({ title: "Configurações salvas com sucesso!" });
 
@@ -369,7 +382,36 @@ export function AdminSettings() {
                 </section>
 
 
-                {/* Kiwify Integration Section */}
+                {/* GTM / Google Analytics Section */}
+                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-green-50/50">
+                        <div className="p-2 bg-green-100 rounded-lg text-green-600">
+                            <Plus className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-slate-800">Rastreamento e Tags</h3>
+                            <p className="text-slate-500 text-sm">Configure os IDs de acompanhamento do Google Tag Manager e Analytics.</p>
+                        </div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        {/* GTM ID */}
+                        <div className="space-y-2">
+                            <Label htmlFor="gtm_id" className="text-sm font-medium text-slate-700">Google Tag Manager ID (GTM-XXXXX)</Label>
+                            <Input
+                                id="gtm_id"
+                                placeholder="Ex: GTM-5LSCVTNJ"
+                                value={formData.google_tag_manager_id}
+                                onChange={e => setFormData({ ...formData, google_tag_manager_id: e.target.value })}
+                                className="bg-slate-50 font-mono"
+                            />
+                            <p className="text-[11px] text-slate-500 italic">
+                                * Este ID será usado para carregar os scripts do GTM em todo o site.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Integration Section */}
                 <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-100 flex items-center gap-3 bg-indigo-50/50">
                         <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">

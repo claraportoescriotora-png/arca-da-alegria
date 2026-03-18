@@ -57,8 +57,39 @@
       });
     })();
   </script>
+  <!-- Google Tag Manager (Dynamic) -->
+  <script>
+    (function () {
+      var supabaseUrl = 'https://gypzrzsmxgjtkidznstd.supabase.co';
+      var supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5cHpyenNteGdqdGtpZHpuc3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExMDc0MzYsImV4cCI6MjA4NjY4MzQzNn0.ma-K7eQc0kcU_Ks9J0HgeC-_4zAnWJkRhzP56LuS0wA';
+      var defaultGtmId = 'GTM-5LSCVTNJ';
+      var gtmId = localStorage.getItem('google_tag_manager_id') || defaultGtmId;
+
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start': new Date().getTime(), event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', gtmId);
+
+      try {
+        fetch(supabaseUrl + '/rest/v1/app_config?key=eq.google_tag_manager_id&select=value', {
+          headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data[0] && data[0].value) {
+              localStorage.setItem('google_tag_manager_id', data[0].value);
+            }
+          }).catch(function (e) { });
+      } catch (e) { }
+    })();
+  </script>
+  <!-- End Google Tag Manager -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://*.supabase.co https://*.google.com https://*.googleapis.com https://*.youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://stape.meuamiguito.com.br; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://stape.meuamiguito.com.br; frame-src https://*.youtube.com https://*.google.com https://*.mediadelivery.net https://*.b-cdn.net; connect-src 'self' https: wss://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://stape.meuamiguito.com.br;" />
+    content="default-src 'self' https://*.supabase.co https://*.google.com https://*.googleapis.com https://*.youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br; frame-src https://*.youtube.com https://*.google.com https://*.mediadelivery.net https://*.b-cdn.net; connect-src 'self' https: wss://*.supabase.co https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br;" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#6366F1" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -93,6 +124,22 @@
 </head>
 
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <script>
+      (function () {
+        var gtmId = localStorage.getItem('google_tag_manager_id') || 'GTM-5LSCVTNJ';
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + gtmId;
+        iframe.height = '0';
+        iframe.width = '0';
+        iframe.style.display = 'none';
+        iframe.style.visibility = 'hidden';
+        document.body.prepend(iframe);
+      })();
+    </script>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   <script>

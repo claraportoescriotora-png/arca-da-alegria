@@ -12,6 +12,7 @@ interface ConfigContextType {
     webhookToken: string;
     subscriptionWebhookSecret: string;
     videoBanners: VideoBanner[];
+    gtmId: string;
     loading: boolean;
 }
 
@@ -23,6 +24,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     const [webhookToken, setWebhookToken] = useState<string>('');
     const [subscriptionWebhookSecret, setSubscriptionWebhookSecret] = useState<string>('');
     const [videoBanners, setVideoBanners] = useState<VideoBanner[]>([]);
+    const [gtmId, setGtmId] = useState<string>('GTM-5LSCVTNJ');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -46,7 +48,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await supabase
                 .from('app_config')
                 .select('key, value')
-                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret']);
+                .in('key', ['logo_url', 'favicon_url', 'video_banners', 'webhook_token', 'subscription_webhook_secret', 'google_tag_manager_id']);
 
             if (data) {
                 const logo = data.find(item => item.key === 'logo_url');
@@ -58,9 +60,11 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
 
                 const webhook = data.find(item => item.key === 'webhook_token');
                 const subSecret = data.find(item => item.key === 'subscription_webhook_secret');
+                const gtm = data.find(item => item.key === 'google_tag_manager_id');
 
                 if (webhook) setWebhookToken(webhook.value);
                 if (subSecret) setSubscriptionWebhookSecret(subSecret.value);
+                if (gtm) setGtmId(gtm.value);
 
                 if (banners && banners.value) {
                     try {
@@ -80,7 +84,7 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ConfigContext.Provider value={{ logoUrl, webhookToken, subscriptionWebhookSecret, videoBanners, loading }}>
+        <ConfigContext.Provider value={{ logoUrl, webhookToken, subscriptionWebhookSecret, videoBanners, gtmId, loading }}>
             {children}
         </ConfigContext.Provider>
     );
