@@ -42,6 +42,107 @@ interface ProductAccessResult {
 // Runtime cache: content-key → cached result
 const cache = new Map<string, Omit<ProductAccessResult, 'loading'>>();
 
+export async function getProductAccess(
+    contentType: string,
+    contentId: string,
+    user: any,
+    profile: any,
+    isAdmin: boolean
+): Promise<Omit<ProductAccessResult, 'loading'>> {
+    const cacheKey = `${contentType}:${contentId}:${user?.id ?? 'anon'}:${isAdmin}`;
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey)!;
+    }
+
+    if (isAdmin) {
+        const r = { isProductGated: false, hasAccess: true, product: null };
+        cache.set(cacheKey, r);
+        return r;
+    }
+
+    try {
+        const { data: allProducts } = await supabase
+            .from('products')
+            .select('id, title, payment_url, price_label, cover_url, content, requires_separate_purchase')
+            .eq('is_active', true);
+
+        if (!allProducts || allProducts.length === 0) {
+            const r = { isProductGated: false, hasAccess: true, product: null };
+            cache.set(cacheKey, r);
+            return r;
+        }
+
+        const matchingProduct = allProducts.find((p) => {
+            const items: { type: string; id: string }[] = Array.isArray(p.content) ? p.content : [];
+            return items.some((item) => item.type === contentType && item.id === contentId);
+        });
+
+        if (!matchingProduct) {
+            const r = { isProductGated: false, hasAccess: true, product: null };
+            cache.set(cacheKey, r);
+            return r;
+        }
+
+        const productInfo: ProductInfo = {
+            id: matchingProduct.id,
+            title: matchingProduct.title,
+            payment_url: matchingProduct.payment_url,
+            price_label: matchingProduct.price_label,
+            cover_url: matchingProduct.cover_url,
+            requires_separate_purchase: matchingProduct.requires_separate_purchase ?? false,
+        };
+
+        if (!productInfo.requires_separate_purchase && profile?.subscription_status === 'active') {
+            const r = { isProductGated: false, hasAccess: true, product: null };
+            cache.set(cacheKey, r);
+            return r;
+        }
+
+        if (!user) {
+            const r = { isProductGated: true, hasAccess: false, product: productInfo };
+            cache.set(cacheKey, r);
+            return r;
+        }
+
+        const { data: ownership } = await supabase
+            .from('user_products')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('product_id', matchingProduct.id)
+            .maybeSingle();
+
+        const r = {
+            isProductGated: true,
+            hasAccess: !!ownership,
+            product: productInfo,
+        };
+        cache.set(cacheKey, r);
+        return r;
+    } catch (e) {
+        console.error('getProductAccess error:', e);
+        return { isProductGated: false, hasAccess: true, product: null };
+    }
+}
+
+import { isContentLocked, DripRequirement } from '@/lib/drip';
+
+/**
+ * Utility to asynchronously determine if an item is locked by either drip or premium gating.
+ */
+export async function checkIsItemLocked(
+    contentType: string,
+    contentId: string,
+    user: any,
+    profile: any,
+    isAdmin: boolean,
+    dripReq: DripRequirement
+): Promise<boolean> {
+    const pAccess = await getProductAccess(contentType, contentId, user, profile, isAdmin);
+    const isPremiumLocked = pAccess.isProductGated && !pAccess.hasAccess;
+    const { isLocked: isDripLocked } = isContentLocked(profile?.created_at, dripReq);
+    return isPremiumLocked || isDripLocked;
+}
+
 export function useProductAccess(contentType: string, contentId: string): ProductAccessResult {
     const { user, profile, isAdmin } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -57,107 +158,17 @@ export function useProductAccess(contentType: string, contentId: string): Produc
             return;
         }
 
-        const cacheKey = `${contentType}:${contentId}:${user?.id ?? 'anon'}:${isAdmin}`;
-        if (cache.has(cacheKey)) {
-            setResult(cache.get(cacheKey)!);
-            setLoading(false);
-            return;
-        }
+        let mounted = true;
+        setLoading(true);
 
-        const check = async () => {
-            setLoading(true);
-
-            // ─── ADMIN BYPASS ──────────────────────────────────────────────
-            if (isAdmin) {
-                const r = { isProductGated: false, hasAccess: true, product: null };
-                cache.set(cacheKey, r);
+        getProductAccess(contentType, contentId, user, profile, isAdmin).then((r) => {
+            if (mounted) {
                 setResult(r);
                 setLoading(false);
-                return;
             }
-            try {
-                // 1. Find any product containing this content item
-                const { data: allProducts } = await supabase
-                    .from('products')
-                    .select('id, title, payment_url, price_label, cover_url, content, requires_separate_purchase')
-                    .eq('is_active', true);
+        });
 
-                if (!allProducts || allProducts.length === 0) {
-                    const r = { isProductGated: false, hasAccess: true, product: null };
-                    cache.set(cacheKey, r);
-                    setResult(r);
-                    return;
-                }
-
-                const matchingProduct = allProducts.find((p) => {
-                    const items: { type: string; id: string }[] = Array.isArray(p.content) ? p.content : [];
-                    return items.some((item) => item.type === contentType && item.id === contentId);
-                });
-
-                // Content is not in any product → no extra gating
-                if (!matchingProduct) {
-                    const r = { isProductGated: false, hasAccess: true, product: null };
-                    cache.set(cacheKey, r);
-                    setResult(r);
-                    return;
-                }
-
-                const productInfo: ProductInfo = {
-                    id: matchingProduct.id,
-                    title: matchingProduct.title,
-                    payment_url: matchingProduct.payment_url,
-                    price_label: matchingProduct.price_label,
-                    cover_url: matchingProduct.cover_url,
-                    requires_separate_purchase: matchingProduct.requires_separate_purchase ?? false,
-                };
-
-                // ─── Key fix: requires_separate_purchase = false ───────────────────
-                // Product doesn't require a separate purchase from subscribers.
-                // Active subscribers get access automatically — prevents contradiction
-                // when existing subscription content is accidentally added to a product.
-                if (!productInfo.requires_separate_purchase && profile?.subscription_status === 'active') {
-                    const r = { isProductGated: false, hasAccess: true, product: null };
-                    cache.set(cacheKey, r);
-                    setResult(r);
-                    return;
-                }
-
-                // At this point either:
-                //   a) requires_separate_purchase = true (exclusive creator content), OR
-                //   b) user is not an active subscriber (trial/pending)
-                // → Check if user has purchased this specific product
-
-                if (!user) {
-                    const r = { isProductGated: true, hasAccess: false, product: productInfo };
-                    cache.set(cacheKey, r);
-                    setResult(r);
-                    return;
-                }
-
-                const { data: ownership } = await supabase
-                    .from('user_products')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('product_id', matchingProduct.id)
-                    .maybeSingle();
-
-                const r = {
-                    isProductGated: true,
-                    hasAccess: !!ownership,
-                    product: productInfo,
-                };
-                cache.set(cacheKey, r);
-                setResult(r);
-            } catch (e) {
-                console.error('useProductAccess error:', e);
-                // Fail open — never block content on error
-                setResult({ isProductGated: false, hasAccess: true, product: null });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        check();
+        return () => { mounted = false; };
     }, [contentType, contentId, user?.id, profile?.subscription_status, isAdmin]);
 
     return { loading, ...result };

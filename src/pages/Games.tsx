@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
 import { useUser } from '@/contexts/UserContext';
+import { checkIsItemLocked } from '@/hooks/useProductAccess';
 
 interface Game {
   id: string;
@@ -20,12 +21,13 @@ interface Game {
   status: string;
   unlock_delay_days?: number;
   required_mission_day?: number;
+  isLocked?: boolean;
 }
 
 export default function Games() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { profile } = useAuth(); // Get user profile from Auth (Supabase)
+  const { user, profile, isAdmin } = useAuth(); // Get user profile from Auth (Supabase)
   const { addXp, xp, level } = useUser(); // Get addXp, xp, level from UserContext (Gamification)
 
   const [games, setGames] = useState<Game[]>([]);
@@ -110,18 +112,28 @@ export default function Games() {
 
       if (error) throw error;
 
-      const formattedGames: Game[] = (data || []).map(g => ({
-        id: g.id,
-        title: g.title,
-        image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
-        difficulty: g.difficulty || 'Fácil',
-        duration: '5 min',
-        xp: g.xp_reward || 50,
-        type: g.type || 'external',
-        status: g.status || 'available',
-        unlock_delay_days: g.unlock_delay_days || 0,
-        required_mission_day: g.required_mission_day || 0
+      const formattedGames: Game[] = await Promise.all((data || []).map(async g => {
+        const isLocked = await checkIsItemLocked('game', g.id, user, profile, isAdmin, {
+          unlockDelayDays: g.unlock_delay_days,
+          requiredMissionDay: g.required_mission_day
+        });
+        return {
+          id: g.id,
+          title: g.title,
+          image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
+          difficulty: g.difficulty || 'Fácil',
+          duration: '5 min',
+          xp: g.xp_reward || 50,
+          type: g.type || 'external',
+          status: g.status || 'available',
+          unlock_delay_days: g.unlock_delay_days || 0,
+          required_mission_day: g.required_mission_day || 0,
+          isLocked
+        };
       }));
+
+      // Sort: unlocked first
+      formattedGames.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
 
       setGames(formattedGames);
     } catch (error) {

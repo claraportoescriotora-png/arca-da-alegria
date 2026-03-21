@@ -14,6 +14,7 @@ interface CoverCardProps {
     type: 'movie' | 'series';
     unlockDelayDays?: number;
     requiredMissionDay?: number;
+    forceLocked?: boolean;
 }
 
 export function CoverCard({
@@ -22,7 +23,8 @@ export function CoverCard({
     coverUrl,
     type,
     unlockDelayDays,
-    requiredMissionDay
+    requiredMissionDay,
+    forceLocked
 }: CoverCardProps) {
     const { profile } = useAuth();
     const navigate = useNavigate();
@@ -37,7 +39,7 @@ export function CoverCard({
         requiredMissionDay
     });
 
-    const isLocked = isDripLocked || isPremiumLocked;
+    const isLocked = forceLocked !== undefined ? forceLocked : (isDripLocked || isPremiumLocked);
 
     const handlePlay = () => {
         if (isLocked) {

@@ -6,11 +6,14 @@ import { CoverCard } from '@/components/CoverCard';
 import { VideoCard } from '@/components/VideoCard';
 import { supabase } from '@/lib/supabase';
 import { useConfig } from '@/contexts/ConfigContext';
+import { useAuth } from '@/contexts/AuthProvider';
+import { checkIsItemLocked } from '@/hooks/useProductAccess';
 
 interface Series {
   id: string;
   title: string;
   coverUrl: string;
+  isLocked?: boolean;
 }
 
 interface Movie {
@@ -19,6 +22,7 @@ interface Movie {
   coverUrl: string;
   unlockDelayDays: number;
   requiredMissionDay: number;
+  isLocked?: boolean;
 }
 
 interface Video {
@@ -31,6 +35,7 @@ interface Video {
   description: string;
   unlockDelayDays: number;
   requiredMissionDay: number;
+  isLocked?: boolean;
 }
 
 interface Episode {
@@ -41,10 +46,12 @@ interface Episode {
   description: string;
   unlockDelayDays: number;
   requiredMissionDay: number;
+  isLocked?: boolean;
 }
 
 export default function Videos() {
   const navigate = useNavigate();
+  const { user, profile, isAdmin } = useAuth();
   const { videoBanners } = useConfig();
   const [series, setSeries] = useState<Series[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -61,19 +68,47 @@ export default function Videos() {
     try {
       setLoading(true);
 
-      // Fetch Series
+      // Fetch Series with episodes for lock evaluation
       const { data: seriesData } = await supabase
         .from('series')
-        .select('*')
+        .select('*, seasons(episodes(id, unlock_delay_days, required_mission_day))')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (seriesData) {
-        setSeries(seriesData.map(s => ({
-          id: s.id,
-          title: s.title,
-          coverUrl: s.cover_url
-        })));
+        const formattedSeries = await Promise.all(seriesData.map(async s => {
+          let hasUnlockedEpisode = false;
+          let episodeCount = 0;
+          if (s.seasons) {
+            for (const season of s.seasons) {
+              if (season.episodes) {
+                for (const ep of season.episodes) {
+                  episodeCount++;
+                  const epLocked = await checkIsItemLocked('episode', ep.id, user, profile, isAdmin, {
+                    unlockDelayDays: ep.unlock_delay_days,
+                    requiredMissionDay: ep.required_mission_day
+                  });
+                  if (!epLocked) {
+                    hasUnlockedEpisode = true;
+                  }
+                }
+              }
+            }
+          }
+          
+          const isEpisodesLocked = episodeCount > 0 ? !hasUnlockedEpisode : true;
+          const isPremiumSeriesLocked = await checkIsItemLocked('series', s.id, user, profile, isAdmin, {});
+          
+          return {
+            id: s.id,
+            title: s.title,
+            coverUrl: s.cover_url,
+            isLocked: isPremiumSeriesLocked || isEpisodesLocked
+          };
+        }));
+        
+        formattedSeries.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setSeries(formattedSeries);
       }
 
       // Fetch Movies
@@ -84,13 +119,22 @@ export default function Videos() {
         .order('created_at', { ascending: false });
 
       if (moviesData) {
-        setMovies(moviesData.map(m => ({
-          id: m.id,
-          title: m.title,
-          coverUrl: m.cover_url,
-          unlockDelayDays: m.unlock_delay_days || 0,
-          requiredMissionDay: m.required_mission_day || 0
-        })));
+        const formattedMovies = await Promise.all(moviesData.map(async m => {
+          const isLocked = await checkIsItemLocked('movie', m.id, user, profile, isAdmin, {
+            unlockDelayDays: m.unlock_delay_days,
+            requiredMissionDay: m.required_mission_day
+          });
+          return {
+            id: m.id,
+            title: m.title,
+            coverUrl: m.cover_url,
+            unlockDelayDays: m.unlock_delay_days || 0,
+            requiredMissionDay: m.required_mission_day || 0,
+            isLocked
+          };
+        }));
+        formattedMovies.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setMovies(formattedMovies);
       }
 
       // Fetch Videos (Older content, like Músicas)
@@ -102,17 +146,26 @@ export default function Videos() {
         .limit(10); // Limit to top 10 recent videos
 
       if (videosData) {
-        setVideos(videosData.map(v => ({
-          id: v.id,
-          title: v.title,
-          thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
-          duration: v.duration || '0:00',
-          category: v.category || 'Músicas',
-          description: '',
-          videoUrl: v.video_url || '',
-          unlockDelayDays: v.unlock_delay_days || 0,
-          requiredMissionDay: v.required_mission_day || 0
-        })));
+        const formattedVideos = await Promise.all(videosData.map(async v => {
+          const isLocked = await checkIsItemLocked('video', v.id, user, profile, isAdmin, {
+            unlockDelayDays: v.unlock_delay_days,
+            requiredMissionDay: v.required_mission_day
+          });
+          return {
+            id: v.id,
+            title: v.title,
+            thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
+            duration: v.duration || '0:00',
+            category: v.category || 'Músicas',
+            description: '',
+            videoUrl: v.video_url || '',
+            unlockDelayDays: v.unlock_delay_days || 0,
+            requiredMissionDay: v.required_mission_day || 0,
+            isLocked
+          };
+        }));
+        formattedVideos.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setVideos(formattedVideos);
       }
 
       // Fetch Episodes
@@ -123,15 +176,25 @@ export default function Videos() {
         .order('created_at', { ascending: false });
 
       if (episodesData) {
-        setEpisodes(episodesData.map(e => ({
-          id: e.id,
-          title: e.title,
-          thumbnail: e.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
-          duration: e.duration || '0:00',
-          description: e.description || 'Episódio da série',
-          unlockDelayDays: e.unlock_delay_days || 0,
-          requiredMissionDay: e.required_mission_day || 0
-        })));
+        const formattedEpisodes = await Promise.all(episodesData.map(async e => {
+          const isLocked = await checkIsItemLocked('episode', e.id, user, profile, isAdmin, {
+            unlockDelayDays: e.unlock_delay_days,
+            requiredMissionDay: e.required_mission_day
+          });
+          return {
+            id: e.id,
+            title: e.title,
+            thumbnail: e.thumbnail_url || 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800',
+            duration: e.duration || '0:00',
+            description: e.description || 'Episódio da série',
+            unlockDelayDays: e.unlock_delay_days || 0,
+            requiredMissionDay: e.required_mission_day || 0,
+            isLocked
+          };
+        }));
+        // Note: Episodes here are for search results. We can sort them generally.
+        formattedEpisodes.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setEpisodes(formattedEpisodes);
       }
 
     } catch (error) {
@@ -228,6 +291,7 @@ export default function Videos() {
                         title={s.title}
                         coverUrl={s.coverUrl}
                         type="series"
+                        forceLocked={s.isLocked}
                       />
                       <p className="mt-2 text-xs font-medium text-slate-300 truncate w-full max-w-[120px] sm:max-w-[140px]">{s.title}</p>
                     </div>

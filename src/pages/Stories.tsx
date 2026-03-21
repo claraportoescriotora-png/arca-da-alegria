@@ -8,6 +8,7 @@ import { StoryCard } from '@/components/StoryCard';
 import { Pagination } from '@/components/Pagination';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthProvider';
+import { checkIsItemLocked } from '@/hooks/useProductAccess';
 
 interface Story {
   id: string;
@@ -18,6 +19,7 @@ interface Story {
   progress?: number;
   unlock_delay_days?: number;
   required_mission_day?: number;
+  isLocked?: boolean;
 }
 
 const categories = ['Todas', 'Favoritas', 'Antigo Testamento', 'Parábolas', 'Novo Testamento'];
@@ -26,7 +28,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 
 export default function Stories() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const { isFavorite } = useFavorites();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('Todas');
@@ -47,7 +49,7 @@ export default function Stories() {
       setLoading(true);
 
       // 1. Build Query
-      let query = supabase.from('stories').select('*', { count: 'exact' });
+      let query = supabase.from('stories').select('*');
 
       if (search) {
         query = query.ilike('title', `%${search}%`);
@@ -57,15 +59,10 @@ export default function Stories() {
         query = query.eq('category', activeCategory);
       }
 
-      // Add Range
-      query = query.range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
-
-      // 2. Parallel Fetch: Query & Progress (Progress still needs to handled carefully)
-      // For progress, we'll fetch only for the returned stories
-      const { data: storiesData, error: storiesError, count } = await query;
+      // Fetch all to allow client-side sorting
+      const { data: storiesData, error: storiesError } = await query;
 
       if (storiesError) throw storiesError;
-      if (count !== null) setTotalItems(count);
 
       let progressMap: Record<string, number> = {};
       if (user && storiesData && storiesData.length > 0) {
@@ -81,21 +78,28 @@ export default function Stories() {
         });
       }
 
-      // 3. Map to Component State
-      const formattedStories: Story[] = (storiesData || []).map(s => ({
-        id: s.id,
-        title: s.title,
-        image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
-        category: s.category || 'Outros',
-        duration: s.duration || '5 min',
-        progress: progressMap[s.id] || 0,
-        unlock_delay_days: s.unlock_delay_days || 0,
-        required_mission_day: s.required_mission_day || 0
+      // 3. Map to Component State and Evaluate Locks
+      const formattedStories: Story[] = await Promise.all((storiesData || []).map(async s => {
+        const isLocked = await checkIsItemLocked('story', s.id, user, profile, isAdmin, {
+          unlockDelayDays: s.unlock_delay_days,
+          requiredMissionDay: s.required_mission_day
+        });
+        
+        return {
+          id: s.id,
+          title: s.title,
+          image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
+          category: s.category || 'Outros',
+          duration: s.duration || '5 min',
+          progress: progressMap[s.id] || 0,
+          unlock_delay_days: s.unlock_delay_days || 0,
+          required_mission_day: s.required_mission_day || 0,
+          isLocked
+        };
       }));
 
-      // Special case: Favorites (this is still tricky with server-side pagination if we don't have a favorites table)
-      // If activeCategory is 'Favoritas', we might need a different query logic.
-      // But for now, let's assume the user wants the standard ones paginated.
+      // Sort: unlocked first
+      formattedStories.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
 
       setStories(formattedStories);
 
@@ -106,10 +110,15 @@ export default function Stories() {
     }
   };
 
-  // Keep a simple filter for "Favoritas" if needed, but the main ones are server-side
-  const displayStories = activeCategory === 'Favoritas'
+  // Map categories and filter
+  let displayStories = activeCategory === 'Favoritas'
     ? stories.filter(s => isFavorite(s.id))
     : stories;
+
+  // Apply Client-Side Pagination
+  const currentTotalItems = displayStories.length;
+  // Use sliced displayStories for rendering
+  const paginatedStories = displayStories.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -153,7 +162,7 @@ export default function Stories() {
             ))
           ) : (
             <>
-              {displayStories.map(story => (
+              {paginatedStories.map(story => (
                 <StoryCard
                   key={story.id}
                   id={story.id}
@@ -174,10 +183,10 @@ export default function Stories() {
           <>
             <Pagination
               currentPage={currentPage}
-              totalPages={Math.ceil(totalItems / ITEMS_PER_PAGE)}
+              totalPages={Math.ceil(currentTotalItems / ITEMS_PER_PAGE)}
               onPageChange={setCurrentPage}
             />
-            {displayStories.length === 0 && (
+            {paginatedStories.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Nenhuma história encontrada</p>
               </div>

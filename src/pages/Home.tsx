@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
 import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushSubscription';
+import { checkIsItemLocked } from '@/hooks/useProductAccess';
 
 interface ContentItem {
   id: string;
@@ -28,6 +29,7 @@ interface ContentItem {
   duration?: string;
   unlock_delay_days?: number;
   required_mission_day?: number;
+  isLocked?: boolean;
 }
 
 interface CatalogItem {
@@ -35,13 +37,14 @@ interface CatalogItem {
   title: string;
   coverUrl: string;
   type: 'movie' | 'series';
+  isLocked?: boolean;
 }
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { name, level, avatarId, notifications } = useUser();
   const { logoUrl } = useConfig();
-  const { user } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -176,48 +179,93 @@ export default function Home() {
 
       const { data: storiesData } = await supabase
         .from('stories')
-        .select('*')
-        .limit(2);
+        .select('*');
 
       if (storiesData) {
-        setRecentStories(storiesData.map(s => ({
-          id: s.id,
-          title: s.title,
-          image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
-          duration: s.duration || '5 min',
-          unlock_delay_days: s.unlock_delay_days || 0,
-          required_mission_day: s.required_mission_day || 0
-        })));
+        const parsedStories = await Promise.all(storiesData.map(async s => {
+          const isLocked = await checkIsItemLocked('story', s.id, user, profile, isAdmin, {
+            unlockDelayDays: s.unlock_delay_days,
+            requiredMissionDay: s.required_mission_day
+          });
+          return {
+            id: s.id,
+            title: s.title,
+            image: s.cover_url || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800',
+            duration: s.duration || '5 min',
+            unlock_delay_days: s.unlock_delay_days || 0,
+            required_mission_day: s.required_mission_day || 0,
+            isLocked
+          };
+        }));
+        parsedStories.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setRecentStories(parsedStories.slice(0, 2));
       }
 
       const { data: gamesData } = await supabase
         .from('games')
         .select('*')
-        .eq('is_active', true)
-        .limit(2);
+        .eq('is_active', true);
 
       if (gamesData) {
-        setRecentGames(gamesData.map(g => ({
-          id: g.id,
-          title: g.title,
-          image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
-          difficulty: g.difficulty || 'Fácil',
-          type: g.type,
-          duration: '5 min',
-          unlock_delay_days: g.unlock_delay_days || 0,
-          required_mission_day: g.required_mission_day || 0
-        })));
+        const parsedGames = await Promise.all(gamesData.map(async g => {
+          const isLocked = await checkIsItemLocked('game', g.id, user, profile, isAdmin, {
+            unlockDelayDays: g.unlock_delay_days,
+            requiredMissionDay: g.required_mission_day
+          });
+          return {
+            id: g.id,
+            title: g.title,
+            image: g.image_url || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
+            difficulty: g.difficulty || 'Fácil',
+            type: g.type,
+            duration: '5 min',
+            unlock_delay_days: g.unlock_delay_days || 0,
+            required_mission_day: g.required_mission_day || 0,
+            isLocked
+          };
+        }));
+        parsedGames.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+        setRecentGames(parsedGames.slice(0, 2));
       }
 
-      // Fetch 2 random/latest Series and 2 Movies for "Em Destaque"
-      const { data: seriesData } = await supabase.from('series').select('*').eq('is_active', true).limit(2).order('created_at', { ascending: false });
-      const { data: moviesData } = await supabase.from('movies').select('*').eq('is_active', true).limit(2).order('created_at', { ascending: false });
+      // Fetch Catalog (Series and Movies)
+      const { data: seriesData } = await supabase.from('series').select('*, seasons(episodes(id, unlock_delay_days, required_mission_day))').eq('is_active', true).order('created_at', { ascending: false });
+      const { data: moviesData } = await supabase.from('movies').select('*').eq('is_active', true).order('created_at', { ascending: false });
 
-      const combined = [
-        ...(seriesData || []).map(s => ({ id: s.id, title: s.title, coverUrl: s.cover_url, type: 'series' as const })),
-        ...(moviesData || []).map(m => ({ id: m.id, title: m.title, coverUrl: m.cover_url, type: 'movie' as const }))
-      ];
-      setFeaturedCatalog(combined);
+      const parsedSeries = await Promise.all((seriesData || []).map(async s => {
+        let hasUnlockedEpisode = false;
+        let episodeCount = 0;
+        if (s.seasons) {
+            for (const season of s.seasons) {
+              if (season.episodes) {
+                for (const ep of season.episodes) {
+                  episodeCount++;
+                  const epLocked = await checkIsItemLocked('episode', ep.id, user, profile, isAdmin, {
+                    unlockDelayDays: ep.unlock_delay_days,
+                    requiredMissionDay: ep.required_mission_day
+                  });
+                  if (!epLocked) hasUnlockedEpisode = true;
+                }
+              }
+            }
+        }
+        const isEpisodesLocked = episodeCount > 0 ? !hasUnlockedEpisode : true;
+        const isPremiumSeriesLocked = await checkIsItemLocked('series', s.id, user, profile, isAdmin, {});
+        return { id: s.id, title: s.title, coverUrl: s.cover_url, type: 'series' as const, isLocked: isPremiumSeriesLocked || isEpisodesLocked };
+      }));
+      
+      const parsedMovies = await Promise.all((moviesData || []).map(async m => {
+          const isLocked = await checkIsItemLocked('movie', m.id, user, profile, isAdmin, {
+            unlockDelayDays: m.unlock_delay_days,
+            requiredMissionDay: m.required_mission_day
+          });
+          return { id: m.id, title: m.title, coverUrl: m.cover_url, type: 'movie' as const, isLocked };
+      }));
+
+      const combined = [ ...parsedSeries, ...parsedMovies ];
+      combined.sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1));
+      
+      setFeaturedCatalog(combined.slice(0, 2));
 
     } catch (error) {
       console.error('Error loading home content:', error);
@@ -428,6 +476,7 @@ export default function Home() {
                     title={item.title}
                     coverUrl={item.coverUrl}
                     type={item.type}
+                    forceLocked={item.isLocked}
                   />
                   <p className="mt-2 text-xs font-medium text-muted-foreground truncate w-full">{item.title}</p>
                 </div>
