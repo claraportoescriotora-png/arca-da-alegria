@@ -76,7 +76,7 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
   return (
     <>
       <div
-        className={`bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 ${!isPremiumLocked && isLocked ? 'grayscale opacity-80' : 'card-hover'}`}
+        className={`bg-card rounded-2xl overflow-hidden shadow-md transition-all duration-300 ${!isPremiumLocked && isLocked ? 'grayscale opacity-75' : ''} ${!isLocked ? 'card-hover ring-2 ring-green-500 shadow-green-500/20' : ''}`}
         onClick={(e) => isLocked && handleAction(e, 'download')}
       >
         <div className="aspect-[4/3] overflow-hidden relative">
@@ -86,12 +86,17 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
             className="w-full h-full object-cover"
           />
           {isLocked && (
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center">
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center z-10">
               {isPremiumLocked ? (
                 <Lock className="w-8 h-8 mb-2 opacity-90 text-amber-400" />
               ) : (
                 <Lock className="w-8 h-8 mb-2 opacity-80" />
               )}
+            </div>
+          )}
+          {!isLocked && (
+            <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-[10px] shadow shadow-green-500/50 z-20 uppercase tracking-wider">
+              Liberado
             </div>
           )}
         </div>

@@ -43,7 +43,7 @@ export function GameCard({ id, title, image, difficulty, duration, unlockDelayDa
   return (
     <>
       <div
-        className={`flex gap-4 p-4 bg-card rounded-2xl shadow-md transition-all duration-300 ${isLocked ? 'grayscale opacity-80 cursor-default' : 'card-hover cursor-pointer'}`}
+        className={`flex gap-4 p-4 bg-card rounded-2xl shadow-md transition-all duration-300 ${isLocked ? 'grayscale opacity-75 cursor-default' : 'card-hover cursor-pointer ring-2 ring-green-500 shadow-green-500/20'}`}
         onClick={handleClick}
       >
         <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner relative">
@@ -64,7 +64,14 @@ export function GameCard({ id, title, image, difficulty, duration, unlockDelayDa
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-fredoka font-semibold text-foreground line-clamp-1">{title}</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-fredoka font-semibold text-foreground line-clamp-1">{title}</h3>
+            {!isLocked && (
+              <span className="shrink-0 px-2 py-0.5 bg-green-500 text-white rounded text-[10px] font-bold uppercase tracking-wider">
+                Liberado
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             {difficulty} • {duration}
           </p>

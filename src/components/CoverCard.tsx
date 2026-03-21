@@ -72,7 +72,8 @@ export function CoverCard({
             <div
                 className={cn(
                     "group relative rounded-lg overflow-hidden shrink-0 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 w-[120px] sm:w-[140px]",
-                    !isPremiumLocked && isLocked && "grayscale"
+                    !isPremiumLocked && isLocked ? "grayscale opacity-75" : "",
+                    !isLocked && "ring-2 ring-green-500 shadow-green-500/30"
                 )}
                 onClick={handlePlay}
             >
@@ -92,11 +93,16 @@ export function CoverCard({
                     />
 
                     {!isLocked && (
-                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div className="w-10 h-10 rounded-full bg-white/90 text-primary flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform shadow-lg">
-                                <Play className="w-5 h-5 fill-current ml-1" />
+                        <>
+                            <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-green-500 text-white rounded font-bold text-[10px] shadow shadow-green-500/50 z-20">
+                                LIBERADO
                             </div>
-                        </div>
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                                <div className="w-10 h-10 rounded-full bg-white/90 text-primary flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform shadow-lg">
+                                    <Play className="w-5 h-5 fill-current ml-1" />
+                                </div>
+                            </div>
+                        </>
                     )}
 
                     {isLocked && (

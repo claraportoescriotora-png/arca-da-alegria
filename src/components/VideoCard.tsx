@@ -77,7 +77,8 @@ export function VideoCard({
       <div
         className={cn(
           "group bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer border border-border/50",
-          !isPremiumLocked && isLocked && "grayscale"
+          !isPremiumLocked && isLocked ? "grayscale opacity-75" : "",
+          !isLocked && "ring-2 ring-green-500 shadow-green-500/20"
         )}
         onClick={handlePlay}
       >
@@ -98,11 +99,16 @@ export function VideoCard({
             />
 
             {!isLocked && (
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-lg">
-                  <Play className="w-6 h-6 fill-current ml-1" />
+              <>
+                <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-green-500 text-white rounded font-bold text-[10px] shadow shadow-green-500/50 z-20 uppercase tracking-wider">
+                  Liberado
                 </div>
-              </div>
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center z-10">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-lg">
+                    <Play className="w-6 h-6 fill-current ml-1" />
+                  </div>
+                </div>
+              </>
             )}
 
             {isLocked && (
