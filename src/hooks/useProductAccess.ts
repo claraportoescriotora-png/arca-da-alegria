@@ -42,6 +42,42 @@ interface ProductAccessResult {
 // Runtime cache: content-key → cached result
 const cache = new Map<string, Omit<ProductAccessResult, 'loading'>>();
 
+// Promise caches to avoid N+1 queries during concurrent checks
+let productsPromise: any = null;
+const ownershipPromiseCache: Record<string, any> = {};
+
+function fetchAllProducts() {
+    if (!productsPromise) {
+        productsPromise = supabase
+            .from('products')
+            .select('id, title, payment_url, price_label, cover_url, content, requires_separate_purchase')
+            .eq('is_active', true)
+            .then(res => {
+                setTimeout(() => { productsPromise = null; }, 60000);
+                return res;
+            });
+    }
+    return productsPromise;
+}
+
+function fetchOwnership(userId: string, productId: string) {
+    const key = `${userId}:${productId}`;
+    if (!ownershipPromiseCache[key]) {
+        ownershipPromiseCache[key] = supabase
+            .from('user_products')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('product_id', productId)
+            .maybeSingle()
+            .then(res => {
+                // Clear after 30s to stay relatively fresh, but solve immediate concurrent spikes
+                setTimeout(() => { delete ownershipPromiseCache[key]; }, 30000);
+                return res;
+            });
+    }
+    return ownershipPromiseCache[key];
+}
+
 export async function getProductAccess(
     contentType: string,
     contentId: string,
@@ -61,10 +97,8 @@ export async function getProductAccess(
     }
 
     try {
-        const { data: allProducts } = await supabase
-            .from('products')
-            .select('id, title, payment_url, price_label, cover_url, content, requires_separate_purchase')
-            .eq('is_active', true);
+        const productsRes = await fetchAllProducts();
+        const allProducts = productsRes.data;
 
         if (!allProducts || allProducts.length === 0) {
             const r = { isProductGated: false, hasAccess: true, product: null };
@@ -104,12 +138,8 @@ export async function getProductAccess(
             return r;
         }
 
-        const { data: ownership } = await supabase
-            .from('user_products')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('product_id', matchingProduct.id)
-            .maybeSingle();
+        const ownershipRes = await fetchOwnership(user.id, matchingProduct.id);
+        const ownership = ownershipRes.data;
 
         const r = {
             isProductGated: true,
