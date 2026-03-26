@@ -42,7 +42,7 @@ AS $$
 BEGIN
     -- Insert users who have subscription_status = 'pending' and are not yet in crm_leads
     INSERT INTO public.crm_leads (user_id, email, stage)
-    SELECT p.id, au.email, 'Novo lead'::crm_stage
+    SELECT p.id, au.email, 'Trial 5d'::crm_stage
     FROM public.profiles p
     JOIN auth.users au ON p.id = au.id
     WHERE p.subscription_status = 'pending'
