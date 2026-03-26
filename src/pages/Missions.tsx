@@ -183,6 +183,7 @@ export default function Missions() {
                 .from('mission_packs')
                 .select('*', { count: 'exact' })
                 .eq('is_active', true)
+                .order('unlock_delay_days', { ascending: true })
                 .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
 
             if (packsError) throw packsError;

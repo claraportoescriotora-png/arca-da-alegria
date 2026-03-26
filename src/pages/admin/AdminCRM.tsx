@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
     Loader2, Search, Calendar, CheckSquare, 
     MessageSquare, Trash2, X, Plus, Clock, Download, 
-    LayoutDashboard, ListTodo, User, DollarSign
+    LayoutDashboard, ListTodo, User, DollarSign, Mail
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -59,6 +59,7 @@ function LeadModal({
     const { toast } = useToast();
     const [notes, setNotes] = useState(lead.notes || '');
     const [name, setName] = useState(lead.name || '');
+    const [email, setEmail] = useState(lead.email || '');
     const [valueStr, setValueStr] = useState(lead.value ? lead.value.toString() : '');
     const [reminderDate, setReminderDate] = useState(
         lead.reminder_date ? format(parseISO(lead.reminder_date), "yyyy-MM-dd'T'HH:mm") : ''
@@ -92,10 +93,12 @@ function LeadModal({
             await onSave({
                 id: lead.id,
                 name: name.trim() || null,
+                email: email.trim() || null,
                 value: valueStr ? parseFloat(valueStr) : null,
                 notes,
                 reminder_date: reminderDate ? new Date(reminderDate).toISOString() : null,
-                tasks
+                tasks,
+                stage: lead.stage
             });
             onClose();
         } finally {
@@ -185,7 +188,7 @@ function LeadModal({
                 <div className="p-6 overflow-y-auto space-y-6 flex-1">
                     {activeTab === 'details' ? (
                         <>
-                            <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         {/* Name */}
                         <div className="space-y-2">
                             <Label className="flex items-center gap-2">
@@ -209,6 +212,18 @@ function LeadModal({
                                 placeholder="0.00" 
                                 value={valueStr}
                                 onChange={(e) => setValueStr(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Contato */}
+                        <div className="space-y-2 col-span-2">
+                            <Label className="flex items-center gap-2">
+                                <Mail className="w-4 h-4 text-slate-500" /> Contato (Email / Telefone)
+                            </Label>
+                            <Input 
+                                placeholder="E-mail ou Telefone do lead..." 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                     </div>
@@ -401,14 +416,32 @@ export function AdminCRM() {
 
     const handleSaveLead = async (updates: Partial<CRMLead>) => {
         try {
-            const { error } = await supabase
-                .from('crm_leads')
-                .update({ ...updates, updated_at: new Date().toISOString() })
-                .eq('id', updates.id);
-            if (error) throw error;
-            
-            toast({ title: 'Lead salvo com sucesso!' });
-            setLeads(prev => prev.map(l => l.id === updates.id ? { ...l, ...updates } : l));
+            if (updates.id === 'new') {
+                const { id, profiles, ...insertData } = updates;
+                const { data, error } = await supabase
+                    .from('crm_leads')
+                    .insert({
+                        ...insertData,
+                        stage: insertData.stage || 'Novo lead'
+                    })
+                    .select('*, profiles!crm_leads_user_id_fkey(created_at)')
+                    .single();
+                
+                if (error) throw error;
+                
+                toast({ title: 'Lead adicionado com sucesso!' });
+                setLeads([data, ...leads]);
+            } else {
+                const { id, profiles, ...cleanUpdates } = updates;
+                const { error } = await supabase
+                    .from('crm_leads')
+                    .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
+                    .eq('id', updates.id);
+                if (error) throw error;
+                
+                toast({ title: 'Lead salvo com sucesso!' });
+                setLeads(prev => prev.map(l => l.id === updates.id ? { ...l, ...updates } : l));
+            }
         } catch (error: any) {
             toast({ variant: 'destructive', title: 'Erro ao salvar', description: error.message });
             throw error;
@@ -544,6 +577,14 @@ export function AdminCRM() {
                             className="pl-9 bg-white"
                         />
                     </div>
+                    
+                    <Button 
+                        onClick={() => setActiveLead({ id: 'new', user_id: null, email: null, name: '', value: null, social_id: null, stage: 'Novo lead', notes: '', reminder_date: null, tasks: [], created_at: new Date().toISOString(), updated_at: new Date().toISOString() })} 
+                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Lead
+                    </Button>
 
                     <Button variant="outline" onClick={handleExportCSV} className="bg-white">
                         <Download className="w-4 h-4 mr-2" />

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Smartphone, Mail, Lock, Sparkles, ArrowRight, ToggleLeft as Toggle } from "lucide-react";
+import { Smartphone, Mail, Lock, Sparkles, ArrowRight, ToggleLeft as Toggle, DownloadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useConfig } from "@/contexts/ConfigContext";
@@ -18,6 +19,32 @@ const Login = () => {
   const { logoUrl } = useConfig();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // PWA Install State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } else {
+      // If no native prompt, show instructions modal (especially for iOS)
+      setShowInstallModal(true);
+    }
+  };
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +124,15 @@ const Login = () => {
                 className={`w-full h-full object-contain drop-shadow-md transition-opacity duration-300 ${logoUrl ? 'opacity-100' : 'opacity-0'}`}
               />
             </div>
+            
+            <Button 
+              onClick={handleInstallClick}
+              variant="outline"
+              className="bg-blue-50/50 hover:bg-blue-100 border-blue-200 text-blue-700 font-bold rounded-full px-6 shadow-sm transition-all text-sm"
+            >
+              <DownloadCloud className="w-4 h-4 mr-2" />
+              Instalar o Aplicativo
+            </Button>
           </CardHeader>
           <CardContent>
             {!sent ? (
@@ -222,6 +258,35 @@ const Login = () => {
           </CardFooter>
         </Card>
       </div>
+
+      <Dialog open={showInstallModal} onOpenChange={setShowInstallModal}>
+        <DialogContent className="sm:max-w-md w-11/12 rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center text-blue-900 flex items-center justify-center gap-2">
+              <Smartphone className="w-6 h-6 text-blue-500" />
+              Como instalar o App
+            </DialogTitle>
+            <DialogDescription className="text-center pt-4 text-base space-y-4">
+              <p>
+                <strong>No iPhone (Safari):</strong><br />
+                1. Toque no ícone de Compartilhar <span className="inline-block border border-gray-300 rounded p-1 mx-1 px-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span> na barra inferior do Safari.<br />
+                2. Role para baixo e toque em <strong>Adicionar à Tela de Início</strong> (Add to Home Screen).
+              </p>
+              <div className="w-full h-px bg-gray-200 my-2"></div>
+              <p>
+                <strong>No Android (Chrome):</strong><br />
+                1. Toque nos 3 pontinhos <span className="inline-block border border-gray-300 rounded p-1 mx-1 pb-1">⋮</span> no canto superior direito.<br />
+                2. Selecione <strong>Adicionar à tela inicial</strong> ou <strong>Instalar aplicativo</strong>.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-4">
+            <Button onClick={() => setShowInstallModal(false)} className="bg-blue-500 text-white w-full rounded-2xl h-12">
+              Entendido!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

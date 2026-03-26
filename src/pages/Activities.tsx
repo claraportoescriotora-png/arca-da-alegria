@@ -41,6 +41,7 @@ export default function Activities() {
       }
 
       const { data, count, error } = await query
+        .order('unlock_delay_days', { ascending: true })
         .order('created_at', { ascending: false })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
