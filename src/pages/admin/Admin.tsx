@@ -16,6 +16,7 @@ import { AdminTestSuite } from '@/pages/admin/AdminTestSuite';
 import { AdminCharades } from '@/pages/admin/AdminCharades';
 import { AdminSettings } from '@/pages/admin/AdminSettings';
 import { AdminProducts } from '@/pages/admin/AdminProducts';
+import { AdminCRM } from '@/pages/admin/AdminCRM';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -86,6 +87,7 @@ export default function Admin() {
                     <Route path="test-suite" element={<AdminTestSuite />} />
                     <Route path="settings" element={<AdminSettings />} />
                     <Route path="products" element={<AdminProducts />} />
+                    <Route path="crm" element={<AdminCRM />} />
                 </Routes>
             </main>
         </div>
