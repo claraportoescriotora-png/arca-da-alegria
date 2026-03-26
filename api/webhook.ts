@@ -324,6 +324,16 @@ export default async function handler(req: any, res: any) {
                 }
             }
 
+            // Update CRM Lead Status to 'Ganho'
+            try {
+                await supabase.from('crm_leads').update({
+                    stage: 'Ganho',
+                    updated_at: new Date().toISOString()
+                }).eq('email', email);
+            } catch (err) {
+                console.error('Falha ao atualizar CRM Lead para Ganho:', err);
+            }
+
         } else if (['refunded', 'chargedback', 'subscription_canceled'].includes(orderStatus)) {
             // Cancel subscription
             await supabase.from('profiles').update({ subscription_status: 'canceled' }).eq('email', email);
