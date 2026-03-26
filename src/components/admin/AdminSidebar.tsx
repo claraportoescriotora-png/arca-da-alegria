@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Video, Gamepad2, Target, Download, Home, LogOut, Sparkles, ShoppingCart, Film, Layers, Smile, Settings, Package, FlaskConical, Users } from 'lucide-react';
+import { BookOpen, Video, Gamepad2, Target, Download, Home, LogOut, Sparkles, ShoppingCart, Film, Layers, Smile, Settings, Package, FlaskConical, Users, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 
@@ -12,6 +12,7 @@ const menuItems = [
     { label: 'Opções (Mímica)', icon: Smile, path: '/admin/charades' },
     { label: 'Loja de Produtos', icon: ShoppingCart, path: '/admin/products' },
     { label: 'CRM Leads', icon: Users, path: '/admin/crm' },
+    { label: 'Campanhas', icon: Mail, path: '/admin/campaigns' },
     { icon: Settings, label: "Configurações", path: "/admin/settings" },
     { label: 'Missões', icon: Target, path: '/admin/missions' },
     { label: 'Downloads', icon: Download, path: '/admin/downloads' },

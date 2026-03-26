@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
     Loader2, Search, Calendar, CheckSquare, 
     MessageSquare, Trash2, X, Plus, Clock, Download, 
-    LayoutDashboard, ListTodo, User, DollarSign, Mail
+    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -41,6 +41,7 @@ interface CRMLead {
     stage: string;
     notes: string;
     reminder_date: string | null;
+    tags: string[];
     tasks: CRMTask[];
     created_at: string;
     updated_at: string;
@@ -65,6 +66,8 @@ function LeadModal({
         lead.reminder_date ? format(parseISO(lead.reminder_date), "yyyy-MM-dd'T'HH:mm") : ''
     );
     const [tasks, setTasks] = useState<CRMTask[]>(lead.tasks || []);
+    const [tags, setTags] = useState<string[]>(lead.tags || []);
+    const [newTagText, setNewTagText] = useState('');
     const [newTaskText, setNewTaskText] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -98,6 +101,7 @@ function LeadModal({
                 notes,
                 reminder_date: reminderDate ? new Date(reminderDate).toISOString() : null,
                 tasks,
+                tags,
                 stage: lead.stage
             });
             onClose();
@@ -251,6 +255,49 @@ function LeadModal({
                             value={reminderDate}
                             onChange={(e) => setReminderDate(e.target.value)}
                         />
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-3">
+                        <Label className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-purple-500" /> Tags do Lead
+                        </Label>
+                        
+                        <div className="flex gap-2">
+                            <Input 
+                                placeholder="Nova tag (ex: VIP)..." 
+                                value={newTagText}
+                                onChange={(e) => setNewTagText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        if (newTagText.trim() && !tags.includes(newTagText.trim())) {
+                                            setTags([...tags, newTagText.trim()]);
+                                            setNewTagText('');
+                                        }
+                                    }
+                                }}
+                            />
+                            <Button type="button" onClick={() => {
+                                if (newTagText.trim() && !tags.includes(newTagText.trim())) {
+                                    setTags([...tags, newTagText.trim()]);
+                                    setNewTagText('');
+                                }
+                            }} disabled={!newTagText.trim()}>
+                                Adicionar
+                            </Button>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {tags.map(tag => (
+                                <div key={tag} className="flex items-center gap-1 bg-purple-100 text-purple-700 font-medium text-xs px-2.5 py-1 rounded-full">
+                                    {tag}
+                                    <button onClick={() => setTags(tags.filter(t => t !== tag))} className="hover:text-purple-900 focus:outline-none">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Tasks */}
@@ -579,7 +626,7 @@ export function AdminCRM() {
                     </div>
                     
                     <Button 
-                        onClick={() => setActiveLead({ id: 'new', user_id: null, email: null, name: '', value: null, social_id: null, stage: 'Novo lead', notes: '', reminder_date: null, tasks: [], created_at: new Date().toISOString(), updated_at: new Date().toISOString() })} 
+                        onClick={() => setActiveLead({ id: 'new', user_id: null, email: null, name: '', value: null, social_id: null, stage: 'Novo lead', notes: '', reminder_date: null, tasks: [], tags: [], created_at: new Date().toISOString(), updated_at: new Date().toISOString() })} 
                         className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                     >
                         <Plus className="w-4 h-4 mr-2" />
@@ -662,6 +709,11 @@ export function AdminCRM() {
                                                                 Trial: Dia {trialInfo.daysActive}
                                                             </span>
                                                         )}
+                                                        {lead.tags && lead.tags.map(t => (
+                                                            <span key={t} className="inline-flex text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 border border-purple-100">
+                                                                #{t}
+                                                            </span>
+                                                        ))}
                                                     </div>
 
                                                     {(totalTasks > 0 || lead.reminder_date || lead.notes) && (

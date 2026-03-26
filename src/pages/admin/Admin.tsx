@@ -17,6 +17,7 @@ import { AdminCharades } from '@/pages/admin/AdminCharades';
 import { AdminSettings } from '@/pages/admin/AdminSettings';
 import { AdminProducts } from '@/pages/admin/AdminProducts';
 import { AdminCRM } from '@/pages/admin/AdminCRM';
+import { AdminCampaigns } from '@/pages/admin/AdminCampaigns';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -88,6 +89,7 @@ export default function Admin() {
                     <Route path="settings" element={<AdminSettings />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="crm" element={<AdminCRM />} />
+                    <Route path="campaigns" element={<AdminCampaigns />} />
                 </Routes>
             </main>
         </div>
