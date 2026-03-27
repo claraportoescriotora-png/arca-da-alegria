@@ -324,12 +324,28 @@ export default async function handler(req: any, res: any) {
                 }
             }
 
-            // Update CRM Lead Status to 'Ganho'
+            // Update CRM Lead Status to 'Ganho' or create if not exists
             try {
-                await supabase.from('crm_leads').update({
-                    stage: 'Ganho',
-                    updated_at: new Date().toISOString()
-                }).eq('email', email);
+                const { data: existingLead } = await supabase
+                    .from('crm_leads')
+                    .select('id')
+                    .eq('email', email)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (existingLead) {
+                    await supabase.from('crm_leads').update({
+                        stage: 'Ganho',
+                        updated_at: new Date().toISOString()
+                    }).eq('id', existingLead.id);
+                } else {
+                    await supabase.from('crm_leads').insert({
+                        email: email,
+                        name: fullName || email.split('@')[0],
+                        stage: 'Ganho',
+                        user_id: userId
+                    });
+                }
             } catch (err) {
                 console.error('Falha ao atualizar CRM Lead para Ganho:', err);
             }

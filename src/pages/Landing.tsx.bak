@@ -142,8 +142,6 @@ export default function Landing() {
                             src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
                             alt="Meu Amiguito"
                             className="h-12 w-auto"
-                            width="649"
-                            height="293"
                         />
                     </div>
 
@@ -213,8 +211,6 @@ export default function Landing() {
                             src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/natameseufilhoheroamiguito%20(1).webp"
                             alt="Nathan e seu filho"
                             className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
-                            width="455"
-                            height="548"
                         />
                     </div>
                 </div>
@@ -299,9 +295,6 @@ export default function Landing() {
                                 src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/familianatan%20(1).webp"
                                 alt="Natan Lima e sua família"
                                 className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
-                                width="600"
-                                height="800"
-                                loading="lazy"
                             />
                         </div>
                         <div className="space-y-6">
@@ -369,9 +362,6 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Daneil%20e%20a%20ovelhinha.webp"
                                     alt="Criança lendo com ovelhinha"
                                     className="w-full max-w-sm h-auto"
-                                    width="500"
-                                    height="575"
-                                    loading="lazy"
                                 />
                             </div>
 
@@ -460,9 +450,6 @@ export default function Landing() {
                                 src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/smartphonemockupamiguito.webp"
                                 alt="App Meu Amiguito"
                                 className="w-full max-w-md h-auto hover:scale-105 transition-transform duration-500"
-                                width="645"
-                                height="677"
-                                loading="lazy"
                             />
                         </div>
                     </div>
@@ -597,9 +584,6 @@ export default function Landing() {
                                 src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/mockupmissoes.webp"
                                 alt="Missões Diárias"
                                 className="relative w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                                width="490"
-                                height="513"
-                                loading="lazy"
                             />
                         </div>
                     </div>
@@ -723,7 +707,7 @@ export default function Landing() {
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={scrollToOffer} className="bg-orange-700 hover:bg-orange-800 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
+                            <button onClick={scrollToOffer} className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
                                 Quero esse superpoder para meu filho
                             </button>
                         </div>
@@ -801,7 +785,7 @@ export default function Landing() {
                                         <button
                                             onClick={prevGame}
                                             className="p-3 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600 transition-all hover:scale-110"
-                                            aria-label="Ver jogo anterior"
+                                            aria-label="Jogo anterior"
                                         >
                                             <ChevronLeft className="w-6 h-6" />
                                         </button>
@@ -821,7 +805,7 @@ export default function Landing() {
                                         <button
                                             onClick={nextGame}
                                             className="p-3 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600 transition-all hover:scale-110"
-                                            aria-label="Ver próximo jogo"
+                                            aria-label="Próximo jogo"
                                         >
                                             <ChevronRight className="w-6 h-6" />
                                         </button>
@@ -897,7 +881,7 @@ export default function Landing() {
                                         <button
                                             onClick={prevVideo}
                                             className="p-3 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 transition-all hover:scale-110"
-                                            aria-label="Ver vídeo anterior"
+                                            aria-label="Vídeo anterior"
                                         >
                                             <ChevronLeft className="w-6 h-6" />
                                         </button>
@@ -917,7 +901,7 @@ export default function Landing() {
                                         <button
                                             onClick={nextVideo}
                                             className="p-3 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 transition-all hover:scale-110"
-                                            aria-label="Ver próximo vídeo"
+                                            aria-label="Próximo vídeo"
                                         >
                                             <ChevronRight className="w-6 h-6" />
                                         </button>
@@ -1173,7 +1157,7 @@ export default function Landing() {
                         href="https://wa.me/5513997666181?text=Oii%20Tio%20Natan%2C%20vim%20do%20site%20do%20Meu%20amiguito%20e%20gostaria%20de%20tirar%20umas%20d%C3%BAvidas%20antes%20de%20fazer%20parte%20da%20comunidade%21"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-3 bg-green-700 hover:bg-green-800 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                        className="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                     >
                         <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
@@ -1266,7 +1250,7 @@ export default function Landing() {
                                             href="https://pay.kiwify.com.br/6UbyckE"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="block w-full bg-green-700 hover:bg-green-800 text-white text-center px-8 py-5 rounded-xl text-xl font-bold transition-all shadow-lg hover:shadow-green-500/30 hover:-translate-y-1 group"
+                                            className="block w-full bg-green-500 hover:bg-green-600 text-white text-center px-8 py-5 rounded-xl text-xl font-bold transition-all shadow-lg hover:shadow-green-500/30 hover:-translate-y-1 group"
                                         >
                                             QUERO MEU FILHO PROTEGIDO
                                         </a>
@@ -1290,9 +1274,6 @@ export default function Landing() {
                         src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
                         alt="Meu Amiguito"
                         className="h-10 w-auto mx-auto"
-                        width="649"
-                        height="293"
-                        loading="lazy"
                     />
                     <div className="text-purple-300 text-xs leading-relaxed space-y-4">
                         <p>
