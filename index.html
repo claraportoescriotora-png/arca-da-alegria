@@ -93,8 +93,8 @@
         } catch (e) { }
       }
 
-      // Load GTM on first user interaction
-      var interactionEvents = ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'];
+      // Load GTM on first meaningful user interaction (mousemove excluded - fires too early)
+      var interactionEvents = ['scroll', 'touchstart', 'keydown', 'click'];
       function onFirstInteraction() {
         loadGTM();
         interactionEvents.forEach(function (event) {
@@ -105,13 +105,13 @@
         window.addEventListener(event, onFirstInteraction, { passive: true });
       });
 
-      // Safety net: load GTM after 3 seconds even without interaction
-      setTimeout(loadGTM, 3000);
+      // Safety net: load GTM after 2 seconds even without interaction
+      setTimeout(loadGTM, 2000);
     })();
   </script>
   <!-- End Google Tag Manager -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://*.supabase.co https://*.google.com https://*.googleapis.com https://*.youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.youtube.com https://*.google.com https://*.mediadelivery.net https://*.b-cdn.net https://*.googletagmanager.com https://*.doubleclick.net https://stape.meuamiguito.com.br; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.googleapis.com https://*.gstatic.com https://video.bunnycdn.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br https://*.google.com https://*.google.com.br https://*.doubleclick.net;" />
+    content="default-src 'self' https://*.supabase.co https://*.google.com https://*.googleapis.com https://*.youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br https://connect.facebook.net https://cdn.visitorapi.com; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br https://connect.facebook.net https://cdn.visitorapi.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.youtube.com https://*.google.com https://*.mediadelivery.net https://*.b-cdn.net https://*.googletagmanager.com https://*.doubleclick.net https://stape.meuamiguito.com.br; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.googleapis.com https://*.gstatic.com https://video.bunnycdn.com https://*.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://stape.meuamiguito.com.br https://*.google.com https://*.google.com.br https://*.doubleclick.net https://connect.facebook.net https://cdn.visitorapi.com;" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#6366F1" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -129,6 +129,10 @@
   <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Preload critical font (Fredoka) used in LCP hero title -->
+  <link rel="preload" as="font" type="font/woff2"
+    href="https://fonts.gstatic.com/s/fredoka/v14/X7nP4b87HvSqjb_WIi2yDCRwoQ.woff2"
+    crossorigin="anonymous">
   <link
     href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
@@ -165,6 +169,19 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+  <!-- Service Worker registration deferred to after page load to avoid render blocking -->
+  <script>
+    window.addEventListener('load', function () {
+      if ('serviceWorker' in navigator) {
+        // Small extra delay to prioritize interactive content first
+        setTimeout(function () {
+          import('/registerSW.js').catch(function () {
+            // registerSW.js may not exist in dev mode - silently ignore
+          });
+        }, 1000);
+      }
+    });
+  </script>
   <script>
     (function () {
       var checkoutPrefixes = ["pay.kiwify.com.br"];

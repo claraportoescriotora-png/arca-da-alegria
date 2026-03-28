@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
         srcDir: 'src',
         filename: 'sw.ts',
         registerType: 'autoUpdate',
+        inlineRegister: false,
         devOptions: {
           enabled: true,
           type: 'module'
