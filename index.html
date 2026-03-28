@@ -123,11 +123,11 @@
   <meta name="google-site-verification" content="notranslate" />
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
-  <!-- Supabase preconnect: both variants needed (images use anonymous, API uses CORS) -->
-  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
+  <!-- Supabase: crossorigin preconnect covers both CORS fetch/API and image requests in Chrome -->
   <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <!-- Non-blocking Google Fonts: loaded async, text renders immediately with system fonts -->
   <link rel="preload"
     href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
@@ -137,16 +137,24 @@
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
   </noscript>
+  <!-- CRITICAL CSS: above-fold styles inlined to prevent FOUC when main CSS loads async -->
+  <!-- Covers: body, header, hero section, H1 — everything visible before first scroll -->
   <style>
-    html,
-    body {
-      overscroll-behavior-y: contain;
-      scroll-behavior: smooth;
-    }
-
-    .notranslate {
-      translate: no !important;
-    }
+    *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid}
+    html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:'Fredoka','Trebuchet MS','Segoe UI',system-ui,sans-serif}
+    body{margin:0;line-height:inherit;overscroll-behavior-y:contain;scroll-behavior:smooth;background-color:#fff;color:#111827}
+    h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
+    img,video{max-width:100%;height:auto;display:block}
+    /* Header above-fold */
+    .lp-header{background-color:rgba(255,255,255,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;border-bottom:2px solid #ede9fe}
+    /* Hero gradient - purple-200 to purple-300 */
+    .lp-hero{background:linear-gradient(to bottom right,#ddd6fe,#c4b5fd,#c4b5fd);padding-top:5rem;overflow:hidden;position:relative}
+    /* H1 critical text styles */
+    .lp-h1{font-size:2.25rem;line-height:1.25;font-weight:700;color:#111827;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif}
+    @media(min-width:768px){.lp-h1{font-size:3rem}}
+    /* Prevent layout shift on images */
+    img{display:block}
+    .notranslate{translate:no!important}
   </style>
   <meta name="description" content="Meu Amiguito - Aplicativo Infantil Cristão" />
 </head>

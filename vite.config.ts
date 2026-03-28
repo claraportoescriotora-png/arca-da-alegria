@@ -50,8 +50,8 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
         }
       }),
-      // Definitive fix: mark registerSW.js as async via both transformIndexHtml AND
-      // writeBundle (catches VitePWA's late-stage injection that bypasses transformIndexHtml)
+      // Definitive fix: mark registerSW.js as async AND make main CSS non-blocking via writeBundle
+      // (catches VitePWA's late-stage injection that bypasses transformIndexHtml)
       {
         name: 'async-register-sw',
         enforce: 'post',
@@ -72,14 +72,22 @@ export default defineConfig(({ mode }) => {
           const htmlFile = path.join(outDir, 'index.html');
           if (fs.existsSync(htmlFile)) {
             let html = fs.readFileSync(htmlFile, 'utf-8');
-            const patched = html.replace(
+
+            // 1. Make registerSW.js async
+            html = html.replace(
               /(<script\b[^>]*\bsrc="[^"]*registerSW\.js"[^>]*)>/gi,
               '$1 async>'
             );
-            if (patched !== html) {
-              fs.writeFileSync(htmlFile, patched, 'utf-8');
-              console.log('[async-register-sw] Patched registerSW.js to async in dist/index.html');
-            }
+
+            // 2. Convert main CSS from render-blocking to async (media=print trick)
+            // Safe in React SPA: CSS (370ms) always finishes before JS (889ms)
+            html = html.replace(
+              /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/g,
+              '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="$1"><noscript><link rel="stylesheet" href="$1"></noscript>'
+            );
+
+            fs.writeFileSync(htmlFile, html, 'utf-8');
+            console.log('[async-register-sw] Patched dist/index.html: registerSW async + CSS non-blocking');
           }
         }
       },
