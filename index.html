@@ -123,60 +123,66 @@
   <meta name="google-site-verification" content="notranslate" />
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
-  <!-- Supabase: crossorigin preconnect covers both CORS fetch/API and image requests in Chrome -->
-  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
+  <title>Amiguitos - App Infantil Cristão</title>
+  <!-- Supabase: no crossorigin (default) for image preconnect; consolidation to fix audit warning -->
+  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <!-- Optimization: Preload the main title font to avoid text shift (CLS) -->
+  <link rel="preload" href="https://fonts.gstatic.com/s/fredoka/v17/X7n64b87HvSqjb_WIi2yDCRwoQ_k7367_B-i2yQag0-mac3OFiXMFg.woff2" as="font" type="font/woff2" crossorigin>
   <!-- Non-blocking Google Fonts: loaded async, text renders immediately with system fonts -->
   <link rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap"
     as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
     <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap">
   </noscript>
-  <!-- CRITICAL CSS: above-fold styles inlined to prevent FOUC when main CSS loads async -->
-  <!-- Covers: body, header, hero section, H1 — everything visible before first scroll -->
+  <!-- CRITICAL CSS: Inlined above-fold layout styles -->
   <style>
     *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid}
-    html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:'Fredoka','Trebuchet MS','Segoe UI',system-ui,sans-serif}
+    html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif}
     body{margin:0;line-height:inherit;overscroll-behavior-y:contain;scroll-behavior:smooth;background-color:#fff;color:#111827}
-    h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
-    img,video{max-width:100%;height:auto;display:block}
-    /* Header above-fold */
-    .lp-header{background-color:rgba(255,255,255,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;border-bottom:2px solid #ede9fe}
-    /* Hero gradient - purple-200 to purple-300 */
+    h1,h2,p{margin:0}
+    img{max-width:100%;height:auto;display:block}
+    .container{width:100%;max-width:1152px;margin-right:auto;margin-left:auto;padding-right:1.5rem;padding-left:1.5rem}
+    .lp-header{background-color:rgba(255,255,255,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;border-bottom:2px solid #ede9fe;height:80px}
     .lp-hero{background:linear-gradient(to bottom right,#ddd6fe,#c4b5fd,#c4b5fd);padding-top:5rem;overflow:hidden;position:relative}
-    /* H1 critical text styles */
-    .lp-h1{font-size:2.25rem;line-height:1.25;font-weight:700;color:#111827;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif}
+    .lp-h1{font-size:2.25rem;line-height:1.2;font-weight:700;color:#111827;margin-bottom:1.5rem}
     @media(min-width:768px){.lp-h1{font-size:3rem}}
-    /* Prevent layout shift on images */
-    img{display:block}
-    .notranslate{translate:no!important}
+    .lp-button{background-color:#9333ea;color:#fff;padding:1rem 2rem;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none}
+    .lp-illustration{width:100%;max-width:48rem;height:auto;margin-left:auto;margin-right:auto;display:block;transform:scale(1.1);transform-origin:bottom}
+    @media(min-width:1024px){.lp-illustration{max-width:120%;transform:translateY(2rem) scale(1.25)}}
   </style>
   <meta name="description" content="Meu Amiguito - Aplicativo Infantil Cristão" />
 </head>
 
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript>
-    <script>
-      (function () {
-        var gtmId = localStorage.getItem('google_tag_manager_id') || 'GTM-5LSCVTNJ';
-        var iframe = document.createElement('iframe');
-        iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + gtmId;
-        iframe.height = '0';
-        iframe.width = '0';
-        iframe.style.display = 'none';
-        iframe.style.visibility = 'hidden';
-        document.body.prepend(iframe);
-      })();
-    </script>
-  </noscript>
-  <!-- End Google Tag Manager (noscript) -->
-  <div id="root"></div>
+  <!-- Shell SSR: Static Hero Content visible before JS loads -->
+  <div id="root">
+    <div class="min-h-screen bg-white">
+        <header class="lp-header">
+            <div class="container flex h-full items-center justify-between">
+                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" style="height:48px;width:auto;">
+                <div style="background-color:#7e22ce;color:#fff;padding:12px 24px;border-radius:99px;font-weight:bold;">Assinar agora</div>
+            </div>
+        </header>
+        <section class="lp-hero">
+            <div class="container grid md:grid-cols-2 gap-12 items-end">
+                <div style="padding-bottom:5rem;">
+                    <h1 class="lp-h1">O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido...</h1>
+                    <p style="font-size:1.125rem;color:#374151;margin-bottom:2rem;">O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos...</p>
+                    <div class="lp-button">Quero acessar agora &rarr;</div>
+                </div>
+                <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;">
+                    <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" class="lp-illustration" width="455" height="548">
+                </div>
+            </div>
+        </section>
+    </div>
+  </div>
   <script type="module" src="/src/main.tsx"></script>
   <!-- SW registration is handled in main.tsx via requestIdleCallback (non-blocking) -->
   <script>
