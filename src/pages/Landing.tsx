@@ -159,7 +159,7 @@ export default function Landing() {
                         </a>
                         <button
                             onClick={scrollToOffer}
-                            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-bold transition-all shadow-soft active:scale-95"
+                            className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-3 rounded-full font-bold transition-all shadow-soft active:scale-95"
                         >
                             Assinar agora
                         </button>
@@ -616,7 +616,7 @@ export default function Landing() {
                                 </div>
                             </div>
 
-                            <button onClick={scrollToOffer} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
+                            <button onClick={scrollToOffer} className="w-full sm:w-auto bg-green-800 hover:bg-green-900 text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
                                 QUERO CRIAR ESSE PADRÃO NO MEU FILHO
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
@@ -820,8 +820,8 @@ export default function Landing() {
                                 {/* Content Side */}
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Gamepad2 className="w-6 h-6 text-purple-500" />
-                                        <span className="text-sm font-bold text-purple-500 tracking-wider uppercase">JOGO EM DESTAQUE</span>
+                                        <Gamepad2 className="w-6 h-6 text-purple-800" />
+                                        <span className="text-sm font-bold text-purple-800 tracking-wider uppercase">JOGO EM DESTAQUE</span>
                                     </div>
 
                                     <h3 className="text-3xl font-bold text-gray-900">
@@ -919,8 +919,8 @@ export default function Landing() {
                                 {/* Content Side */}
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Play className="w-6 h-6 text-blue-500 fill-current" />
-                                        <span className="text-sm font-bold text-blue-500 tracking-wider uppercase">EM CARTAZ</span>
+                                        <Play className="w-6 h-6 text-blue-800 fill-current" />
+                                        <span className="text-sm font-bold text-blue-800 tracking-wider uppercase">EM CARTAZ</span>
                                     </div>
 
                                     <h3 className="text-3xl font-bold text-gray-900">
@@ -1104,7 +1104,7 @@ export default function Landing() {
 
                         {/* Bonus 1 */}
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
-                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                            <div className="absolute -top-4 -right-4 bg-red-700 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
                                 Bônus 1
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
@@ -1129,7 +1129,7 @@ export default function Landing() {
 
                         {/* Bonus 2 */}
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
-                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                            <div className="absolute -top-4 -right-4 bg-red-700 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
                                 Bônus 2
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
@@ -1154,7 +1154,7 @@ export default function Landing() {
 
                         {/* Bonus 3 */}
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
-                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                            <div className="absolute -top-4 -right-4 bg-red-700 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
                                 Bônus 3
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
@@ -1179,7 +1179,7 @@ export default function Landing() {
 
                         {/* Bonus 4 */}
                         <div className="bg-white rounded-3xl p-6 shadow-soft border-2 border-orange-100 flex flex-col hover:-translate-y-2 transition-transform duration-300 relative">
-                            <div className="absolute -top-4 -right-4 bg-red-500 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
+                            <div className="absolute -top-4 -right-4 bg-red-700 text-white font-bold text-xs uppercase px-3 py-1 rounded-full shadow-lg transform rotate-6 z-10">
                                 Bônus 4
                             </div>
                             <div className="rounded-2xl aspect-[4/3] overflow-hidden mb-6 shadow-sm flex items-center justify-center bg-gray-50">
@@ -1283,8 +1283,8 @@ export default function Landing() {
 
                                 <div className="space-y-2 mt-4 text-gray-800 font-bold text-center md:text-left">
                                     <p>Um investimento na eternidade do seu filho.</p>
-                                    <p className="text-blue-600">Zero Ideologia.</p>
-                                    <p className="text-green-600">Zero Bagunça Digital.</p>
+                                    <p className="text-blue-800">Zero Ideologia.</p>
+                                    <p className="text-green-800">Zero Bagunça Digital.</p>
                                 </div>
 
                                 <div className="space-y-6 pt-4 border-t border-gray-100">

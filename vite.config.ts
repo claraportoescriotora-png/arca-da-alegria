@@ -50,14 +50,37 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
         }
       }),
-      // Safety net: make registerSW.js async regardless of VitePWA version behavior
+      // Definitive fix: mark registerSW.js as async via both transformIndexHtml AND
+      // writeBundle (catches VitePWA's late-stage injection that bypasses transformIndexHtml)
       {
         name: 'async-register-sw',
-        transformIndexHtml(html: string) {
-          return html.replace(
-            /(<script\b[^>]*\bsrc="[^"]*registerSW\.js"[^>]*)>/gi,
-            '$1 async>'
-          );
+        enforce: 'post',
+        apply: 'build',
+        transformIndexHtml: {
+          order: 'post',
+          handler(html: string) {
+            return html.replace(
+              /(<script\b[^>]*\bsrc="[^"]*registerSW\.js"[^>]*)>/gi,
+              '$1 async>'
+            );
+          }
+        },
+        async writeBundle(this: any, options: any) {
+          const fs = await import('fs');
+          const path = await import('path');
+          const outDir = options.dir || 'dist';
+          const htmlFile = path.join(outDir, 'index.html');
+          if (fs.existsSync(htmlFile)) {
+            let html = fs.readFileSync(htmlFile, 'utf-8');
+            const patched = html.replace(
+              /(<script\b[^>]*\bsrc="[^"]*registerSW\.js"[^>]*)>/gi,
+              '$1 async>'
+            );
+            if (patched !== html) {
+              fs.writeFileSync(htmlFile, patched, 'utf-8');
+              console.log('[async-register-sw] Patched registerSW.js to async in dist/index.html');
+            }
+          }
         }
       },
       {

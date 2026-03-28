@@ -123,8 +123,9 @@
   <meta name="google-site-verification" content="notranslate" />
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
-  <!-- Supabase: no crossorigin needed for image CDN (avoids browser warning) -->
+  <!-- Supabase preconnect: both variants needed (images use anonymous, API uses CORS) -->
   <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
+  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Non-blocking Google Fonts: loaded async, text renders immediately with system fonts -->
