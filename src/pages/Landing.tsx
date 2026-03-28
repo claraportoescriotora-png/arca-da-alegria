@@ -144,6 +144,8 @@ export default function Landing() {
                             className="h-12 w-auto"
                             width="649"
                             height="293"
+                            loading="eager"
+                            sizes="(max-width: 640px) 160px, 200px"
                         />
                     </div>
 
@@ -215,6 +217,9 @@ export default function Landing() {
                             className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
                             width="455"
                             height="548"
+                            loading="eager"
+                            fetchPriority="high"
+                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
                     </div>
                 </div>
