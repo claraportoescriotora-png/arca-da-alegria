@@ -231,7 +231,7 @@ export default function Landing() {
                         {/* Card 1 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" />
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" loading="lazy" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais ansiosas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -242,7 +242,7 @@ export default function Landing() {
                         {/* Card 2 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" />
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" loading="lazy" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais agitadas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -253,7 +253,7 @@ export default function Landing() {
                         {/* Card 3 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-pink-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" />
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" loading="lazy" />
                             </div>
                             <h3 className="font-bold text-gray-900">Menos concentradas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -264,7 +264,7 @@ export default function Landing() {
                         {/* Card 4 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" />
+                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" loading="lazy" />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais distantes da família</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -499,6 +499,7 @@ export default function Landing() {
                                         src={story.image}
                                         alt={story.name}
                                         className="w-full h-full object-cover"
+                                        loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-2">
                                         <span className="text-white text-xs font-bold text-center">{story.name}</span>
@@ -626,6 +627,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/box7diascomjesus.webp"
                                     alt="7 Dias com Jesus"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -647,6 +649,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/18passosparadefendersuafe.webp"
                                     alt="18 passos para defender sua Fé"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -668,6 +671,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/3diasparavenceraansiedade.webp"
                                     alt="3 Dias para Vencer a Ansiedade"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -810,12 +814,14 @@ export default function Landing() {
                                                 <button
                                                     key={idx}
                                                     onClick={() => setCurrentGameIndex(idx)}
-                                                    className={`w-3 h-3 rounded-full transition-all ${idx === currentGameIndex
-                                                        ? 'bg-purple-600 w-8'
-                                                        : 'bg-gray-300 hover:bg-purple-300'
+                                                    className={`p-3 flex items-center justify-center transition-all ${idx === currentGameIndex
+                                                        ? 'text-purple-600'
+                                                        : 'text-gray-300 hover:text-purple-300'
                                                         }`}
                                                     aria-label={`Ir para jogo ${idx + 1}`}
-                                                />
+                                                >
+                                                    <span className={`block rounded-full transition-all ${idx === currentGameIndex ? 'w-8 h-3 bg-purple-600' : 'w-3 h-3 bg-current'}`} />
+                                                </button>
                                             ))}
                                         </div>
                                         <button
@@ -870,6 +876,7 @@ export default function Landing() {
                                         src={videos[currentVideoIndex].image}
                                         alt={videos[currentVideoIndex].title}
                                         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                        loading="lazy"
                                     />
                                     <div className="absolute top-4 left-4">
                                         <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm ${videos[currentVideoIndex].color}`}>
@@ -906,12 +913,14 @@ export default function Landing() {
                                                 <button
                                                     key={idx}
                                                     onClick={() => setCurrentVideoIndex(idx)}
-                                                    className={`w-3 h-3 rounded-full transition-all ${idx === currentVideoIndex
-                                                        ? 'bg-blue-600 w-8'
-                                                        : 'bg-gray-300 hover:bg-blue-300'
+                                                    className={`p-3 flex items-center justify-center transition-all ${idx === currentVideoIndex
+                                                        ? 'text-blue-600'
+                                                        : 'text-gray-300 hover:text-blue-300'
                                                         }`}
                                                     aria-label={`Ir para vídeo ${idx + 1}`}
-                                                />
+                                                >
+                                                    <span className={`block rounded-full transition-all ${idx === currentVideoIndex ? 'w-8 h-3 bg-blue-600' : 'w-3 h-3 bg-current'}`} />
+                                                </button>
                                             ))}
                                         </div>
                                         <button
@@ -958,6 +967,7 @@ export default function Landing() {
                                         src={item.img}
                                         alt={item.title}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        loading="lazy"
                                     />
                                 </div>
                                 <p className="text-center font-bold text-gray-800">{item.title}</p>
@@ -1071,6 +1081,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/60atividades.webp"
                                     alt="60 Atividades Bíblicas"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -1095,6 +1106,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/17quebra-cabecas.webp"
                                     alt="17 Quebra-cabeças para Colorir e Montar"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -1119,6 +1131,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/boxamaisbela.webp"
                                     alt="Box: As Mais Belas Histórias da Bíblia"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -1143,6 +1156,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/animaisdaarca.webp"
                                     alt="Os Animais da Arca de Noé (Novo!)"
                                     className="w-full h-full object-contain"
+                                    loading="lazy"
                                 />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -1200,6 +1214,7 @@ export default function Landing() {
                                     src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/todososprodutosamuiguitopro.webp"
                                     alt="Pacote Completo Meu Amiguito"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                    loading="lazy"
                                 />
                                 <div className="absolute bottom-6 right-6 bg-yellow-400 text-purple-900 font-bold px-6 py-3 rounded-xl shadow-2xl transform rotate-3 animate-bounce z-10">
                                     Oferta Especial!
