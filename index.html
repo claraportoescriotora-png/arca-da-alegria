@@ -124,8 +124,8 @@
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
   <title>Amiguitos - App Infantil Cristão</title>
-  <!-- Supabase: no crossorigin (default) for image preconnect; consolidation to fix audit warning -->
-  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
+  <!-- Supabase: 'crossorigin' here covers both CORS-enabled images and API fetches -->
+  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -148,11 +148,14 @@
     .container{width:100%;max-width:1152px;margin-right:auto;margin-left:auto;padding-right:1.5rem;padding-left:1.5rem}
     /* Layout Match for Hero and Header */
     .lp-header{background-color:rgba(255,255,255,0.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;border-bottom:2px solid #ede9fe;height:80px}
-    .bg-gradient-hero{background:linear-gradient(to bottom right,#ddd6fe,#c4b5fd,#c4b5fd);padding-top:5rem;overflow:hidden;position:relative}
-    /* Tailwind class simulations for the shell */
-    .text-4xl{font-size:2.25rem;line-height:1.2;font-weight:700;color:#111827}
-    .text-lg{font-size:1.125rem;line-height:1.75;color:#374151}
-    @media(min-width:768px){.md\:text-5xl{font-size:3rem}}
+    /* Hero Gradient match: purple-200 via purple-300 to lavender-200 */
+    .bg-gradient-hero{background:linear-gradient(to bottom right,#ddd6fe,#c4b5fd,#e9d5ff);padding-top:5rem;overflow:hidden;position:relative}
+    /* Tailwind class simulations: MUST MATCH Metrics exactly to avoid CLS */
+    .text-4xl{font-size:2.25rem;line-height:1.25;font-weight:700;color:#111827}
+    .text-lg{font-size:1.125rem;line-height:1.625;color:#374151}
+    @media(min-width:768px){.md\:text-5xl{font-size:3rem;line-height:1.2}}
+    .pt-20{padding-top:5rem}
+    .pb-20{padding-bottom:5rem}
   </style>
   <meta name="description" content="Meu Amiguito - Aplicativo Infantil Cristão" />
 </head>
@@ -163,20 +166,20 @@
   <div id="root">
     <div class="min-h-screen bg-white">
         <header class="lp-header">
-            <div class="container flex h-full items-center justify-between">
-                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" width="649" height="293" style="height:48px;width:auto;">
+            <div class="container h-full flex items-center justify-between">
+                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" width="300" height="135" style="height:48px;width:auto;" crossorigin="anonymous">
                 <div style="background-color:#7e22ce;color:#fff;padding:12px 24px;border-radius:99px;font-weight:bold;">Assinar agora</div>
             </div>
         </header>
-        <section class="bg-gradient-hero">
+        <section class="bg-gradient-hero pt-20">
             <div class="container grid md:grid-cols-2 gap-12 items-end">
-                <div style="padding-bottom:5rem;">
-                    <h1 class="text-4xl md:text-5xl font-bold leading-tight text-gray-900">O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.</h1>
-                    <p class="text-lg text-gray-700 leading-relaxed" style="margin-top:1.5rem;margin-bottom:2rem;">O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.</p>
+                <div class="pb-20">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight">O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.</h1>
+                    <p class="text-lg" style="margin-top:1.5rem;margin-bottom:2rem;">O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.</p>
                     <div style="background-color:#9333ea;color:#fff;padding:1rem 2rem;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;">Quero acessar agora &rarr;</div>
                 </div>
                 <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;">
-                    <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" width="455" height="548" style="width:100%;max-width:48rem;height:auto;transform:scale(1.1);transform-origin:bottom;" fetchpriority="high" loading="eager">
+                    <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" width="455" height="548" style="width:100%;max-width:48rem;height:auto;transform:scale(1.1);transform-origin:bottom;" fetchpriority="high" loading="eager" crossorigin="anonymous">
                 </div>
             </div>
         </section>
