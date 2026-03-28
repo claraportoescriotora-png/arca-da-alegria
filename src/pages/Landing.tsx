@@ -139,13 +139,14 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/logo%20meu%20amiguito%20por%20extenso.webp"
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80"
+                            srcSet="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80 300w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=500&quality=80 500w"
+                            sizes="(max-width: 640px) 160px, 200px"
                             alt="Meu Amiguito"
                             className="h-12 w-auto"
                             width="649"
                             height="293"
                             loading="eager"
-                            sizes="(max-width: 640px) 160px, 200px"
                         />
                     </div>
 
@@ -212,14 +213,15 @@ export default function Landing() {
                     {/* Hero Illustration */}
                     <div className="flex items-end justify-center h-full relative xl:translate-x-8">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/natameseufilhoheroamiguito%20(1).webp"
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80"
+                            srcSet="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=480&quality=80 480w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=768&quality=80 768w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80 900w"
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             alt="Nathan e seu filho"
                             className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
                             width="455"
                             height="548"
                             loading="eager"
                             fetchPriority="high"
-                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
                     </div>
                 </div>

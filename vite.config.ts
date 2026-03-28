@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'sw.ts',
-        registerType: 'autoUpdate',
-        inlineRegister: false,
+        // No registerType = VitePWA won't generate or inject registerSW.js
+        // SW registration is handled manually in main.tsx via requestIdleCallback
         devOptions: {
           enabled: true,
           type: 'module'
