@@ -147,7 +147,6 @@ export default function Landing() {
                             width="649"
                             height="293"
                             loading="eager"
-                            crossOrigin="anonymous"
                         />
                     </div>
 
@@ -223,7 +222,6 @@ export default function Landing() {
                             height="548"
                             loading="eager"
                             fetchPriority="high"
-                            crossOrigin="anonymous"
                         />
                     </div>
                 </div>

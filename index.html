@@ -124,8 +124,8 @@
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
   <title>Amiguitos - App Infantil Cristão</title>
-  <!-- Supabase: 'crossorigin' here covers both CORS-enabled images and API fetches -->
-  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
+  <!-- Supabase: standard preconnect (no crossorigin as requested for non-CORS images) -->
+  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -141,21 +141,20 @@
   <!-- CRITICAL CSS: Inlined above-fold layout styles -->
   <style>
     *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid}
-    html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif}
+    html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:'Fredoka',Arial,Helvetica,sans-serif}
     body{margin:0;line-height:inherit;overscroll-behavior-y:contain;scroll-behavior:smooth;background-color:#fff;color:#111827}
     h1,h2,p{margin:0}
     img{max-width:100%;height:auto;display:block}
     .container{width:100%;max-width:1152px;margin-right:auto;margin-left:auto;padding-right:1.5rem;padding-left:1.5rem}
-    /* Layout Match for Hero and Header */
+    /* Header Sync: Matches React heights/gaps to prevent shift */
     .lp-header{background-color:rgba(255,255,255,0.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;border-bottom:2px solid #ede9fe;height:80px}
-    /* Hero Gradient match: purple-200 via purple-300 to lavender-200 */
+    /* Hero Stabilization: Exact margins corresponding to Tailwind's space-y-6 (1.5rem) */
     .bg-gradient-hero{background:linear-gradient(to bottom right,#ddd6fe,#c4b5fd,#e9d5ff);padding-top:5rem;overflow:hidden;position:relative}
-    /* Tailwind class simulations: MUST MATCH Metrics exactly to avoid CLS */
-    .text-4xl{font-size:2.25rem;line-height:1.25;font-weight:700;color:#111827}
-    .text-lg{font-size:1.125rem;line-height:1.625;color:#374151}
+    .text-4xl{font-size:2.25rem;line-height:1.25;font-weight:700;color:#111827;margin-bottom:1.5rem}
+    .text-lg{font-size:1.125rem;line-height:1.625;color:#374151;margin-top:1.5rem;margin-bottom:2rem}
     @media(min-width:768px){.md\:text-5xl{font-size:3rem;line-height:1.2}}
-    .pt-20{padding-top:5rem}
-    .pb-20{padding-bottom:5rem}
+    /* Decoration sync (Clouds) */
+    .hero-cloud{position:absolute;background-color:#fff;border-radius:9999px;opacity:0.1}
   </style>
   <meta name="description" content="Meu Amiguito - Aplicativo Infantil Cristão" />
 </head>
@@ -167,19 +166,25 @@
     <div class="min-h-screen bg-white">
         <header class="lp-header">
             <div class="container h-full flex items-center justify-between">
-                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" width="300" height="135" style="height:48px;width:auto;" crossorigin="anonymous">
-                <div style="background-color:#7e22ce;color:#fff;padding:12px 24px;border-radius:99px;font-weight:bold;">Assinar agora</div>
+                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" width="300" height="135" style="height:48px;width:auto;">
+                <div style="display:flex;align-items:center;gap:1rem;">
+                    <div style="color:#7e22ce;font-weight:bold;margin-right:1rem;display:none;">Já sou aluno</div>
+                    <div style="background-color:#7e22ce;color:#fff;padding:12px 24px;border-radius:99px;font-weight:bold;">Assinar agora</div>
+                </div>
             </div>
         </header>
-        <section class="bg-gradient-hero pt-20">
-            <div class="container grid md:grid-cols-2 gap-12 items-end">
-                <div class="pb-20">
+        <section class="bg-gradient-hero" style="padding-top:5rem;">
+            <div class="hero-cloud" style="top:2.5rem;left:2.5rem;width:8rem;height:5rem;"></div>
+            <div class="hero-cloud" style="top:5rem;right:5rem;width:10rem;height:6rem;"></div>
+            <div class="hero-cloud" style="bottom:2.5rem;left:33%;width:9rem;height:5.5rem;"></div>
+            <div class="container grid md:grid-cols-2 gap-12 items-end" style="position:relative;z-index:10;">
+                <div style="padding-bottom:5rem;">
                     <h1 class="text-4xl md:text-5xl font-bold leading-tight">O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.</h1>
-                    <p class="text-lg" style="margin-top:1.5rem;margin-bottom:2rem;">O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.</p>
-                    <div style="background-color:#9333ea;color:#fff;padding:1rem 2rem;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;">Quero acessar agora &rarr;</div>
+                    <p class="text-lg">O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.</p>
+                    <div style="background-color:#9333ea;color:#fff;padding:1rem 2rem;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;margin-top:1.5rem;">Quero acessar agora &rarr;</div>
                 </div>
                 <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;">
-                    <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" width="455" height="548" style="width:100%;max-width:48rem;height:auto;transform:scale(1.1);transform-origin:bottom;" fetchpriority="high" loading="eager" crossorigin="anonymous">
+                    <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" width="455" height="548" style="width:100%;max-width:48rem;height:auto;transform:scale(1.1);transform-origin:bottom;" fetchpriority="high" loading="eager">
                 </div>
             </div>
         </section>
