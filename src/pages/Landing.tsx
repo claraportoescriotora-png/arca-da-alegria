@@ -139,8 +139,8 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80"
-                            srcSet="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80 300w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=500&quality=80 500w"
+                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain"
+                            srcSet="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain 300w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=500&quality=80&resize=contain 500w"
                             sizes="(max-width: 640px) 160px, 200px"
                             alt="Meu Amiguito"
                             className="h-12 w-auto"
@@ -238,7 +238,13 @@ export default function Landing() {
                         {/* Card 1 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojitriste.avif" alt="Ansiosa" className="w-10 h-10 object-contain" loading="lazy" />
+                                <img
+                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/emojitriste.avif?width=80&quality=80"
+                                    alt="Ansiosa"
+                                    className="w-10 h-10 object-contain"
+                                    loading="lazy"
+                                    width="80" height="80"
+                                />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais ansiosas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -249,7 +255,13 @@ export default function Landing() {
                         {/* Card 2 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojiagitado.webp" alt="Agitada" className="w-10 h-10 object-contain" loading="lazy" />
+                                <img
+                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/emojiagitado.webp?width=80&quality=80"
+                                    alt="Agitada"
+                                    className="w-10 h-10 object-contain"
+                                    loading="lazy"
+                                    width="80" height="80"
+                                />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais agitadas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -260,7 +272,13 @@ export default function Landing() {
                         {/* Card 3 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-pink-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojicerebro.webp" alt="Menos concentrada" className="w-10 h-10 object-contain" loading="lazy" />
+                                <img
+                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/emojicerebro.webp?width=80&quality=80"
+                                    alt="Menos concentrada"
+                                    className="w-10 h-10 object-contain"
+                                    loading="lazy"
+                                    width="80" height="80"
+                                />
                             </div>
                             <h3 className="font-bold text-gray-900">Menos concentradas</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
@@ -271,7 +289,13 @@ export default function Landing() {
                         {/* Card 4 */}
                         <div className="bg-white rounded-3xl p-6 text-center space-y-4 shadow-soft border-2 border-gray-100">
                             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/emojifamilia.webp" alt="Distante da família" className="w-10 h-10 object-contain" loading="lazy" />
+                                <img
+                                    src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/emojifamilia.webp?width=80&quality=80"
+                                    alt="Distante da família"
+                                    className="w-10 h-10 object-contain"
+                                    loading="lazy"
+                                    width="80" height="80"
+                                />
                             </div>
                             <h3 className="font-bold text-gray-900">Mais distantes da família</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">

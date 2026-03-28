@@ -123,12 +123,19 @@
   <meta name="google-site-verification" content="notranslate" />
   <meta http-equiv="Content-Language" content="pt-BR" />
   <title>Amiguitos - App Infantil Cristão</title>
-  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co" crossorigin>
+  <!-- Supabase: no crossorigin needed for image CDN (avoids browser warning) -->
+  <link rel="preconnect" href="https://gypzrzsmxgjtkidznstd.supabase.co">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+  <!-- Non-blocking Google Fonts: loaded async, text renders immediately with system fonts -->
+  <link rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+  </noscript>
   <style>
     html,
     body {

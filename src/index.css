@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap');
+/* Google Fonts loaded via <link> in index.html (non-blocking) - NOT via @import */
 
 @tailwind base;
 @tailwind components;
@@ -139,11 +139,13 @@
 
 @layer utilities {
   .font-fredoka {
-    font-family: 'Fredoka', sans-serif;
+    /* System fonts render immediately; Fredoka swaps in when loaded */
+    font-family: 'Fredoka', 'Trebuchet MS', system-ui, -apple-system, sans-serif;
   }
 
   .font-nunito {
-    font-family: 'Nunito', sans-serif;
+    /* System fonts render immediately; Nunito swaps in when loaded */
+    font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
   }
 
   /* Gradient backgrounds */

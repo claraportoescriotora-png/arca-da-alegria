@@ -50,6 +50,16 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
         }
       }),
+      // Safety net: make registerSW.js async regardless of VitePWA version behavior
+      {
+        name: 'async-register-sw',
+        transformIndexHtml(html: string) {
+          return html.replace(
+            /(<script\b[^>]*\bsrc="[^"]*registerSW\.js"[^>]*)>/gi,
+            '$1 async>'
+          );
+        }
+      },
       {
         name: 'configure-server',
         configureServer(server) {
