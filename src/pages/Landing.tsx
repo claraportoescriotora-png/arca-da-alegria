@@ -179,31 +179,31 @@ export default function Landing() {
                 <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-end relative z-10">
                     <div className="space-y-6 pb-20">
                         <div className="min-h-[180px] md:min-h-[120px]">
-                            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
-                                O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.
+                            <h1 className="text-3xl md:text-5xl font-bold leading-tight text-gray-900">
+                                Uma única assinatura: App de Filmes, Jogos e Missões para Deixar o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido com Valores Cristãos.
                             </h1>
                         </div>
-                        <p className="text-lg text-gray-700 leading-relaxed">
-                            O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
+                        <p className="text-lg text-gray-700 leading-relaxed font-medium">
+                            Por apenas R$ 97 por ano (menos de R$ 10,03 ao mês), leve: Histórias bíblicas, jogos educativos, atividades criativas e missões espirituais para a sua família.
                         </p>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
+                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Quase 20 horas de conteúdo puro e sem ideologias.</span>
+                                <span className="text-gray-800 font-medium">+20 horas de conteúdo seguro, puro e sem ideologias.</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
+                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Missões práticas para tirar seu filho da tela e aproximá-lo de você.</span>
+                                <span className="text-gray-800 font-medium">Missões práticas para tirar seu filho do vício da tela e aproximá-lo de você.</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
+                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
                                     <span className="text-white text-sm">✓</span>
                                 </div>
-                                <span className="text-gray-800 font-medium">Curadoria de quem vive o ministério infantil todos os dias.</span>
+                                <span className="text-gray-800 font-medium">Curadoria rigorosa do Tio Natan, que vive o ministério infantil todos os dias.</span>
                             </div>
                         </div>
                         <button onClick={scrollToOffer} className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg flex items-center gap-2 group">
