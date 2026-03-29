@@ -195,32 +195,7 @@ export default defineConfig(({ mode }) => {
         }
       }
     ],
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              // 1. Core Framework (High reuse, low change)
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-                return 'vendor-core';
-              }
-              // 2. Heavy Libs (Supabase, Auth, Query)
-              if (id.includes('@supabase') || id.includes('@tanstack') || id.includes('lucide-react')) {
-                return 'vendor-libs';
-              }
-              return 'vendor';
-            }
-            // Isolate Landing and Admin to ensure they don't bloat the main app
-            if (id.includes('pages/Landing')) {
-              return 'landing';
-            }
-            if (id.includes('pages/admin')) {
-              return 'admin';
-            }
-          }
-        }
-      }
-    },
+    build: {},
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

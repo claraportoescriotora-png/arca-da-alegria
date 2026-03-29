@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,40 +9,37 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import { UserProvider } from "@/contexts/UserContext";
 import { ConfigProvider } from "@/contexts/ConfigContext";
 
-const Home = lazy(() => import("./pages/Home"));
-const Login = lazy(() => import("./pages/Login"));
-const Stories = lazy(() => import("./pages/Stories"));
-const Videos = lazy(() => import("./pages/Videos"));
-const Games = lazy(() => import("./pages/Games"));
-const PuzzleGame = lazy(() => import("./pages/games/PuzzleGame"));
-const ShepherdGame = lazy(() => import("./pages/games/ShepherdGame"));
-const SkyJumpGame = lazy(() => import("./pages/games/SkyJumpGame"));
-const SignsGame = lazy(() => import("./pages/games/SignsGame"));
-const FindJesusGame = lazy(() => import("./pages/games/FindJesusGame"));
-const RhythmGame = lazy(() => import("./pages/games/RhythmGame"));
-const CharadesGame = lazy(() => import("./pages/games/CharadesGame"));
-const Activities = lazy(() => import("./pages/Activities"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Favorites = lazy(() => import("./pages/Favorites"));
-const Notifications = lazy(() => import("./pages/Notifications"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const Help = lazy(() => import("./pages/Help"));
-const StoryDetail = lazy(() => import("./pages/StoryDetail"));
-const VideoDetail = lazy(() => import("./pages/VideoDetail"));
-const SeriesDetail = lazy(() => import("./pages/SeriesDetail"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Devotional = lazy(() => import("./pages/Devotional"));
-const Missions = lazy(() => import("./pages/Missions"));
-const MissionDetail = lazy(() => import("./pages/MissionDetail"));
-const Paywall = lazy(() => import("./pages/Paywall"));
-const Welcome = lazy(() => import("./pages/Welcome"));
-const ThankYou = lazy(() => import("./pages/ThankYou"));
-const Store = lazy(() => import("./pages/Store"));
-
-// High-impact lazy loads (Landing for SEO, Admin for bundle size)
-const Admin = lazy(() => import("./pages/admin/Admin"));
-const Landing = lazy(() => import("./pages/Landing"));
-
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Stories from "./pages/Stories";
+import Videos from "./pages/Videos";
+import Games from "./pages/Games";
+import PuzzleGame from "./pages/games/PuzzleGame";
+import ShepherdGame from "./pages/games/ShepherdGame";
+import SkyJumpGame from "./pages/games/SkyJumpGame";
+import SignsGame from "./pages/games/SignsGame";
+import FindJesusGame from "./pages/games/FindJesusGame";
+import RhythmGame from "./pages/games/RhythmGame";
+import CharadesGame from "./pages/games/CharadesGame";
+import Activities from "./pages/Activities";
+import Profile from "./pages/Profile";
+import Favorites from "./pages/Favorites";
+import Notifications from "./pages/Notifications";
+import Privacy from "./pages/Privacy";
+import Help from "./pages/Help";
+import StoryDetail from "./pages/StoryDetail";
+import VideoDetail from "./pages/VideoDetail";
+import SeriesDetail from "./pages/SeriesDetail";
+import NotFound from "./pages/NotFound";
+import Devotional from "./pages/Devotional";
+import Missions from "./pages/Missions";
+import MissionDetail from "./pages/MissionDetail";
+import Paywall from "./pages/Paywall";
+import Welcome from "./pages/Welcome";
+import ThankYou from "./pages/ThankYou";
+import Store from "./pages/Store";
+import Admin from "./pages/admin/Admin";
+import Landing from "./pages/Landing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SubscriptionGuard from "./components/SubscriptionGuard";
 
@@ -60,8 +56,7 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                  <Suspense fallback={null}>
-                    <Routes>
+                  <Routes>
                       {/* Public Landing Page */}
                       <Route path="/landing" element={<Landing />} />
 
@@ -98,8 +93,7 @@ const App = () => (
                       <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
 
                       <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
+                  </Routes>
                 </BrowserRouter>
               </TooltipProvider>
             </FavoritesProvider>
