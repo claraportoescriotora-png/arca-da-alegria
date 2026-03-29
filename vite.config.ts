@@ -195,7 +195,23 @@ export default defineConfig(({ mode }) => {
         }
       }
     ],
-    build: {},
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // Only split what we know is safe and heavy
+            // @supabase is ~250KB and never shares React context — safe to isolate
+            if (id.includes('node_modules/@supabase')) {
+              return 'vendor-supabase';
+            }
+            // Admin pages are large and only used by admins — safe to isolate
+            if (id.includes('src/pages/admin')) {
+              return 'chunk-admin';
+            }
+          }
+        }
+      }
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

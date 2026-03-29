@@ -1301,14 +1301,22 @@ export default function Landing() {
                                     </div>
 
                                     <div className="text-center md:text-left">
-                                        <div className="mb-4">
-                                            <span className="text-gray-500 text-lg line-through mr-3">De R$ 197,00</span>
-                                            <div className="inline-block align-middle">
-                                                <span className="text-sm text-gray-600 block leading-none">por apenas 12x de</span>
-                                                <span className="text-4xl font-bold text-purple-600 leading-none">R$ 10,03</span>
+                                        <div className="mb-6">
+                                            <div className="mb-4">
+                                                <h3 className="text-lg font-bold text-purple-900 block">Assinatura Anual Premium:</h3>
+                                                <p className="text-gray-600 text-sm">1 ano inteiro de proteção e conteúdo por apenas</p>
                                             </div>
-                                            <div className="mt-1 text-sm text-gray-500 font-medium">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-sm text-gray-500 font-medium">12x de</span>
+                                                <span className="text-5xl font-bold text-purple-600 leading-none">R$ 10,03</span>
+                                            </div>
+                                            <div className="text-sm text-gray-500 font-medium">
                                                 (Ou R$ 97,00 à vista)
+                                            </div>
+                                            <div className="mt-6 pt-6 border-t border-purple-100">
+                                                <p className="text-sm text-gray-600 leading-relaxed italic">
+                                                    "O Meu Amiguito é uma plataforma viva! Sua assinatura anual garante novos desenhos, atividades e atualizações constantes para o seu filho, além de manter nossos servidores rodando sem anúncios e 100% seguros."
+                                                </p>
                                             </div>
                                         </div>
 
