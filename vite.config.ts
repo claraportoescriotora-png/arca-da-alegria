@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import fs from "fs";
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
@@ -46,8 +47,13 @@ export default defineConfig(({ mode }) => {
             }
           ]
         },
+        injectManifest: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg}'],
+          cleanupOutdatedCaches: true,
         }
       }),
       // Definitive fix: mark registerSW.js as async AND make main CSS non-blocking via writeBundle
@@ -189,6 +195,32 @@ export default defineConfig(({ mode }) => {
         }
       }
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              // 1. Core Framework (High reuse, low change)
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor-core';
+              }
+              // 2. Heavy Libs (Supabase, Auth, Query)
+              if (id.includes('@supabase') || id.includes('@tanstack') || id.includes('lucide-react')) {
+                return 'vendor-libs';
+              }
+              return 'vendor';
+            }
+            // Isolate Landing and Admin to ensure they don't bloat the main app
+            if (id.includes('pages/Landing')) {
+              return 'landing';
+            }
+            if (id.includes('pages/admin')) {
+              return 'admin';
+            }
+          }
+        }
+      }
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

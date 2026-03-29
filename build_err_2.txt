@@ -1,0 +1,88 @@
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+(node:25324) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+/assets/devocional-bg.png referenced in /assets/devocional-bg.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+[32m✓[39m 2824 modules transformed.
+Circular chunk: vendor -> vendor-core -> vendor. Please adjust the manual chunk logic for these chunks.
+rendering chunks...
+computing gzip size...
+[async-register-sw] Patched dist/index.html: registerSW async + CSS non-blocking
+[2mdist/[22m[32mregisterSW.js                          [39m[1m[2m    0.13 kB[22m[1m[22m
+[2mdist/[22m[32mmanifest.webmanifest                   [39m[1m[2m    0.52 kB[22m[1m[22m
+[2mdist/[22m[32massets/devocional-bg-BoC2wFqW.png      [39m[1m[2m    5.80 kB[22m[1m[22m
+[2mdist/[22m[32mindex.html                             [39m[1m[2m   13.39 kB[22m[1m[22m[2m │ gzip:   5.18 kB[22m
+[2mdist/[22m[32massets/heart-icon-CaftQSiA.jpg         [39m[1m[2m   75.30 kB[22m[1m[22m
+[2mdist/[22m[32massets/morning-icon-D7TL_0ab.jpg       [39m[1m[2m   86.43 kB[22m[1m[22m
+[2mdist/[22m[32massets/night-icon-DwMQ8REy.jpg         [39m[1m[2m   94.24 kB[22m[1m[22m
+[2mdist/[22m[32massets/devocional-icon-120kJnD8.jpg    [39m[1m[2m   98.73 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-BfMU5tjC.css              [39m[1m[2m  137.34 kB[22m[1m[22m[2m │ gzip:  20.73 kB[22m
+[2mdist/[22m[36massets/UserAvatar-CgXHl3B-.js          [39m[1m[2m    0.62 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/NotFound-BAAmwr6I.js            [39m[1m[2m    0.66 kB[22m[1m[22m[2m │ gzip:   0.40 kB[22m
+[2mdist/[22m[36massets/Pagination-CJIYHwmj.js          [39m[1m[2m    0.72 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+[2mdist/[22m[36massets/BottomNav-DoNZOtxE.js           [39m[1m[2m    1.54 kB[22m[1m[22m[2m │ gzip:   0.82 kB[22m
+[2mdist/[22m[36massets/Privacy-CDmsi8ga.js             [39m[1m[2m    1.70 kB[22m[1m[22m[2m │ gzip:   0.79 kB[22m
+[2mdist/[22m[36massets/GameCard-BBfYMGRE.js            [39m[1m[2m    2.05 kB[22m[1m[22m[2m │ gzip:   1.04 kB[22m
+[2mdist/[22m[36massets/Help-DiEwCFX9.js                [39m[1m[2m    2.09 kB[22m[1m[22m[2m │ gzip:   0.87 kB[22m
+[2mdist/[22m[36massets/useProductAccess-BYocRCko.js    [39m[1m[2m    2.18 kB[22m[1m[22m[2m │ gzip:   0.93 kB[22m
+[2mdist/[22m[36massets/Notifications-DyXOnSCo.js       [39m[1m[2m    2.51 kB[22m[1m[22m[2m │ gzip:   1.01 kB[22m
+[2mdist/[22m[36massets/CoverCard-OKhU_dbn.js           [39m[1m[2m    2.52 kB[22m[1m[22m[2m │ gzip:   1.22 kB[22m
+[2mdist/[22m[36massets/DripLockModal-DgmmsyiQ.js       [39m[1m[2m    2.90 kB[22m[1m[22m[2m │ gzip:   1.22 kB[22m
+[2mdist/[22m[36massets/ThankYou-Bf-c2VR_.js            [39m[1m[2m    2.95 kB[22m[1m[22m[2m │ gzip:   1.17 kB[22m
+[2mdist/[22m[36massets/Paywall-DYMNK-n1.js             [39m[1m[2m    3.00 kB[22m[1m[22m[2m │ gzip:   1.09 kB[22m
+[2mdist/[22m[36massets/VideoCard-njMJwACg.js           [39m[1m[2m    3.26 kB[22m[1m[22m[2m │ gzip:   1.42 kB[22m
+[2mdist/[22m[36massets/Welcome-DURgKYVl.js             [39m[1m[2m    3.29 kB[22m[1m[22m[2m │ gzip:   1.55 kB[22m
+[2mdist/[22m[36massets/StoryCard-BT6QhQV0.js           [39m[1m[2m    3.32 kB[22m[1m[22m[2m │ gzip:   1.43 kB[22m
+[2mdist/[22m[36massets/ContentAccessGuard-DWXJY561.js  [39m[1m[2m    3.69 kB[22m[1m[22m[2m │ gzip:   1.41 kB[22m
+[2mdist/[22m[36massets/Favorites-Deou1U6X.js           [39m[1m[2m    3.96 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/Stories-4JMoeI-g.js             [39m[1m[2m    4.84 kB[22m[1m[22m[2m │ gzip:   2.14 kB[22m
+[2mdist/[22m[36massets/SeriesDetail-CPSaeBuG.js        [39m[1m[2m    5.33 kB[22m[1m[22m[2m │ gzip:   2.09 kB[22m
+[2mdist/[22m[36massets/Missions-DfZ83lhx.js            [39m[1m[2m    6.18 kB[22m[1m[22m[2m │ gzip:   2.48 kB[22m
+[2mdist/[22m[36massets/Games-DeXFkVGg.js               [39m[1m[2m    6.81 kB[22m[1m[22m[2m │ gzip:   2.60 kB[22m
+[2mdist/[22m[36massets/RhythmGame-JAOV8yhw.js          [39m[1m[2m    6.88 kB[22m[1m[22m[2m │ gzip:   2.87 kB[22m
+[2mdist/[22m[36massets/VideoDetail-4oKf6K3t.js         [39m[1m[2m    7.03 kB[22m[1m[22m[2m │ gzip:   2.82 kB[22m
+[2mdist/[22m[36massets/Devotional-CJ0SnYZB.js          [39m[1m[2m    7.18 kB[22m[1m[22m[2m │ gzip:   2.67 kB[22m
+[2mdist/[22m[36massets/Activities-CPEP-a9M.js          [39m[1m[2m    7.26 kB[22m[1m[22m[2m │ gzip:   2.87 kB[22m
+[2mdist/[22m[36massets/Login-D5ZgmwDB.js               [39m[1m[2m    8.35 kB[22m[1m[22m[2m │ gzip:   3.09 kB[22m
+[2mdist/[22m[36massets/Videos-xoibaC_1.js              [39m[1m[2m    8.70 kB[22m[1m[22m[2m │ gzip:   2.56 kB[22m
+[2mdist/[22m[36massets/Store-CsvsiAPM.js               [39m[1m[2m    8.72 kB[22m[1m[22m[2m │ gzip:   2.90 kB[22m
+[2mdist/[22m[36massets/CharadesGame-BgwMsTa-.js        [39m[1m[2m    8.82 kB[22m[1m[22m[2m │ gzip:   3.03 kB[22m
+[2mdist/[22m[36massets/ShepherdGame-p0dA8E0j.js        [39m[1m[2m    9.22 kB[22m[1m[22m[2m │ gzip:   3.29 kB[22m
+[2mdist/[22m[36massets/StoryDetail-C_UT8L8_.js         [39m[1m[2m    9.35 kB[22m[1m[22m[2m │ gzip:   3.34 kB[22m
+[2mdist/[22m[36massets/FindJesusGame-CegaB-nW.js       [39m[1m[2m    9.70 kB[22m[1m[22m[2m │ gzip:   3.86 kB[22m
+[2mdist/[22m[36massets/Profile-BO5UOTi_.js             [39m[1m[2m    9.87 kB[22m[1m[22m[2m │ gzip:   3.11 kB[22m
+[2mdist/[22m[36massets/SkyJumpGame-CAiIuQzT.js         [39m[1m[2m   10.03 kB[22m[1m[22m[2m │ gzip:   3.79 kB[22m
+[2mdist/[22m[36massets/PuzzleGame-BRsWS-Lf.js          [39m[1m[2m   10.42 kB[22m[1m[22m[2m │ gzip:   3.50 kB[22m
+[2mdist/[22m[36massets/MissionDetail-NfI9c9Mr.js       [39m[1m[2m   13.11 kB[22m[1m[22m[2m │ gzip:   4.84 kB[22m
+[2mdist/[22m[36massets/SignsGame-BEiAgiM_.js           [39m[1m[2m   14.07 kB[22m[1m[22m[2m │ gzip:   4.70 kB[22m
+[2mdist/[22m[36massets/Home-DnqQ2H7B.js                [39m[1m[2m   18.85 kB[22m[1m[22m[2m │ gzip:   6.19 kB[22m
+[2mdist/[22m[36massets/index-CcFmBuwd.js               [39m[1m[2m   21.76 kB[22m[1m[22m[2m │ gzip:   6.99 kB[22m
+[2mdist/[22m[36massets/landing-4ZavgHDa.js             [39m[1m[2m   63.41 kB[22m[1m[22m[2m │ gzip:  13.52 kB[22m
+[2mdist/[22m[36massets/vendor-libs-w1BRqDSz.js         [39m[1m[2m  194.72 kB[22m[1m[22m[2m │ gzip:  52.16 kB[22m
+[2mdist/[22m[36massets/admin-BEBxHhYf.js               [39m[1m[2m  221.99 kB[22m[1m[22m[2m │ gzip:  48.27 kB[22m
+[2mdist/[22m[36massets/vendor-core-HUk3CHgI.js         [39m[1m[2m  365.29 kB[22m[1m[22m[2m │ gzip: 104.94 kB[22m
+[2mdist/[22m[36massets/vendor-BE4tCMXO.js              [39m[1m[33m2,290.03 kB[39m[22m[2m │ gzip: 681.00 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 19.65s[39m
+
+PWA v1.2.0
+Building src/sw.ts service worker ("es" format)...
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 53 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[36msw.mjs  [39m[1m[2m17.42 kB[22m[1m[22m[2m │ gzip: 5.83 kB[22m
+[32m✓ built in 10.24s[39m
+
+PWA v1.2.0
+mode      injectManifest
+format:   es
+precache  329 entries (28064.61 KiB)
+files generated
+  dist/sw.js
