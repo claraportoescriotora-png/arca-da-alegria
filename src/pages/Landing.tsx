@@ -178,9 +178,11 @@ export default function Landing() {
 
                 <div className="container max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-end relative z-10">
                     <div className="space-y-6 pb-20">
-                        <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
-                            O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.
-                        </h1>
+                        <div className="min-h-[180px] md:min-h-[120px]">
+                            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
+                                O Único Lugar Onde Você Deixa o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido e Edificado com Valores Cristãos.
+                            </h1>
+                        </div>
                         <p className="text-lg text-gray-700 leading-relaxed">
                             O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
                         </p>
