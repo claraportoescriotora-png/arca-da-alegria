@@ -1,6 +1,9 @@
 /// <reference lib="webworker" />
 declare let self: ServiceWorkerGlobalScope;
 
+// Service Worker Version: 1.0.2 (Force update to clear landing flicker cache)
+const SW_VERSION = '1.0.2';
+
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 
 // Precaching automatically injected by vite-plugin-pwa
@@ -8,11 +11,27 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
 self.addEventListener('install', (event) => {
+    // Force the waiting service worker to become the active service worker.
     self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(self.clients.claim());
+    // Ensure the new service worker takes control of all pages immediately.
+    event.waitUntil(
+        Promise.all([
+            self.clients.claim(),
+            // Clear old caches if version changes (Workbox handles most of this, but we can be explicit)
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheName !== 'workbox-precache-v2' && !cacheName.includes(SW_VERSION)) {
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+        ])
+    );
 });
 
 self.addEventListener('push', (event) => {

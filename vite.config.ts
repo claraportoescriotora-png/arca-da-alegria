@@ -204,10 +204,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules/@supabase')) {
               return 'vendor-supabase';
             }
-            // Admin pages are large and only used by admins — safe to isolate
-            if (id.includes('src/pages/admin')) {
-              return 'chunk-admin';
-            }
           }
         }
       }

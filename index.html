@@ -116,6 +116,23 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Amiguitos" />
+  <meta name="application-name" content="Amiguitos" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- Lazy Load Recovery: Prevents "stale build" MIME type and chunk errors -->
+  <script type="text/javascript">
+    window.addEventListener('error', function(e) {
+      const isChunkLoadError = e.message && (
+        e.message.toLowerCase().includes('chunkloaderror') ||
+        e.message.toLowerCase().includes('loading chunk') ||
+        e.message.toLowerCase().includes('valid javascript mime type')
+      );
+      if (isChunkLoadError) {
+        console.warn('Versão do aplicativo desatualizada detectada. Atualizando...', e.message);
+        window.location.reload();
+      }
+    }, true);
+  </script>
   <link rel="apple-touch-icon"
     href="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp" />
   <link rel="manifest" href="/manifest.json" />
