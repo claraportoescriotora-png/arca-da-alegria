@@ -112,7 +112,7 @@
   <!-- End Google Tag Manager -->
   <!-- CSP is enforced via vercel.json HTTP header (takes precedence over meta tags) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#6366F1" />
+  <meta name="theme-color" content="#0f172a" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Amiguitos" />
@@ -170,38 +170,20 @@
 <body class="bg-gray-50 min-h-screen text-gray-900 font-sans antialiased">
   <!-- PRIMARY SHELL: Static Hero render to eliminate 100% of Font-Swap CLS and improve LCP -->
   <div id="root">
-    <header class="lp-header" style="background-color:rgba(255,255,255,0.8); backdrop-filter:blur(8px); position:sticky; top:0; z-index:50; border-bottom:2px solid #ede9fe; height:80px;">
-      <div class="container h-full flex items-center justify-between">
-        <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=80&resize=contain" alt="Logo" width="300" height="135" style="height:48px;width:auto;">
-        <div style="background-color:#7e22ce; color:#fff; padding:12px 24px; border-radius:99px; font-weight:bold;">Assinar agora</div>
+    <!-- SPLASH SCREEN: Essential to prevent flicker. Matches theme-color and provides a premium load feel. -->
+    <div style="position: fixed; inset: 0; background-color: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
+      <div style="position: relative; width: 280px; height: 120px; display: flex; align-items: center; justify-content: center;">
+        <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/logo%20meu%20amiguito%20por%20extenso.webp?width=300&quality=90&resize=contain" 
+             alt="Logo" 
+             style="width: 100%; height: auto; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" 
+             fetchpriority="high">
       </div>
-    </header>
-    <main>
-      <section class="bg-gradient-hero">
-        <!-- Decoration sync (Clouds) -->
-        <div class="hero-cloud" style="width:20rem; height:20rem; top:-5rem; left:-5rem"></div>
-        <div class="hero-cloud" style="width:16rem; height:16rem; bottom:-4rem; right:-4rem"></div>
-        <div class="container relative z-10">
-          <div class="hero-grid">
-            <div class="text-center lg:text-left hero-text-col">
-              <!-- Height lock: reserving space for the title before font/text renders -->
-              <div class="hero-title-lock">
-                <h1 class="text-4xl md:text-5xl font-bold">
-                  Uma única assinatura você terá: filmes, jogos e missões com conteúdo seguro e valores cristãos para os pequeninos.
-                </h1>
-              </div>
-              <p class="text-lg">
-                O tio Natan preparou: Quase 20 horas de histórias bíblicas, jogos educativos, atividades criativas e missões espirituais em um só lugar.
-              </p>
-              <div style="background-color:#9333ea; color:#fff; padding:1rem 2rem; border-radius:9999px; font-weight:600; display:inline-flex; align-items:center; margin-top:1.5rem;">Quero acessar agora &rarr;</div>
-            </div>
-            <div style="display:flex; align-items:flex-end; justify-content:center; position:relative;">
-              <img src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80" alt="Banner" width="900" height="1000" style="width:100%; max-width:48rem; height:auto; transform:scale(1.1); transform-origin:bottom;" fetchpriority="high" loading="eager">
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+      <div style="margin-top: 2rem; width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #6366F1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>
+      @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.98); } }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
   </div>
   <script type="module" src="/src/main.tsx"></script>
   <!-- SW registration is handled in main.tsx via requestIdleCallback (non-blocking) -->
