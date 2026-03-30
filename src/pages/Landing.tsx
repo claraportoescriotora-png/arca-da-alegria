@@ -180,7 +180,7 @@ export default function Landing() {
                     <div className="space-y-6 pb-20">
                         <div className="min-h-[180px] md:min-h-[120px]">
                             <h1 className="text-3xl md:text-5xl font-bold leading-tight text-gray-900">
-                                Uma única assinatura: App de Filmes, Jogos e Missões para Deixar o Celular na Mão do seu Filho com a Paz de que Ele está Sendo Protegido com Valores Cristãos.
+                                Uma única assinatura você terá: filmes, jogos e missões com conteúdo seguro e valores cristãos.
                             </h1>
                         </div>
                         <p className="text-lg text-gray-700 leading-relaxed font-medium">
