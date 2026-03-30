@@ -411,7 +411,6 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* Features Grid */}
             <section className="py-20 bg-white">
                 <div className="container max-w-6xl mx-auto px-6">
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
@@ -481,6 +480,172 @@ export default function Landing() {
                                 loading="lazy"
                             />
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Videos Section */}
+
+            <section className="py-20 bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 overflow-hidden">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            Vídeos, filmes e aprendizado seguro para seu filho.
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Mais de 20h de conteúdo Seguro e Sem Ideologias. Só valores cristãos e aprendizado de verdade. Enquanto o YouTube expõe, a gente protege.
+                        </p>
+                    </div>
+
+                    <div className="relative group/carousel">
+                        {/* Navigation Buttons */}
+                        <button
+                            onClick={() => scroll(videosScrollRef, 'left')}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
+                            aria-label="Anterior"
+                        >
+                            <ChevronLeft className="w-8 h-8" />
+                        </button>
+                        <button
+                            onClick={() => scroll(videosScrollRef, 'right')}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
+                            aria-label="Próximo"
+                        >
+                            <ChevronRight className="w-8 h-8" />
+                        </button>
+
+                        <div
+                            ref={videosScrollRef}
+                            className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide px-4 -mx-4"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {videos.map((video, idx) => (
+                                <div
+                                    key={idx}
+                                    className="min-w-[280px] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:scale-[1.03] transition-all duration-500 group/card relative aspect-video bg-white"
+                                >
+                                    <img
+                                        src={video.image}
+                                        alt={video.title}
+                                        className="w-full h-full object-cover transform group-hover/card:scale-110 transition-transform duration-700"
+                                        loading="lazy"
+                                    />
+                                    {/* Overlay Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
+
+                                    {/* Content Overlay */}
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${video.color.replace('text-', 'text-white bg-').replace('-100', '-600')}`}>
+                                                {video.tag}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-bold leading-tight">
+                                            {video.title}
+                                        </h3>
+                                    </div>
+
+                                    {/* Play Button Indicator (Netflix Style) */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100">
+                                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-xl">
+                                                <Play className="w-6 h-6 fill-current ml-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-12 text-center">
+                        <button onClick={scrollToOffer} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                            <Play className="w-6 h-6 fill-current" />
+                            QUERO PROTEGER MEU FILHO COM CONTEÚDO SEGURO
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Games Section */}
+            <section className="py-20 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 overflow-hidden">
+                <div className="container max-w-6xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            Jogos Online Cristãos: Diversão Interativa com Princípios Bíblicos
+                        </h2>
+                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                            Chega de ansiedade. Nossos jogos treinam memória, raciocínio e coordenação.
+                            Enquanto ele joga, a mente e o espírito evoluem.
+                        </p>
+                    </div>
+
+                    <div className="relative group/carousel">
+                        {/* Navigation Buttons */}
+                        <button
+                            onClick={() => scroll(gamesScrollRef, 'left')}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-purple-600 hover:bg-purple-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
+                            aria-label="Anterior"
+                        >
+                            <ChevronLeft className="w-8 h-8" />
+                        </button>
+                        <button
+                            onClick={() => scroll(gamesScrollRef, 'right')}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-purple-600 hover:bg-purple-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
+                            aria-label="Próximo"
+                        >
+                            <ChevronRight className="w-8 h-8" />
+                        </button>
+
+                        <div
+                            ref={gamesScrollRef}
+                            className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide px-4 -mx-4"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {games.map((game, idx) => (
+                                <div
+                                    key={idx}
+                                    className="min-w-[280px] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:scale-[1.03] transition-all duration-500 group/card relative aspect-video bg-white"
+                                >
+                                    <img
+                                        src={game.image}
+                                        alt={game.title}
+                                        className="w-full h-full object-cover transform group-hover/card:scale-110 transition-transform duration-700"
+                                        loading="lazy"
+                                    />
+                                    {/* Overlay Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
+
+                                    {/* Content Overlay */}
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${game.color.replace('text-', 'text-white bg-').replace('-100', '-600')}`}>
+                                                {game.tag}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-bold leading-tight">
+                                            {game.title}
+                                        </h3>
+                                    </div>
+
+                                    {/* Play Button Indicator (Netflix Style) */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100">
+                                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-xl">
+                                                <Play className="w-6 h-6 fill-current ml-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-12 text-center">
+                        <button onClick={scrollToOffer} className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
+                            <Play className="w-6 h-6 fill-current" />
+                            QUERO MEU FILHO MAIS INTELIGENTE E CONECTADO
+                        </button>
                     </div>
                 </div>
             </section>
@@ -765,170 +930,6 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* Games Section */}
-            <section className="py-20 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 overflow-hidden">
-                <div className="container max-w-6xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                            Seu filho mais inteligente enquanto se conecta com Deus.
-                        </h2>
-                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
-                            Chega de ansiedade. Nossos jogos treinam memória, raciocínio e coordenação.
-                            Enquanto ele joga, a mente e o espírito evoluem.
-                        </p>
-                    </div>
-
-                    <div className="relative group/carousel">
-                        {/* Navigation Buttons */}
-                        <button
-                            onClick={() => scroll(gamesScrollRef, 'left')}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-purple-600 hover:bg-purple-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
-                            aria-label="Anterior"
-                        >
-                            <ChevronLeft className="w-8 h-8" />
-                        </button>
-                        <button
-                            onClick={() => scroll(gamesScrollRef, 'right')}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-purple-600 hover:bg-purple-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
-                            aria-label="Próximo"
-                        >
-                            <ChevronRight className="w-8 h-8" />
-                        </button>
-
-                        <div
-                            ref={gamesScrollRef}
-                            className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide px-4 -mx-4"
-                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                        >
-                            {games.map((game, idx) => (
-                                <div
-                                    key={idx}
-                                    className="min-w-[280px] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:scale-[1.03] transition-all duration-500 group/card relative aspect-video bg-white"
-                                >
-                                    <img
-                                        src={game.image}
-                                        alt={game.title}
-                                        className="w-full h-full object-cover transform group-hover/card:scale-110 transition-transform duration-700"
-                                        loading="lazy"
-                                    />
-                                    {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
-
-                                    {/* Content Overlay */}
-                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${game.color.replace('text-', 'text-white bg-').replace('-100', '-600')}`}>
-                                                {game.tag}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-xl md:text-2xl font-bold leading-tight">
-                                            {game.title}
-                                        </h3>
-                                    </div>
-
-                                    {/* Play Button Indicator (Netflix Style) */}
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100">
-                                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-xl">
-                                                <Play className="w-6 h-6 fill-current ml-1" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="mt-12 text-center">
-                        <button onClick={scrollToOffer} className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
-                            <Play className="w-6 h-6 fill-current" />
-                            QUERO MEU FILHO MAIS INTELIGENTE E CONECTADO
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            {/* Videos Section */}
-            <section className="py-20 bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 overflow-hidden">
-                <div className="container max-w-6xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                            Vídeos, filmes e aprendizado seguro para seu filho.
-                        </h2>
-                        <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
-                            Mais de 20h de conteúdo Seguro e Sem Ideologias. Só valores cristãos e aprendizado de verdade. Enquanto o YouTube expõe, a gente protege.
-                        </p>
-                    </div>
-
-                    <div className="relative group/carousel">
-                        {/* Navigation Buttons */}
-                        <button
-                            onClick={() => scroll(videosScrollRef, 'left')}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
-                            aria-label="Anterior"
-                        >
-                            <ChevronLeft className="w-8 h-8" />
-                        </button>
-                        <button
-                            onClick={() => scroll(videosScrollRef, 'right')}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 p-3 rounded-full bg-white shadow-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:flex active:scale-90"
-                            aria-label="Próximo"
-                        >
-                            <ChevronRight className="w-8 h-8" />
-                        </button>
-
-                        <div
-                            ref={videosScrollRef}
-                            className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide px-4 -mx-4"
-                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                        >
-                            {videos.map((video, idx) => (
-                                <div
-                                    key={idx}
-                                    className="min-w-[280px] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:scale-[1.03] transition-all duration-500 group/card relative aspect-video bg-white"
-                                >
-                                    <img
-                                        src={video.image}
-                                        alt={video.title}
-                                        className="w-full h-full object-cover transform group-hover/card:scale-110 transition-transform duration-700"
-                                        loading="lazy"
-                                    />
-                                    {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
-
-                                    {/* Content Overlay */}
-                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${video.color.replace('text-', 'text-white bg-').replace('-100', '-600')}`}>
-                                                {video.tag}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-xl md:text-2xl font-bold leading-tight">
-                                            {video.title}
-                                        </h3>
-                                    </div>
-
-                                    {/* Play Button Indicator (Netflix Style) */}
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100">
-                                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-xl">
-                                                <Play className="w-6 h-6 fill-current ml-1" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="mt-12 text-center">
-                        <button onClick={scrollToOffer} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-10 py-5 rounded-full text-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto group">
-                            <Play className="w-6 h-6 fill-current" />
-                            QUERO PROTEGER MEU FILHO COM CONTEÚDO SEGURO
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             {/* Activities Section */}
             <section className="py-20 bg-gradient-to-br from-pink-100 to-purple-100">
