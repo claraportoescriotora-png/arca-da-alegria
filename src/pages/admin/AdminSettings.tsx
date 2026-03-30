@@ -131,6 +131,15 @@ export function AdminSettings() {
                 );
             if (gtmError) throw gtmError;
 
+            // Upsert video_banners
+            const { error: bannersError } = await supabase
+                .from('app_config')
+                .upsert(
+                    { key: 'video_banners', value: JSON.stringify(videoBanners) },
+                    { onConflict: 'key' }
+                );
+            if (bannersError) throw bannersError;
+
             toast({ title: "Configurações salvas com sucesso!" });
 
             // Force a reload so ConfigContext updates everywhere (it only fetches on mount)
