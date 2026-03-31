@@ -115,7 +115,7 @@ export default function Landing() {
     const testimonials = [
         { image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/depoimentoalana.webp" },
         { image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/depoimentojanete.webp" },
-        { image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/depoimentojanete.webp" }
+        { image: "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/depoimentoleide.webp" }
     ];
 
     const scrollToOffer = () => {
@@ -924,12 +924,12 @@ export default function Landing() {
                         {testimonials.map((t, i) => (
                             <div
                                 key={i}
-                                className="min-w-[240px] md:min-w-[320px] snap-center rounded-[2.5rem] overflow-hidden shadow-lg border-2 border-purple-50 group/card transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 aspect-[3/4] bg-gray-50"
+                                className="min-w-[280px] md:min-w-[400px] snap-center rounded-[2.5rem] overflow-hidden shadow-lg border-2 border-purple-50 group/card transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 h-[500px] md:h-[700px] bg-black"
                             >
                                 <img
                                     src={t.image}
                                     alt={`Depoimento ${i + 1}`}
-                                    className="w-full h-full object-cover transform group-hover/card:scale-105 transition-transform duration-700"
+                                    className="w-full h-full object-contain"
                                     loading="lazy"
                                 />
                                 {/* Overlay subtle gradient */}
