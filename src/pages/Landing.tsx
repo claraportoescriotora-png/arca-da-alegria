@@ -169,6 +169,17 @@ export default function Landing() {
                         <p className="text-lg text-gray-700 leading-relaxed font-medium">
                             Por apenas R$ 97 por ano (menos de R$ 10,03 ao mês), leve: Histórias bíblicas, jogos educativos, atividades criativas e missões espirituais para a sua família.
                         </p>
+                        
+                        {/* Video for Mobile */}
+                        <div className="block md:hidden aspect-video w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white/50">
+                            <iframe
+                                src="https://www.youtube.com/embed/eog-0gANEv8?autoplay=0&rel=0"
+                                title="Meu Amiguito - Vídeo Hero"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full"
+                            ></iframe>
+                        </div>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
@@ -195,19 +206,17 @@ export default function Landing() {
                         </button>
                     </div>
 
-                    {/* Hero Illustration */}
-                    <div className="flex items-end justify-center h-full relative xl:translate-x-8">
-                        <img
-                            src="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80"
-                            srcSet="https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=480&quality=80 480w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=768&quality=80 768w, https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/render/image/public/activities/natameseufilhoheroamiguito%20(1).webp?width=900&quality=80 900w"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            alt="Nathan e seu filho"
-                            className="w-full max-w-3xl lg:max-w-[120%] h-auto object-bottom transform scale-110 lg:scale-125 lg:translate-y-8 origin-bottom"
-                            width="455"
-                            height="548"
-                            loading="eager"
-                            fetchPriority="high"
-                        />
+                    {/* Hero Video for Desktop */}
+                    <div className="hidden md:flex items-center justify-center h-full relative xl:translate-x-8 mb-20">
+                        <div className="aspect-video w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 transform lg:scale-110 lg:translate-y-8">
+                            <iframe
+                                src="https://www.youtube.com/embed/eog-0gANEv8?autoplay=0&rel=0"
+                                title="Meu Amiguito - Vídeo Hero"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full"
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
             </section>
