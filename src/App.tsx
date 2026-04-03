@@ -42,6 +42,7 @@ const Missions = lazy(() => import("./pages/Missions"));
 const MissionDetail = lazy(() => import("./pages/MissionDetail"));
 const Store = lazy(() => import("./pages/Store"));
 const Admin = lazy(() => import("./pages/admin/Admin"));
+const EasterLanding = lazy(() => import("./pages/EasterLanding"));
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import SubscriptionGuard from "./components/SubscriptionGuard";
@@ -63,6 +64,7 @@ const App = () => (
                     <Routes>
                       {/* Public Landing Page */}
                       <Route path="/landing" element={<Landing />} />
+                      <Route path="/pascoa" element={<EasterLanding />} />
 
                       <Route path="/" element={<Login />} />
                       <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
