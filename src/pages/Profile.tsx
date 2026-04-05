@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthProvider';
 
 const menuItems = [
   { icon: Bell, label: 'Notificações', path: '/notifications' },
@@ -20,6 +21,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { name, level, avatarId, xp, updateName, setCustomAvatar } = useUser();
+  const { signOut } = useAuth();
   const { toast } = useToast();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -204,13 +206,12 @@ export default function Profile() {
           ))}
         </div>
 
-        {/* Logout */}
         <button 
-          onClick={() => navigate('/')}
-          className="w-full flex items-center justify-center gap-2 p-4 bg-danger/10 text-danger rounded-2xl font-medium hover:bg-danger/20 transition-colors"
+          onClick={signOut}
+          className="w-full flex items-center justify-center gap-2 p-4 bg-danger/10 text-danger rounded-2xl font-medium hover:bg-danger/20 transition-colors mt-4"
         >
           <LogOut className="w-5 h-5" />
-          Sair
+          Sair do Aplicativo
         </button>
       </main>
 

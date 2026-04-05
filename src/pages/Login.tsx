@@ -147,9 +147,9 @@ const Login = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white whitespace-nowrap">
         <div className="animate-bounce">
-          <img src={logoUrl || "/logo.png"} alt="Loading..." className="w-32 h-32 object-contain" />
+          <img src={logoUrl || "/logo/arca-logo-2.png"} alt="Loading..." className="w-48 h-48 object-contain" />
         </div>
       </div>
     );
