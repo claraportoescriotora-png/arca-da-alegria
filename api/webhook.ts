@@ -28,11 +28,11 @@ const PWA_INSTRUCTIONS = `
   </div>
 `;
 
-// Helper to generate a unique random password (e.g. AMIG-X72A)
+// Helper to generate a unique random password (8 chars, e.g. XJ8K2P9W)
 function generateSecurePassword(): string {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude ambiguous chars like 0, O, 1, I
-    let result = 'AMIG-';
-    for (let i = 0; i < 4; i++) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnopqrstuvwxyz'; // Secure set
+    let result = '';
+    for (let i = 0; i < 8; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;

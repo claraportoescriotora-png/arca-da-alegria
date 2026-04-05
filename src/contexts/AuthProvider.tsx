@@ -15,6 +15,8 @@ export interface Profile {
     streak: number;
     avatar_url?: string;
     created_at?: string;
+    failed_attempts?: number;
+    locked_until?: string | null;
 }
 
 interface AuthContextType {

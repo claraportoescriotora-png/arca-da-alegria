@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
     Loader2, Search, Calendar, CheckSquare, 
     MessageSquare, Trash2, X, Plus, Clock, Download, 
-    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target, ShieldOff, Sparkles
+    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target, ShieldOff, Sparkles, Lock
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -244,6 +244,35 @@ function LeadModal({
             setSaving(false);
         }
     };
+
+    const handleUnlockUser = async () => {
+        if (!lead.user_id) {
+            toast({ variant: 'destructive', title: 'Erro', description: 'Este lead não possui um usuário vinculado no app.' });
+            return;
+        }
+
+        if (!window.confirm(`Tem certeza que deseja DESTRAVAR o usuário ${lead.name || lead.email}? Isso resetará as tentativas de login.`)) {
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ failed_attempts: 0, locked_until: null })
+                .eq('id', lead.user_id);
+            
+            if (error) throw error;
+
+            toast({ title: 'Usuário destravado com sucesso!' });
+            onClose();
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Erro ao destravar', description: e.message });
+        } finally {
+            setSaving(false);
+        }
+    };
+
 
 
     return (
@@ -490,6 +519,15 @@ function LeadModal({
                                 >
                                     <Sparkles className="w-4 h-4 mr-2" />
                                     Acesso Cortesia
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleUnlockUser} 
+                                    disabled={saving}
+                                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 font-bold"
+                                >
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Destravar
                                 </Button>
                                 <Button 
                                     variant="outline" 

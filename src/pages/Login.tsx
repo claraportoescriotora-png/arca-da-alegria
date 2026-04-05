@@ -129,16 +129,62 @@ const Login = () => {
     e.preventDefault();
     if (!email || !password) return;
     setLoading(true);
+    
+    const normalizedEmail = email.toLowerCase().trim();
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // 1. Check if user is locked
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('failed_attempts, locked_until')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (profile) {
+        if (profile.failed_attempts >= 12) {
+          throw new Error("Sua conta foi bloqueada por excesso de tentativas. Por favor, redefina sua senha clicando em 'Link Mágico' (esqueci minha senha) ou entre em contato com o suporte.");
+        }
+        
+        if (profile.locked_until && new Date(profile.locked_until) > new Date()) {
+          const waitTime = Math.ceil((new Date(profile.locked_until).getTime() - new Date().getTime()) / 60000);
+          throw new Error(`Muitas tentativas sem sucesso. Sua conta está temporariamente bloqueada. Tente novamente em ${waitTime} minutos.`);
+        }
+      }
+
+      // 2. Attempt Login
+      const { data: authData, error } = await supabase.auth.signInWithPassword({ 
+        email: normalizedEmail, 
+        password 
+      });
+
+      if (error) {
+        // 3. Handle Failure: Increment counter
+        const newAttempts = (profile?.failed_attempts || 0) + 1;
+        let updateData: any = { failed_attempts: newAttempts };
+        
+        if (newAttempts === 8) {
+          updateData.locked_until = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+        } else if (newAttempts >= 12) {
+          // Permanent lock handled by the flag logic above
+        }
+
+        await supabase.from('profiles').update(updateData).eq('email', normalizedEmail);
+        
+        throw error;
+      };
+
+      // 4. Handle Success: Reset counter
+      if (profile && authData.user) {
+        await supabase.from('profiles').update({ failed_attempts: 0, locked_until: null }).eq('id', authData.user.id);
+      }
+
       toast({ title: "Bem-vindo(a)!", description: "Login realizado com sucesso!" });
       navigate("/home");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro ao entrar",
-        description: error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message,
+        description: error.message,
       });
     } finally {
       setLoading(false);
