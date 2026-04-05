@@ -66,7 +66,7 @@ export function useTrialAccess(): TrialAccess {
     const trialDaysTotal = config?.trial_days ?? 7;
     const trialDaysLeft = Math.max(0, trialDaysTotal - daysSinceReg);
     const isTrialExpired = daysSinceReg >= trialDaysTotal;
-    const isTrial = isPending && !isActiveSubscription;
+    const isTrial = isPending && !isActiveSubscription && profile?.subscription_status !== 'blocked';
 
     const canAccess = (): boolean => {
         if (isAdmin) return true;

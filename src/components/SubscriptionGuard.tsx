@@ -45,6 +45,11 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
         return <>{children}</>;
     }
 
+    // 2. Blocked users → absolute block (redirect to paywall with info)
+    if (profile?.subscription_status === 'blocked') {
+        return <Navigate to="/paywall?reason=blocked" replace />;
+    }
+
     // 2. Pending users within trial window → access with trial banner (platform trial)
     // We show the banner even if they have products, so they know platform-wide access is temporary
     if (isTrial && !isTrialExpired) {

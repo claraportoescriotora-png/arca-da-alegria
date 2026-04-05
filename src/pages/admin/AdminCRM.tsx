@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
     Loader2, Search, Calendar, CheckSquare, 
     MessageSquare, Trash2, X, Plus, Clock, Download, 
-    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target
+    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target, ShieldOff
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -154,6 +154,54 @@ function LeadModal({
             toast({ variant: 'destructive', title: 'Erro ao enviar mensagem', description: e.message });
         } finally {
             setSendingReply(false);
+        }
+    };
+
+    const handleBlockUser = async () => {
+        if (!lead.user_id) {
+            toast({ variant: 'destructive', title: 'Erro', description: 'Este lead não possui um usuário vinculado no app.' });
+            return;
+        }
+
+        if (!window.confirm(`Tem certeza que deseja BLOQUEAR o usuário ${lead.name || lead.email}? Ele perderá todo o acesso imediatamente.`)) {
+            return;
+        }
+
+        setSaving(true);
+        try {
+            // 1. Block profile
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ subscription_status: 'blocked' })
+                .eq('id', lead.user_id);
+            
+            if (profileError) throw profileError;
+
+            // 2. Remove products
+            const { error: productsError } = await supabase
+                .from('user_products')
+                .delete()
+                .eq('user_id', lead.user_id);
+            
+            if (productsError) throw productsError;
+
+            // 3. Update CRM Lead
+            const newTags = [...tags];
+            if (!newTags.includes('BLOQUEADO')) newTags.push('BLOQUEADO');
+
+            await onSave({
+                id: lead.id,
+                stage: 'Perdido',
+                tags: newTags,
+                notes: notes + '\n[BLOQUEIO] Usuário bloqueado manualmente via CRM.'
+            });
+
+            toast({ title: 'Usuário bloqueado com sucesso!' });
+            onClose();
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Erro ao bloquear', description: e.message });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -391,6 +439,17 @@ function LeadModal({
                         )}
                     </div>
                     <div className="flex gap-2">
+                        {lead.user_id && lead.stage !== 'Perdido' && (
+                            <Button 
+                                variant="outline" 
+                                onClick={handleBlockUser} 
+                                disabled={saving}
+                                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                            >
+                                <ShieldOff className="w-4 h-4 mr-2" />
+                                Bloquear Usuário
+                            </Button>
+                        )}
                         <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
                         <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white min-w-28">
                             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

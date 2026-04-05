@@ -60,11 +60,22 @@ const Paywall = () => {
                         </div>
                     </div>
 
-                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                        <p className="text-sm text-yellow-800 text-center">
-                            Sua conta <strong>{user?.email}</strong> está aguardando ativação.
-                        </p>
-                    </div>
+                    {profile?.subscription_status === 'blocked' ? (
+                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                            <p className="text-sm text-red-800 text-center font-bold">
+                                Acesso Suspenso.
+                            </p>
+                            <p className="text-xs text-red-700 text-center mt-1">
+                                Esta conta foi desativada por irregularidades no pagamento ou violação dos termos. Entre em contato com o suporte para mais informações.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <p className="text-sm text-yellow-800 text-center">
+                                Sua conta <strong>{user?.email}</strong> está aguardando ativação.
+                            </p>
+                        </div>
+                    )}
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
                     <Button

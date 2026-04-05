@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 export interface Profile {
     id: string;
     full_name: string | null;
-    subscription_status: 'active' | 'pending' | 'canceled';
+    subscription_status: 'active' | 'pending' | 'canceled' | 'blocked';
     permissions: string[];
     xp: number;
     coins: number;
