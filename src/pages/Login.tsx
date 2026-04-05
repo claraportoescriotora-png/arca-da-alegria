@@ -149,7 +149,7 @@ const Login = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white whitespace-nowrap">
         <div className="animate-bounce">
-          <img src={logoUrl || "/logo/meu-amiguito.webp"} alt="Loading..." className="w-48 h-48 object-contain" />
+          <img src={logoUrl || "https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/Meu%20amiguitologo.webp"} alt="Loading..." className="w-48 h-48 object-contain" />
         </div>
       </div>
     );

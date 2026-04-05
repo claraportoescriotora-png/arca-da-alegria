@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
     Loader2, Search, Calendar, CheckSquare, 
     MessageSquare, Trash2, X, Plus, Clock, Download, 
-    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target, ShieldOff
+    LayoutDashboard, ListTodo, User, DollarSign, Mail, Target, ShieldOff, Sparkles
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -204,6 +204,47 @@ function LeadModal({
             setSaving(false);
         }
     };
+
+    const handleSetPartnerAccess = async () => {
+        if (!lead.user_id) {
+            toast({ variant: 'destructive', title: 'Erro', description: 'Este lead não possui um usuário vinculado no app.' });
+            return;
+        }
+
+        if (!window.confirm(`Tem certeza que deseja dar ACESSO CORTESIA (Sem Mídia) ao usuário ${lead.name || lead.email}?`)) {
+            return;
+        }
+
+        setSaving(true);
+        try {
+            // 1. Update profile to partner
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ subscription_status: 'partner' })
+                .eq('id', lead.user_id);
+            
+            if (profileError) throw profileError;
+
+            // 2. Update CRM Lead
+            const newTags = [...tags];
+            if (!newTags.includes('CORTESIA-SEM-MIDIA')) newTags.push('CORTESIA-SEM-MIDIA');
+
+            await onSave({
+                id: lead.id,
+                stage: 'Usando',
+                tags: newTags,
+                notes: notes + '\n[ACESSO] Acesso cortesia (exceto mídia) liberado manualmente via CRM.'
+            });
+
+            toast({ title: 'Acesso Cortesia liberado!' });
+            onClose();
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Erro ao liberar acesso', description: e.message });
+        } finally {
+            setSaving(false);
+        }
+    };
+
 
     return (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -440,15 +481,26 @@ function LeadModal({
                     </div>
                     <div className="flex gap-2">
                         {lead.user_id && lead.stage !== 'Perdido' && (
-                            <Button 
-                                variant="outline" 
-                                onClick={handleBlockUser} 
-                                disabled={saving}
-                                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                            >
-                                <ShieldOff className="w-4 h-4 mr-2" />
-                                Bloquear Usuário
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleSetPartnerAccess} 
+                                    disabled={saving}
+                                    className="text-fuchsia-600 border-fuchsia-200 hover:bg-fuchsia-50 hover:text-fuchsia-700"
+                                >
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    Acesso Cortesia
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleBlockUser} 
+                                    disabled={saving}
+                                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                                >
+                                    <ShieldOff className="w-4 h-4 mr-2" />
+                                    Bloquear Usuário
+                                </Button>
+                            </div>
                         )}
                         <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
                         <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white min-w-28">

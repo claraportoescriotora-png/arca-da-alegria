@@ -52,6 +52,29 @@ interface Episode {
 export default function Videos() {
   const navigate = useNavigate();
   const { user, profile, isAdmin } = useAuth();
+
+  if (profile?.subscription_status === 'partner') {
+    return (
+      <div className="min-h-screen bg-slate-900 pb-24 text-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-fuchsia-500/20 rounded-full flex items-center justify-center mb-6">
+          <PlayCircle className="w-10 h-10 text-fuchsia-500" />
+        </div>
+        <h1 className="font-fredoka text-2xl font-bold mb-4">Área Restrita 🔒</h1>
+        <p className="text-slate-400 max-w-xs mx-auto mb-8">
+          Seu acesso de cortesia inclui Histórias, Jogos e Missões. A área de Vídeos e Filmes não está disponível nesta modalidade.
+        </p>
+        <button 
+          onClick={() => navigate('/home')}
+          className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white px-8 py-3 rounded-full font-bold transition-all"
+        >
+          Voltar para o Início
+        </button>
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <BottomNav />
+        </div>
+      </div>
+    );
+  }
   const { videoBanners } = useConfig();
   const [series, setSeries] = useState<Series[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);

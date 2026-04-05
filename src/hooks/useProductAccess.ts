@@ -126,7 +126,7 @@ export async function getProductAccess(
             requires_separate_purchase: matchingProduct.requires_separate_purchase ?? false,
         };
 
-        if (!productInfo.requires_separate_purchase && profile?.subscription_status === 'active') {
+        if (!productInfo.requires_separate_purchase && (profile?.subscription_status === 'active' || profile?.subscription_status === 'partner')) {
             const r = { isProductGated: false, hasAccess: true, product: null };
             cache.set(cacheKey, r);
             return r;
