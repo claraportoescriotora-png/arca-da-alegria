@@ -170,6 +170,12 @@ export async function checkIsItemLocked(
     const pAccess = await getProductAccess(contentType, contentId, user, profile, isAdmin);
     const isPremiumLocked = pAccess.isProductGated && !pAccess.hasAccess;
     const { isLocked: isDripLocked } = isContentLocked(profile?.created_at, dripReq);
+    
+    // Admins and Partners bypass drip content (release_days)
+    if (isAdmin || profile?.subscription_status === 'partner') {
+        return isPremiumLocked;
+    }
+
     return isPremiumLocked || isDripLocked;
 }
 
