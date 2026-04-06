@@ -13,7 +13,7 @@ const Paywall = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (profile?.subscription_status === 'active') {
+        if (profile?.subscription_status === 'active' || profile?.subscription_status === 'partner') {
             navigate('/home');
         }
     }, [profile, navigate]);

@@ -66,7 +66,7 @@ const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
     // 3. Active subscribers OR Product owners (Trial expired) → access to the shell
     // If trial is expired, they don't see the banner anymore, but get into the shell
     // ContentAccessGuard inside pages will handle individual piece locking
-    if (profile?.subscription_status === 'active' || hasProducts) {
+    if (profile?.subscription_status === 'active' || profile?.subscription_status === 'partner' || hasProducts) {
         return <>{children}</>;
     }
 
