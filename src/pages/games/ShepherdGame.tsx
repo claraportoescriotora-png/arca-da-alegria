@@ -29,7 +29,7 @@ const FRUITS: { type: FruitType; icon: string; color: string }[] = [
 export default function ShepherdGame() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { addXp } = useUser();
     const { toast } = useToast();
 
@@ -94,10 +94,11 @@ export default function ShepherdGame() {
 
     useEffect(() => {
         if (!dataLoaded || profile === null) return;
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: unlockDelayDaysFetched,
             requiredMissionDay: requiredMissionDayFetched
-        });
+        }, 0, isBypassed);
         if (isLocked) {
             setIsDripLocked(true);
             setDripDaysRemaining(daysRemaining);

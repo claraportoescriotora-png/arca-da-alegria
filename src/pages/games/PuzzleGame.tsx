@@ -25,9 +25,9 @@ interface PuzzlePiece {
 }
 
 export default function PuzzleGame() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { profile } = useAuth();
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const { profile, isAdmin } = useAuth();
   const { addXp } = useUser();
   const { toast } = useToast();
 
@@ -56,10 +56,11 @@ export default function PuzzleGame() {
   // Drip check runs AFTER both data and profile are ready
   useEffect(() => {
     if (!dataLoaded || profile === null) return;
+    const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
     const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
       unlockDelayDays: unlockDelayDaysFetched,
       requiredMissionDay: requiredMissionDayFetched
-    });
+    }, 0, isBypassed);
     if (isLocked) {
       setIsDripLocked(true);
       setDripDaysRemaining(daysRemaining);

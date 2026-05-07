@@ -54,7 +54,7 @@ export function useTrialAccess(): TrialAccess {
     }, []);
 
     // Detect trial state from profile
-    const isActiveSubscription = profile?.subscription_status === 'active';
+    const isActiveSubscription = profile?.subscription_status === 'active' || profile?.subscription_status === 'partner';
     const isPending = profile?.subscription_status === 'pending';
 
     // Calendar-day difference: counts how many calendar dates separate the two days,

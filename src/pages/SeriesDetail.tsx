@@ -36,7 +36,7 @@ interface Episode {
 export default function SeriesDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
 
     const [series, setSeries] = useState<Series | null>(null);
     const [seasons, setSeasons] = useState<Season[]>([]);
@@ -117,10 +117,11 @@ export default function SeriesDetail() {
     };
 
     const handlePlayEpisode = (episode: Episode) => {
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: episode.unlock_delay_days,
             requiredMissionDay: episode.required_mission_day
-        });
+        }, 0, isBypassed);
 
         if (isLocked) {
             setDripModalState({

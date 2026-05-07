@@ -16,7 +16,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const [loginMode, setLoginMode] = useState<"password" | "magic">("password");
+  const [otpCode, setOtpCode] = useState("");
+  const [loginMode, setLoginMode] = useState<"password" | "otp">("password");
   const [step, setStep] = useState<"welcome" | "survey" | "install" | "login">("welcome");
   const [surveyData, setSurveyData] = useState({ source: "", goal: "" });
   const [isStandalone, setIsStandalone] = useState(false);
@@ -97,28 +98,50 @@ const Login = () => {
     }
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/magic-link", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.toLowerCase().trim(),
+        options: { shouldCreateUser: true },
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Erro ao enviar link");
+      if (error) throw error;
       setSent(true);
       toast({
-        title: "Verifique o seu e-mail!",
-        description: "Enviámos um link de acesso para " + email,
+        title: "Código enviado! 📬",
+        description: "Verifique seu e-mail e digite o código de 6 dígitos aqui no app.",
       });
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro ao enviar",
+        title: "Erro ao enviar código",
         description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !otpCode) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.toLowerCase().trim(),
+        token: otpCode.trim(),
+        type: "email",
+      });
+      if (error) throw error;
+      toast({ title: "Bem-vindo(a)! 🎉", description: "Login realizado com sucesso!" });
+      navigate("/home");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Código inválido",
+        description: "O código está errado ou expirou. Tente receber um novo.",
       });
     } finally {
       setLoading(false);
@@ -349,103 +372,127 @@ const Login = () => {
                 )}
               </CardHeader>
               <CardContent>
-                {!sent ? (
-                  <div className="space-y-6">
-                    <div className="flex justify-center mb-2">
-                      <div className="bg-blue-50 p-1 rounded-2xl flex gap-1 border border-blue-100">
-                        <button
-                          onClick={() => setLoginMode("password")}
-                          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${loginMode === "password" ? "bg-white text-blue-600 shadow-sm" : "text-blue-400 hover:text-blue-600"}`}
-                        >
-                          Senha
-                        </button>
-                        <button
-                          onClick={() => setLoginMode("magic")}
-                          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${loginMode === "magic" ? "bg-white text-blue-600 shadow-sm" : "text-blue-400 hover:text-blue-600"}`}
-                        >
-                          Sem Senha
-                        </button>
+                <div className="space-y-6">
+                  <div className="flex justify-center mb-2">
+                    <div className="bg-blue-50 p-1 rounded-2xl flex gap-1 border border-blue-100">
+                      <button
+                        onClick={() => { setLoginMode("password"); setSent(false); }}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${loginMode === "password" ? "bg-white text-blue-600 shadow-sm" : "text-blue-400 hover:text-blue-600"}`}
+                      >
+                        Senha
+                      </button>
+                      <button
+                        onClick={() => setLoginMode("otp")}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${loginMode === "otp" ? "bg-white text-blue-600 shadow-sm" : "text-blue-400 hover:text-blue-600"}`}
+                      >
+                        Acesso Rápido
+                      </button>
+                    </div>
+                  </div>
+
+                  <form onSubmit={loginMode === "otp" ? (sent ? handleVerifyOtp : handleSendOtp) : handlePasswordLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="font-bold text-blue-900 ml-1">E-mail</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          autoComplete="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="pl-12 rounded-2xl border-blue-100 focus:border-blue-400 bg-blue-50/30 text-blue-950 placeholder:text-gray-400 h-14"
+                          style={{ color: '#1e3a8a' }}
+                        />
                       </div>
                     </div>
 
-                    <form onSubmit={loginMode === "magic" ? handleMagicLink : handlePasswordLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="font-bold text-blue-900 ml-1">E-mail</Label>
+                    {loginMode === "password" && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Label htmlFor="password_field" className="font-bold text-blue-900 ml-1">Senha</Label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
                           <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="seu@email.com"
-                            autoComplete="email"
+                            id="password_field"
+                            name="password"
+                            type="password"
+                            placeholder="••••••••"
+                            autoComplete="current-password"
                             required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="pl-12 rounded-2xl border-blue-100 focus:border-blue-400 bg-blue-50/30 text-blue-950 placeholder:text-gray-400 h-14"
                             style={{ color: '#1e3a8a' }}
                           />
                         </div>
                       </div>
+                    )}
 
-                      {loginMode === "password" && (
-                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                          <Label htmlFor="password_field" className="font-bold text-blue-900 ml-1">Senha</Label>
-                          <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
-                            <Input
-                              id="password_field"
-                              name="password"
-                              type="password"
-                              placeholder="••••••••"
-                              autoComplete="current-password"
-                              required
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              className="pl-12 rounded-2xl border-blue-100 focus:border-blue-400 bg-blue-50/30 text-blue-950 placeholder:text-gray-400 h-14"
-                              style={{ color: '#1e3a8a' }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex flex-col gap-3 pt-2">
-                        <Button
-                          type="submit"
-                          disabled={loading}
-                          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-7 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3 transform active:scale-95 transition-all"
-                        >
-                          {loading ? "Processando..." : (
-                            loginMode === "magic" ? (
-                              <>Receber Link <Mail className="w-6 h-6" /></>
-                            ) : (
-                              <>Entrar agora <ArrowRight className="w-6 h-6" /></>
-                            )
-                          )}
-                        </Button>
-                        <Button
+                    {loginMode === "otp" && sent && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-center justify-between ml-1">
+                          <Label htmlFor="otp_code" className="font-bold text-blue-900">Código de acesso</Label>
+                          <button
                             type="button"
-                            variant="ghost"
-                            onClick={() => window.location.href = "https://www.meuamiguito.com.br/landing"}
-                            className="text-blue-600 hover:text-blue-700 font-bold h-12"
+                            onClick={() => { setSent(false); setOtpCode(""); }}
+                            className="text-xs text-blue-500 hover:underline font-bold"
                           >
-                            Não tenho conta? Assinar agora
-                          </Button>
+                            Reenviar e-mail
+                          </button>
+                        </div>
+                        <div className="relative">
+                          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                          <Input
+                            id="otp_code"
+                            name="otp_code"
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="00000000"
+                            maxLength={8}
+                            required
+                            value={otpCode}
+                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                            className="pl-12 rounded-2xl border-blue-100 focus:border-blue-400 bg-blue-50/30 text-blue-950 placeholder:text-gray-400 h-14 text-2xl tracking-[0.5em] font-bold text-center"
+                            style={{ color: '#1e3a8a' }}
+                            autoFocus
+                          />
+                        </div>
+                        <p className="text-[10px] text-gray-400 text-center uppercase font-black tracking-widest pt-1">
+                          Verifique sua caixa de entrada
+                        </p>
                       </div>
-                    </form>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 space-y-8 animate-in fade-in zoom-in duration-500">
-                    <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-blue-500">
-                      <Sparkles className="w-12 h-12 animate-pulse" />
+                    )}
+
+                    <div className="flex flex-col gap-3 pt-2">
+                      <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-7 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3 transform active:scale-95 transition-all"
+                      >
+                        {loading ? "Processando..." : (
+                          loginMode === "otp" ? (
+                            sent
+                              ? <>Confirmar Código <ArrowRight className="w-6 h-6" /></>
+                              : <>Receber Código <Mail className="w-6 h-6" /></>
+                          ) : (
+                            <>Entrar agora <ArrowRight className="w-6 h-6" /></>
+                          )
+                        )}
+                      </Button>
+                      <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => window.location.href = "https://www.meuamiguito.com.br/landing"}
+                          className="text-blue-600 hover:text-blue-700 font-bold h-12"
+                        >
+                          Não tenho conta? Assinar agora
+                        </Button>
                     </div>
-                    <div className="space-y-3">
-                      <h3 className="text-3xl font-bold text-blue-900 text-center">Quase lá! ✨</h3>
-                      <p className="text-lg text-gray-600 text-center">Enviamos o acesso para <strong>{email}</strong></p>
-                    </div>
-                    <Button variant="outline" onClick={() => setSent(false)} className="rounded-2xl border-blue-200 text-blue-600 h-12 px-8">Tentar outro e-mail</Button>
-                  </div>
-                )}
+                  </form>
+                </div>
               </CardContent>
             </>
           )}

@@ -31,7 +31,7 @@ type Category = 'animals' | 'people' | 'objects' | 'fruits';
 export default function CharadesGame() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
 
     const [isDripLocked, setIsDripLocked] = useState(false);
     const [dripDaysRemaining, setDripDaysRemaining] = useState(0);
@@ -49,10 +49,11 @@ export default function CharadesGame() {
 
     useEffect(() => {
         if (!dataLoaded || profile === null) return;
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: unlockDelayDaysFetched,
             requiredMissionDay: requiredMissionDayFetched
-        });
+        }, 0, isBypassed);
         if (isLocked) {
             setIsDripLocked(true);
             setDripDaysRemaining(daysRemaining);

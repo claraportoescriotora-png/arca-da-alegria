@@ -169,10 +169,11 @@ export async function checkIsItemLocked(
 ): Promise<boolean> {
     const pAccess = await getProductAccess(contentType, contentId, user, profile, isAdmin);
     const isPremiumLocked = pAccess.isProductGated && !pAccess.hasAccess;
-    const { isLocked: isDripLocked } = isContentLocked(profile?.created_at, dripReq);
+    const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
+    const { isLocked: isDripLocked } = isContentLocked(profile?.created_at, dripReq, 0, isBypassed);
     
     // Admins and Partners bypass drip content (release_days)
-    if (isAdmin || profile?.subscription_status === 'partner') {
+    if (isBypassed) {
         return isPremiumLocked;
     }
 

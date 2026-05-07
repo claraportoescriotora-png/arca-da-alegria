@@ -28,7 +28,7 @@ interface Story {
 export default function StoryDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { addXp } = useUser();
   const { toast } = useToast();
@@ -65,16 +65,17 @@ export default function StoryDetail() {
   useEffect(() => {
     if (!story || !profile) return;
 
+    const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
     const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
       unlockDelayDays: story.unlock_delay_days,
       requiredMissionDay: story.required_mission_day
-    });
+    }, 0, isBypassed);
 
     setIsDripLocked(isLocked);
     setDripDaysRemaining(daysRemaining);
     setUnlockDelayDays(story.unlock_delay_days || 0);
     setRequiredMissionDay(story.required_mission_day || 0);
-  }, [story, profile]);
+  }, [story, profile, isAdmin]);
 
   const fetchStory = async () => {
     if (!id) return;

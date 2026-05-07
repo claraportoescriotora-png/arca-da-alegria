@@ -12,8 +12,10 @@ export interface DripRequirement {
 export function isContentLocked(
     registrationDate: string | null | undefined,
     requirement: DripRequirement,
-    currentMissionDay: number = 0
+    currentMissionDay: number = 0,
+    ignoreDrip: boolean = false
 ): { isLocked: boolean; daysRemaining: number } {
+    if (ignoreDrip) return { isLocked: false, daysRemaining: 0 };
     if (!registrationDate) return { isLocked: false, daysRemaining: 0 };
 
     const regDate = parseISO(registrationDate);

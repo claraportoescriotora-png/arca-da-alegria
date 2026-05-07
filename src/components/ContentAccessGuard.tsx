@@ -51,7 +51,7 @@ export function ContentAccessGuard({ contentType, contentId, children }: Content
     }
 
     // 2. Full active subscribers get everything else
-    if (profile?.subscription_status === 'active') {
+    if (profile?.subscription_status === 'active' || profile?.subscription_status === 'partner') {
         return <>{children}</>;
     }
 

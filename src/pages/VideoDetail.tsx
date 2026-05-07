@@ -38,7 +38,7 @@ export default function VideoDetail() {
     const type = searchParams.get('type') || 'video'; // 'video', 'movie', 'episode'
 
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { toggleFavorite, isFavorite } = useFavorites();
     const { addXp } = useUser();
     const { toast } = useToast();
@@ -63,16 +63,17 @@ export default function VideoDetail() {
     useEffect(() => {
         if (!video || !profile) return;
 
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: video.unlock_delay_days,
             requiredMissionDay: video.required_mission_day
-        });
+        }, 0, isBypassed);
 
         setIsDripLocked(isLocked);
         setDripDaysRemaining(daysRemaining);
         setUnlockDelayDays(video.unlock_delay_days || 0);
         setRequiredMissionDay(video.required_mission_day || 0);
-    }, [video, profile]);
+    }, [video, profile, isAdmin]);
 
     const fetchVideoAndRecommendations = async () => {
         if (!id) return;

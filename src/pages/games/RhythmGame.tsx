@@ -27,7 +27,7 @@ const VERSES = [
 export default function RhythmGame() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { addXp } = useUser();
 
     const [isDripLocked, setIsDripLocked] = useState(false);
@@ -46,10 +46,11 @@ export default function RhythmGame() {
 
     useEffect(() => {
         if (!dataLoaded || profile === null) return;
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: unlockDelayDaysFetched,
             requiredMissionDay: requiredMissionDayFetched
-        });
+        }, 0, isBypassed);
         if (isLocked) {
             setIsDripLocked(true);
             setDripDaysRemaining(daysRemaining);

@@ -169,6 +169,8 @@ export default function Games() {
       navigate(`/games/rhythm/${game.id}`);
     } else if (game.type === 'charades') {
       navigate(`/games/charades/${game.id}`);
+    } else if (game.type === 'embed') {
+      navigate(`/games/embed/${game.id}`);
     } else {
       toast({
         title: "Em construção",

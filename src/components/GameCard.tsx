@@ -18,14 +18,15 @@ interface GameCardProps {
 
 export function GameCard({ id, title, image, difficulty, duration, unlockDelayDays, requiredMissionDay, onClick }: GameCardProps) {
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
 
   // Check locking
+  const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
   const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
-  });
+  }, 0, isBypassed);
 
   const handleClick = (e: React.MouseEvent) => {
     if (isLocked) {

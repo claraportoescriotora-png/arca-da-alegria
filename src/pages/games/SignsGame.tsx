@@ -29,7 +29,7 @@ const SYMBOLS: SymbolType[] = [
 export default function SignsGame() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { addXp } = useUser();
 
     const [isDripLocked, setIsDripLocked] = useState(false);
@@ -67,10 +67,11 @@ export default function SignsGame() {
 
     useEffect(() => {
         if (!dataLoaded || profile === null) return;
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: unlockDelayDaysFetched,
             requiredMissionDay: requiredMissionDayFetched
-        });
+        }, 0, isBypassed);
         if (isLocked) {
             setIsDripLocked(true);
             setDripDaysRemaining(daysRemaining);

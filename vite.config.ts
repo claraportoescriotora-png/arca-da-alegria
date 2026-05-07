@@ -7,13 +7,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
     server: {
       host: "::",
       port: 8080,
+      // Added hmr overlay configuration for better dev experience in 2026
+      hmr: {
+        overlay: true,
+      }
     },
     plugins: [
       react(),
@@ -21,8 +24,7 @@ export default defineConfig(({ mode }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'sw.ts',
-        // No registerType = VitePWA won't generate or inject registerSW.js
-        // SW registration is handled manually in main.tsx via requestIdleCallback
+        registerType: 'autoUpdate', // Modern VitePWA default
         devOptions: {
           enabled: true,
           type: 'module'
@@ -38,26 +40,27 @@ export default defineConfig(({ mode }) => {
             {
               src: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
               sizes: '192x192',
-              type: 'image/webp'
+              type: 'image/webp',
+              purpose: 'any maskable'
             },
             {
               src: 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp',
               sizes: '512x512',
-              type: 'image/webp'
+              type: 'image/webp',
+              purpose: 'any maskable'
             }
           ]
         },
         injectManifest: {
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // Increased for 2026 asset sizes
         },
         workbox: {
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg}'],
           cleanupOutdatedCaches: true,
         }
       }),
-      // Definitive fix: mark registerSW.js as async AND make main CSS non-blocking via writeBundle
-      // (catches VitePWA's late-stage injection that bypasses transformIndexHtml)
+      // Definitive fix: mark registerSW.js as async AND make main CSS non-blocking
       {
         name: 'async-register-sw',
         enforce: 'post',
@@ -72,8 +75,6 @@ export default defineConfig(({ mode }) => {
           }
         },
         async writeBundle(this: any, options: any) {
-          const fs = await import('fs');
-          const path = await import('path');
           const outDir = options.dir || 'dist';
           const htmlFile = path.join(outDir, 'index.html');
           if (fs.existsSync(htmlFile)) {
@@ -86,7 +87,6 @@ export default defineConfig(({ mode }) => {
             );
 
             // 2. Convert main CSS from render-blocking to async (media=print trick)
-            // Safe in React SPA: CSS (370ms) always finishes before JS (889ms)
             html = html.replace(
               /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/g,
               '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="$1"><noscript><link rel="stylesheet" href="$1"></noscript>'
@@ -100,13 +100,7 @@ export default defineConfig(({ mode }) => {
       {
         name: 'configure-server',
         configureServer(server) {
-          server.middlewares.use('/api/agent/flow', async (req, res, next) => {
-            if (req.method !== 'POST') {
-              res.statusCode = 405;
-              res.end('Method Not Allowed');
-              return;
-            }
-
+          const handleApiRequest = async (req: any, res: any, endpoint: string) => {
             const chunks: any[] = [];
             for await (const chunk of req) {
               chunks.push(chunk);
@@ -114,96 +108,74 @@ export default defineConfig(({ mode }) => {
             const bodyText = Buffer.concat(chunks).toString();
 
             try {
-              // Inject Env Vars into process.env for the handler to see
               Object.assign(process.env, env);
+              const handlerPath = `./api/${endpoint}.ts`;
+              
+              if (!fs.existsSync(path.resolve(__dirname, handlerPath))) {
+                res.statusCode = 404;
+                res.end(`API Handler for ${endpoint} not found`);
+                return;
+              }
 
-              // Dynamic import
-              const { default: handler } = await import('./api/agent/flow.ts');
-
-              // Mock Request
-              const webReq = new Request('http://localhost:8080/api/agent/flow', {
+              const { default: handler } = await import(handlerPath);
+              const webReq = new Request(`http://localhost:8080/api/${endpoint}`, {
                 method: 'POST',
                 headers: req.headers as any,
                 body: bodyText
               });
 
-              // The handler in flow.ts expects (req, res) Node style
-              // But we can ALSO try to call it standard style if it returns a Response
-              // To fix the "Expected 2 arguments" error, we provide an empty mock for res if needed
               const handlerFn = handler as any;
               const webRes = await (handlerFn.length > 1 ? handlerFn(webReq, res) : handlerFn(webReq));
 
-              // If handler already handled the response (Node style), webRes might be undefined
               if (!webRes) return;
 
-              // Mock Response (Fetch Style)
               res.statusCode = webRes.status;
               (webRes.headers as Headers).forEach((val: string, key: string) => res.setHeader(key, val));
               const responseText = await webRes.text();
               res.end(responseText);
 
             } catch (err: any) {
-              console.error("API Proxy Error:", err);
+              console.error(`API Proxy Error [${endpoint}]:`, err);
               res.statusCode = 500;
               res.end(JSON.stringify({ error: err?.message || "Unknown Error" }));
             }
+          };
+
+          server.middlewares.use('/api/agent/flow', (req, res) => {
+            if (req.method !== 'POST') {
+              res.statusCode = 405;
+              res.end('Method Not Allowed');
+              return;
+            }
+            handleApiRequest(req, res, 'agent/flow');
           });
 
-          server.middlewares.use('/api/import-drive-pdfs', async (req, res, next) => {
+          server.middlewares.use('/api/import-drive-pdfs', (req, res) => {
             if (req.method !== 'POST') {
               res.statusCode = 405;
               res.end('Method Not Allowed');
               return;
             }
-
-            const chunks: any[] = [];
-            for await (const chunk of req) {
-              chunks.push(chunk);
-            }
-            const bodyText = Buffer.concat(chunks).toString();
-
-            try {
-              // Inject Env Vars into process.env for the handler to see
-              Object.assign(process.env, env);
-
-              // Dynamic import
-              const { default: handler } = await import('./api/import-drive-pdfs.ts');
-
-              // Mock Request
-              const webReq = new Request('http://localhost:8080/api/import-drive-pdfs', {
-                method: 'POST',
-                headers: req.headers as any,
-                body: bodyText
-              });
-
-              const handlerFn = handler as any;
-              const webRes = await (handlerFn.length > 1 ? handlerFn(webReq, res) : handlerFn(webReq));
-
-              if (!webRes) return;
-
-              res.statusCode = webRes.status;
-              (webRes.headers as Headers).forEach((val: string, key: string) => res.setHeader(key, val));
-              const responseText = await webRes.text();
-              res.end(responseText);
-
-            } catch (err: any) {
-              console.error("API Proxy Error:", err);
-              res.statusCode = 500;
-              res.end(JSON.stringify({ error: err?.message || "Unknown Error" }));
-            }
+            handleApiRequest(req, res, 'import-drive-pdfs');
           });
         }
       }
     ],
     build: {
+      target: 'esnext', // Support 2026 modern JS features
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: true
+        }
+      },
       rollupOptions: {
         output: {
           manualChunks(id) {
-            // Only split what we know is safe and heavy
-            // @supabase is ~250KB and never shares React context — safe to isolate
-            if (id.includes('node_modules/@supabase')) {
-              return 'vendor-supabase';
-            }
+            if (id.includes('node_modules/@supabase')) return 'vendor-supabase';
+            if (id.includes('node_modules/react')) return 'vendor-react';
+            if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
           }
         }
       }

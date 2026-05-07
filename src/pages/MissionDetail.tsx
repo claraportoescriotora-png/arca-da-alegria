@@ -46,7 +46,7 @@ interface PackDetails {
 export default function MissionDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const { addXp } = useUser();
     const { toast } = useToast();
 
@@ -87,14 +87,16 @@ export default function MissionDetail() {
     }, [id]);
 
     useEffect(() => {
-        if (!dataLoaded || profile === null) return;
+        const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
         const { isLocked, daysRemaining } = isContentLocked(profile?.created_at, {
             unlockDelayDays: unlockDelayDaysFetched
-        });
+        }, 0, isBypassed);
         if (isLocked) {
             setIsDripLocked(true);
             setDripDaysRemaining(daysRemaining);
             setUnlockDelayDays(unlockDelayDaysFetched);
+        } else {
+            setIsDripLocked(false);
         }
     }, [dataLoaded, profile]);
 
@@ -190,13 +192,14 @@ export default function MissionDetail() {
                 let isDayLocked = true;
                 let unlockDate = undefined;
 
+                const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
                 if (startDate) {
                     const dayOffset = m.day_number - 1;
                     const targetDate = addDays(startDate, dayOffset);
                     unlockDate = setHours(setMinutes(targetDate, 0), 4);
-                    isDayLocked = isAfter(unlockDate, now);
+                    isDayLocked = isBypassed ? false : isAfter(unlockDate, now);
                 } else {
-                    isDayLocked = true;
+                    isDayLocked = isBypassed ? false : true;
                 }
 
                 const dayTasks = (m.mission_tasks || [])

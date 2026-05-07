@@ -17,7 +17,7 @@ interface ActivityCardProps {
 }
 
 export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, requiredMissionDay }: ActivityCardProps) {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
 
@@ -26,10 +26,11 @@ export function ActivityCard({ id, title, image, type, pdfUrl, unlockDelayDays, 
   const isPremiumLocked = isProductGated && !hasProductAccess;
 
   // Check drip locking (only if not premium locked)
+  const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
   const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
-  });
+  }, 0, isBypassed);
 
   const isLocked = isPremiumLocked || isDripLocked;
 

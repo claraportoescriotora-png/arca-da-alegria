@@ -27,6 +27,7 @@ const SignsGame = lazy(() => import("./pages/games/SignsGame"));
 const FindJesusGame = lazy(() => import("./pages/games/FindJesusGame"));
 const RhythmGame = lazy(() => import("./pages/games/RhythmGame"));
 const CharadesGame = lazy(() => import("./pages/games/CharadesGame"));
+const EmbedGame = lazy(() => import("./pages/games/EmbedGame"));
 const Activities = lazy(() => import("./pages/Activities"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
@@ -84,6 +85,7 @@ const App = () => (
                       <Route path="/games/find-jesus/:id" element={<ProtectedRoute><SubscriptionGuard><FindJesusGame /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/games/rhythm/:id" element={<ProtectedRoute><SubscriptionGuard><RhythmGame /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/games/charades/:id" element={<ProtectedRoute><SubscriptionGuard><CharadesGame /></SubscriptionGuard></ProtectedRoute>} />
+                      <Route path="/games/embed/:id" element={<ProtectedRoute><SubscriptionGuard><EmbedGame /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/activities" element={<ProtectedRoute><SubscriptionGuard><Activities /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/missions" element={<ProtectedRoute><SubscriptionGuard><Missions /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/missions/:id" element={<ProtectedRoute><SubscriptionGuard><MissionDetail /></SubscriptionGuard></ProtectedRoute>} />

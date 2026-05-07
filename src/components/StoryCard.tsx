@@ -23,7 +23,7 @@ export function StoryCard({
   unlockDelayDays, requiredMissionDay
 }: StoryCardProps) {
   const { toggleFavorite, isFavorite } = useFavorites();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('story', id);
   const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -31,10 +31,11 @@ export function StoryCard({
 
   const isPremiumLocked = isProductGated && !hasProductAccess;
 
+  const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
   const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
     unlockDelayDays,
     requiredMissionDay
-  });
+  }, 0, isBypassed);
 
   const isLocked = isDripLocked || isPremiumLocked;
 

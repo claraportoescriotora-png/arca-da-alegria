@@ -14,6 +14,7 @@ interface Game {
     id: string;
     title: string;
     image_url: string;
+    game_url?: string;
     type: string;
     status: string; // 'available' | 'coming_soon'
     config: any;
@@ -29,7 +30,7 @@ export function AdminGames() {
     // Config Dialog State
     const [isConfigOpen, setIsConfigOpen] = useState(false);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-    const [puzzleImageFile, setPuzzleImageFile] = useState<File | null>(null);
+    const [gameImageFile, setGameImageFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
@@ -84,34 +85,47 @@ export function AdminGames() {
     // Create Dialog State
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [newGameTitle, setNewGameTitle] = useState("");
-    const [newGameType, setNewGameType] = useState("puzzle");
+    const [newGameType, setNewGameType] = useState("embed");
+    const [newGameUrl, setNewGameUrl] = useState("");
     const [creating, setCreating] = useState(false);
 
     const handleCreateGame = async () => {
         if (!newGameTitle) return;
+        if (newGameType === 'embed' && !newGameUrl) {
+            toast({ variant: "destructive", title: "URL obrigatória", description: "Informe a URL do jogo embed." });
+            return;
+        }
 
         setCreating(true);
         try {
-            // Default Biblical Image to avoid empty/broken state, but NO Vecteezy/Unsplash hardcoding
             const defaultImage = 'https://gypzrzsmxgjtkidznstd.supabase.co/storage/v1/object/public/activities/meuamiguitopwaicone.webp';
 
-            const { error } = await supabase
-                .from('games')
-                .insert({
-                    title: newGameTitle,
-                    type: newGameType,
-                    status: 'available',
-                    image_url: newGameType === 'puzzle' ? defaultImage : null,
-                    config: newGameType === 'puzzle' ? { image: defaultImage, pieces: 9 } : {},
-                    is_active: true
-                });
+            const insertData: any = {
+                title: newGameTitle,
+                type: newGameType,
+                status: 'available',
+                image_url: defaultImage,
+                is_active: true,
+            };
+
+            if (newGameType === 'embed') {
+                insertData.game_url = newGameUrl.trim();
+                insertData.config = { width: 800, height: 600 };
+            } else if (newGameType === 'puzzle') {
+                insertData.config = { image: defaultImage, pieces: 9 };
+            } else {
+                insertData.config = {};
+            }
+
+            const { error } = await supabase.from('games').insert(insertData);
 
             if (error) throw error;
 
             toast({ title: "Jogo Criado!", description: "O novo jogo foi adicionado com sucesso." });
             setIsCreateOpen(false);
             setNewGameTitle("");
-            setNewGameType("puzzle");
+            setNewGameType("embed");
+            setNewGameUrl("");
             fetchGames();
         } catch (error: any) {
             console.error(error);
@@ -129,14 +143,14 @@ export function AdminGames() {
             let finalUrlWithCacheBuster = selectedGame.image_url;
 
             // 1. Upload file if selected
-            if (puzzleImageFile) {
-                const fileExt = puzzleImageFile.name.split('.').pop();
-                const fileName = `puzzle-${selectedGame.id}-${Date.now()}.${fileExt}`;
+            if (gameImageFile) {
+                const fileExt = gameImageFile.name.split('.').pop();
+                const fileName = `${selectedGame.id}-${Date.now()}.${fileExt}`;
                 const filePath = `games/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from('activities')
-                    .upload(filePath, puzzleImageFile);
+                    .upload(filePath, gameImageFile);
 
                 if (uploadError) throw uploadError;
 
@@ -149,15 +163,16 @@ export function AdminGames() {
 
             // 2. Update Game Config and Image URL
             const newConfig = { ...selectedGame.config };
-            if (puzzleImageFile) {
+            if (gameImageFile) {
                 newConfig.image = finalUrlWithCacheBuster;
             }
 
-            const { error: updateError, data } = await supabase
+            const { error: updateError } = await supabase
                 .from('games')
                 .update({
                     config: newConfig,
                     image_url: finalUrlWithCacheBuster,
+                    game_url: selectedGame.game_url || null,
                     unlock_delay_days: Number(selectedGame.unlock_delay_days || 0),
                     required_mission_day: Number(selectedGame.required_mission_day || 0)
                 })
@@ -168,7 +183,7 @@ export function AdminGames() {
 
             toast({ title: "Configurações salvas!", description: "O jogo foi atualizado com sucesso." });
 
-            setPuzzleImageFile(null);
+            setGameImageFile(null);
             setIsConfigOpen(false);
             setSelectedGame(null);
             fetchGames();
@@ -270,7 +285,7 @@ export function AdminGames() {
                         <div className="space-y-2">
                             <Label>Título do Jogo</Label>
                             <Input
-                                placeholder="Ex: Quebra-Cabeça da Criação"
+                                placeholder="Ex: Corrida no Trânsito"
                                 value={newGameTitle}
                                 onChange={(e) => setNewGameTitle(e.target.value)}
                             />
@@ -283,12 +298,25 @@ export function AdminGames() {
                                 value={newGameType}
                                 onChange={(e) => setNewGameType(e.target.value)}
                             >
+                                <option value="embed">🌐 Jogo Embed (iframe)</option>
                                 <option value="puzzle">Quebra-Cabeça</option>
                                 <option value="memory">Jogo da Memória</option>
                                 <option value="quiz">Quiz</option>
                                 <option value="other">Outro</option>
                             </select>
                         </div>
+
+                        {newGameType === 'embed' && (
+                            <div className="space-y-2">
+                                <Label>URL do Jogo (src do iframe)</Label>
+                                <Input
+                                    placeholder="https://html5.gamedistribution.com/GAME_ID/?gd_sdk_referrer_url=..."
+                                    value={newGameUrl}
+                                    onChange={(e) => setNewGameUrl(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-500">Cole apenas o valor do atributo <code>src</code> do iframe.</p>
+                            </div>
+                        )}
                     </div>
 
                     <DialogFooter>
@@ -312,37 +340,69 @@ export function AdminGames() {
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
-                        {selectedGame?.type === 'puzzle' && (
+                        {selectedGame?.type === 'embed' && (
                             <div className="space-y-2">
-                                <Label>Imagem do Quebra-Cabeça</Label>
-                                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                        onChange={(e) => setPuzzleImageFile(e.target.files?.[0] || null)}
-                                    />
-                                    {puzzleImageFile ? (
-                                        <div className="text-center">
-                                            <ImageIcon className="w-8 h-8 mx-auto text-green-500 mb-2" />
-                                            <p className="text-sm font-medium text-slate-700">{puzzleImageFile.name}</p>
-                                            <p className="text-xs text-slate-500">Clique para mudar</p>
-                                        </div>
-                                    ) : (
-                                        <div className="text-center">
-                                            <Upload className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                                            <p className="text-sm font-medium text-slate-700">Clique para escolher uma imagem</p>
-                                            <p className="text-xs text-slate-500">JPG, PNG (Max 2MB)</p>
-                                        </div>
-                                    )}
+                                <Label>URL do Jogo (src do iframe)</Label>
+                                <Input
+                                    placeholder="https://html5.gamedistribution.com/GAME_ID/?gd_sdk_referrer_url=..."
+                                    value={selectedGame?.game_url || ''}
+                                    onChange={e => selectedGame && setSelectedGame({ ...selectedGame, game_url: e.target.value })}
+                                    className="bg-white font-mono text-xs"
+                                />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <Label className="text-xs">Largura (px)</Label>
+                                        <Input
+                                            type="number"
+                                            value={selectedGame?.config?.width || 800}
+                                            onChange={e => selectedGame && setSelectedGame({ ...selectedGame, config: { ...selectedGame.config, width: parseInt(e.target.value) || 800 } })}
+                                            className="bg-white"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label className="text-xs">Altura (px)</Label>
+                                        <Input
+                                            type="number"
+                                            value={selectedGame?.config?.height || 600}
+                                            onChange={e => selectedGame && setSelectedGame({ ...selectedGame, config: { ...selectedGame.config, height: parseInt(e.target.value) || 600 } })}
+                                            className="bg-white"
+                                        />
+                                    </div>
                                 </div>
-                                {selectedGame.config?.image && (
-                                    <div className="mt-2 text-xs text-slate-500">
-                                        Imagem atual: <a href={selectedGame.config.image} target="_blank" className="text-blue-500 hover:underline">Ver Imagem</a>
+                                <p className="text-[10px] text-slate-400">Largura e altura originais do jogo (para calcular proporção correta na tela).</p>
+                            </div>
+                        )}
+
+                        {/* Cover Image Upload (Universal) */}
+                        <div className="space-y-2">
+                            <Label>Capa do Jogo (Imagem)</Label>
+                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    onChange={(e) => setGameImageFile(e.target.files?.[0] || null)}
+                                />
+                                {gameImageFile ? (
+                                    <div className="text-center">
+                                        <ImageIcon className="w-8 h-8 mx-auto text-green-500 mb-2" />
+                                        <p className="text-sm font-medium text-slate-700">{gameImageFile.name}</p>
+                                        <p className="text-xs text-slate-500">Clique para mudar</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center">
+                                        <Upload className="w-8 h-8 mx-auto text-slate-400 mb-2" />
+                                        <p className="text-sm font-medium text-slate-700">Clique para escolher uma capa</p>
+                                        <p className="text-xs text-slate-500">Apenas se quiser trocar a atual</p>
                                     </div>
                                 )}
                             </div>
-                        )}
+                            {selectedGame?.image_url && (
+                                <div className="mt-2 text-[10px] text-slate-500 flex items-center gap-2">
+                                    Capa atual: <a href={selectedGame.image_url} target="_blank" className="text-blue-500 hover:underline truncate max-w-[200px]">{selectedGame.image_url}</a>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Content Drip Settings */}
                         <div className="space-y-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">

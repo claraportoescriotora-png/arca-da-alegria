@@ -26,7 +26,7 @@ export function CoverCard({
     requiredMissionDay,
     forceLocked
 }: CoverCardProps) {
-    const { profile } = useAuth();
+    const { profile, isAdmin } = useAuth();
     const navigate = useNavigate();
     const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
     const [isImageFinal, setIsImageFinal] = useState(false);
@@ -34,10 +34,11 @@ export function CoverCard({
     const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess(type, id);
     const isPremiumLocked = isProductGated && !hasProductAccess;
 
+    const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
     const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
         unlockDelayDays,
         requiredMissionDay
-    });
+    }, 0, isBypassed);
 
     const isLocked = forceLocked !== undefined ? forceLocked : (isDripLocked || isPremiumLocked);
 

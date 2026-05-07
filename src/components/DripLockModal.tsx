@@ -26,7 +26,7 @@ export function DripLockModal({
 
     // User can "experience" the drip (see timers) if they are a full subscriber
     // OR if they are currently in a valid trial period.
-    const isActive = profile?.subscription_status === 'active';
+    const isActive = profile?.subscription_status === 'active' || profile?.subscription_status === 'partner';
     const canSeeReleaseInfo = isActive || (isTrial && !isTrialExpired);
 
     return (

@@ -35,6 +35,7 @@ function MissionItem({
     hasOtherActiveMission: boolean;
 }) {
     const navigate = useNavigate();
+    const { isAdmin } = useAuth();
     const { isProductGated, hasAccess: hasProductAccess, product } = useProductAccess('mission_pack', pack.id);
     const { isTrial, isTrialExpired } = useTrialAccess();
     const [isDripDialogOpen, setIsDripDialogOpen] = useState(false);
@@ -43,9 +44,10 @@ function MissionItem({
     const canSeeReleaseInfo = isActive || (isTrial && !isTrialExpired);
 
     const isPremiumLocked = isProductGated && !hasProductAccess;
+    const isBypassed = profile?.subscription_status === 'partner' || isAdmin;
     const { isLocked: isDripLocked, daysRemaining } = isContentLocked(profile?.created_at, {
         unlockDelayDays: pack.unlock_delay_days
-    });
+    }, 0, isBypassed);
 
     const isLocked = isDripLocked || isPremiumLocked;
 

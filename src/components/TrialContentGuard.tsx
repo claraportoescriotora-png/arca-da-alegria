@@ -22,7 +22,7 @@ export function TrialContentGuard({ contentType, contentId, children, productTit
     }
 
     // Active subscribers have full access
-    if (profile?.subscription_status === 'active') {
+    if (profile?.subscription_status === 'active' || profile?.subscription_status === 'partner') {
         return <>{children}</>;
     }
 
