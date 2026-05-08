@@ -53,6 +53,28 @@ export function AdminGames() {
         setLoading(false);
     };
 
+    const toggleActive = async (game: Game) => {
+        const newActive = !game.is_active;
+
+        // Optimistic update
+        setGames(games.map(g => g.id === game.id ? { ...g, is_active: newActive } : g));
+
+        const { error } = await supabase
+            .from('games')
+            .update({ is_active: newActive })
+            .eq('id', game.id);
+
+        if (error) {
+            setGames(games);
+            toast({ variant: "destructive", title: "Erro ao atualizar visibilidade", description: error.message });
+        } else {
+            toast({
+                title: newActive ? "Jogo Visível" : "Jogo Oculto",
+                description: `O jogo "${game.title}" agora ${newActive ? 'aparecerá' : 'não aparecerá'} para os clientes.`
+            });
+        }
+    };
+
     const toggleStatus = async (game: Game) => {
         const newStatus = game.status === 'available' ? 'coming_soon' : 'available';
 
@@ -65,13 +87,12 @@ export function AdminGames() {
             .eq('id', game.id);
 
         if (error) {
-            // Revert on error
             setGames(games);
             toast({ variant: "destructive", title: "Erro ao atualizar status", description: error.message });
         } else {
             toast({
-                title: newStatus === 'available' ? "Jogo Ativado" : "Jogo Desativado",
-                description: `O jogo "${game.title}" agora está ${newStatus === 'available' ? 'disponível' : 'em breve'}.`
+                title: newStatus === 'available' ? "Status: Disponível" : "Status: Em Breve",
+                description: `O jogo "${game.title}" agora está marcado como ${newStatus === 'available' ? 'disponível' : 'em breve'}.`
             });
         }
     };
@@ -216,7 +237,8 @@ export function AdminGames() {
                         <TableRow className="bg-slate-50">
                             <TableHead>Jogo</TableHead>
                             <TableHead>Tipo</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Status (Badge)</TableHead>
+                            <TableHead>Visível (Cliente)</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -253,8 +275,19 @@ export function AdminGames() {
                                                 checked={game.status === 'available'}
                                                 onCheckedChange={() => toggleStatus(game)}
                                             />
-                                            <span className={`text-sm ${game.status === 'available' ? 'text-green-600 font-medium' : 'text-slate-400'}`}>
-                                                {game.status === 'available' ? 'Ativo' : 'Em Breve'}
+                                            <span className={`text-xs ${game.status === 'available' ? 'text-green-600 font-medium' : 'text-slate-400'}`}>
+                                                {game.status === 'available' ? 'Disponível' : 'Em Breve'}
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <Switch
+                                                checked={game.is_active}
+                                                onCheckedChange={() => toggleActive(game)}
+                                            />
+                                            <span className={`text-xs ${game.is_active ? 'text-blue-600 font-medium' : 'text-slate-400'}`}>
+                                                {game.is_active ? 'Sim' : 'Não'}
                                             </span>
                                         </div>
                                     </TableCell>
