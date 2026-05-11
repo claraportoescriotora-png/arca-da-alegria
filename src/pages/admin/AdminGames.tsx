@@ -99,7 +99,7 @@ export function AdminGames() {
 
     const openConfig = (game: Game) => {
         setSelectedGame(game);
-        setPuzzleImageFile(null);
+        setGameImageFile(null);
         setIsConfigOpen(true);
     };
 
@@ -406,9 +406,20 @@ export function AdminGames() {
                             </div>
                         )}
 
+                        {/* Cover Image URL (Manual) */}
+                        <div className="space-y-2">
+                            <Label>URL da Capa (Opcional)</Label>
+                            <Input
+                                placeholder="https://exemplo.com/imagem.jpg"
+                                value={selectedGame?.image_url || ''}
+                                onChange={e => selectedGame && setSelectedGame({ ...selectedGame, image_url: e.target.value })}
+                                className="bg-white"
+                            />
+                        </div>
+
                         {/* Cover Image Upload (Universal) */}
                         <div className="space-y-2">
-                            <Label>Capa do Jogo (Imagem)</Label>
+                            <Label>Ou Upload de Arquivo</Label>
                             <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
                                 <input
                                     type="file"
@@ -426,15 +437,10 @@ export function AdminGames() {
                                     <div className="text-center">
                                         <Upload className="w-8 h-8 mx-auto text-slate-400 mb-2" />
                                         <p className="text-sm font-medium text-slate-700">Clique para escolher uma capa</p>
-                                        <p className="text-xs text-slate-500">Apenas se quiser trocar a atual</p>
+                                        <p className="text-xs text-slate-500">Apenas se quiser trocar a atual via upload</p>
                                     </div>
                                 )}
                             </div>
-                            {selectedGame?.image_url && (
-                                <div className="mt-2 text-[10px] text-slate-500 flex items-center gap-2">
-                                    Capa atual: <a href={selectedGame.image_url} target="_blank" className="text-blue-500 hover:underline truncate max-w-[200px]">{selectedGame.image_url}</a>
-                                </div>
-                            )}
                         </div>
 
                         {/* Content Drip Settings */}
