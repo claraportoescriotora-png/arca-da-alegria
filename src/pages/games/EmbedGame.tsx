@@ -68,15 +68,35 @@ export default function EmbedGame() {
           <span className="text-sm font-medium">Voltar</span>
         </button>
 
-        <h1 className="text-white font-bold text-base truncate max-w-[180px] text-center">{game.title}</h1>
+        <h1 className="text-white font-bold text-base truncate max-w-[150px] text-center">{game.title}</h1>
 
-        <button
-          onClick={() => setIframeKey(k => k + 1)}
-          className="flex items-center gap-1 text-white/60 hover:text-white transition-colors"
-          title="Reiniciar jogo"
-        >
-          <RefreshCw className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              try {
+                if (screen.orientation && screen.orientation.lock) {
+                  await screen.orientation.lock('landscape');
+                } else {
+                  alert('Para tela cheia, vire seu celular de lado (verifique se a trava de rotação do aparelho está desligada).');
+                }
+              } catch (err) {
+                alert('Vire seu celular de lado para jogar em modo paisagem (verifique se a trava de rotação está desligada).');
+              }
+            }}
+            className="flex items-center gap-1 text-white/60 hover:text-white transition-colors"
+            title="Girar Tela"
+          >
+            <Maximize2 className="w-5 h-5" />
+          </button>
+          
+          <button
+            onClick={() => setIframeKey(k => k + 1)}
+            className="flex items-center gap-1 text-white/60 hover:text-white transition-colors"
+            title="Reiniciar jogo"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Game Area */}
