@@ -109,48 +109,19 @@ export function AdminGames() {
     const [newGameType, setNewGameType] = useState("embed");
     const [newGameUrl, setNewGameUrl] = useState("");
     const [creating, setCreating] = useState(false);
-    const [importing, setImporting] = useState(false);
-
-    const handleBatchImport = async () => {
-        if (!confirm("Tem certeza que deseja importar o catálogo GameMonetize (380 jogos)? Eles entrarão como invisíveis.")) return;
-        setImporting(true);
-        try {
-            const res = await fetch('/games_feed_processed.json');
-            if (!res.ok) throw new Error("Não foi possível carregar games_feed_processed.json");
-            const gamesToImport = await res.json();
-            
-            let inserted = 0;
-            // Insert in chunks of 50
-            for (let i = 0; i < gamesToImport.length; i += 50) {
-                const chunk = gamesToImport.slice(i, i + 50);
-                const { error } = await supabase.from('games').insert(chunk);
-                if (error) throw error;
-                inserted += chunk.length;
-            }
-            
-            toast({ title: "Importação Concluída", description: `${inserted} jogos foram importados com sucesso!` });
-            fetchGames();
-        } catch (error: any) {
-            console.error(error);
-            toast({ variant: "destructive", title: "Erro na importação", description: error.message });
-        } finally {
-            setImporting(false);
-        }
-    };
-
     const [cleaning, setCleaning] = useState(false);
-    const handleCleanGameDistribution = async () => {
-        if (!confirm("Tem certeza que deseja EXCLUIR TODOS os jogos da GameDistribution do banco de dados? Essa ação não pode ser desfeita.")) return;
+    const handleCleanGamezop = async () => {
+        if (!confirm("Tem certeza que deseja EXCLUIR TODOS os jogos da Gamezop do banco de dados?")) return;
         setCleaning(true);
         try {
             const { error } = await supabase
                 .from('games')
                 .delete()
-                .ilike('game_url', '%gamedistribution.com%');
+                .ilike('game_url', '%gamezop.com%');
                 
             if (error) throw error;
             
-            toast({ title: "Limpeza Concluída", description: `Os jogos da GameDistribution foram removidos.` });
+            toast({ title: "Limpeza Concluída", description: `Os jogos da Gamezop foram removidos.` });
             fetchGames();
         } catch (error: any) {
             console.error(error);
@@ -159,6 +130,8 @@ export function AdminGames() {
             setCleaning(false);
         }
     };
+
+
 
     const handleCreateGame = async () => {
         if (!newGameTitle) return;
@@ -276,13 +249,9 @@ export function AdminGames() {
                     <p className="text-slate-500">Ative, desative e configure os jogos do app.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={handleCleanGameDistribution} disabled={cleaning} variant="outline" className="border-red-200 text-red-700 hover:bg-red-50">
+                    <Button onClick={handleCleanGamezop} disabled={cleaning} variant="outline" className="border-red-200 text-red-700 hover:bg-red-50">
                         {cleaning ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                        Excluir GameDistribution
-                    </Button>
-                    <Button onClick={handleBatchImport} disabled={importing} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                        {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-                        Importar Lote
+                        Excluir Gamezop
                     </Button>
                     <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <Gamepad2 className="w-4 h-4 mr-2" />
