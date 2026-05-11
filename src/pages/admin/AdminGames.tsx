@@ -109,6 +109,34 @@ export function AdminGames() {
     const [newGameType, setNewGameType] = useState("embed");
     const [newGameUrl, setNewGameUrl] = useState("");
     const [creating, setCreating] = useState(false);
+    const [importing, setImporting] = useState(false);
+
+    const handleBatchImport = async () => {
+        if (!confirm("Tem certeza que deseja importar o catálogo GameMonetize (380 jogos)? Eles entrarão como invisíveis.")) return;
+        setImporting(true);
+        try {
+            const res = await fetch('/games_feed_processed.json');
+            if (!res.ok) throw new Error("Não foi possível carregar games_feed_processed.json");
+            const gamesToImport = await res.json();
+            
+            let inserted = 0;
+            // Insert in chunks of 50
+            for (let i = 0; i < gamesToImport.length; i += 50) {
+                const chunk = gamesToImport.slice(i, i + 50);
+                const { error } = await supabase.from('games').insert(chunk);
+                if (error) throw error;
+                inserted += chunk.length;
+            }
+            
+            toast({ title: "Importação Concluída", description: `${inserted} jogos foram importados com sucesso!` });
+            fetchGames();
+        } catch (error: any) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Erro na importação", description: error.message });
+        } finally {
+            setImporting(false);
+        }
+    };
 
     const handleCreateGame = async () => {
         if (!newGameTitle) return;
@@ -225,10 +253,16 @@ export function AdminGames() {
                     <h2 className="text-2xl font-bold font-fredoka text-slate-800">Gerenciar Jogos</h2>
                     <p className="text-slate-500">Ative, desative e configure os jogos do app.</p>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Gamepad2 className="w-4 h-4 mr-2" />
-                    Novo Jogo
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={handleBatchImport} disabled={importing} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+                        Importar Lote
+                    </Button>
+                    <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Gamepad2 className="w-4 h-4 mr-2" />
+                        Novo Jogo
+                    </Button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
