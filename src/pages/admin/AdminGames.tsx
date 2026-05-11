@@ -138,6 +138,28 @@ export function AdminGames() {
         }
     };
 
+    const [cleaning, setCleaning] = useState(false);
+    const handleCleanGameDistribution = async () => {
+        if (!confirm("Tem certeza que deseja EXCLUIR TODOS os jogos da GameDistribution do banco de dados? Essa ação não pode ser desfeita.")) return;
+        setCleaning(true);
+        try {
+            const { error } = await supabase
+                .from('games')
+                .delete()
+                .ilike('game_url', '%gamedistribution.com%');
+                
+            if (error) throw error;
+            
+            toast({ title: "Limpeza Concluída", description: `Os jogos da GameDistribution foram removidos.` });
+            fetchGames();
+        } catch (error: any) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Erro ao excluir", description: error.message });
+        } finally {
+            setCleaning(false);
+        }
+    };
+
     const handleCreateGame = async () => {
         if (!newGameTitle) return;
         if (newGameType === 'embed' && !newGameUrl) {
@@ -254,6 +276,10 @@ export function AdminGames() {
                     <p className="text-slate-500">Ative, desative e configure os jogos do app.</p>
                 </div>
                 <div className="flex gap-2">
+                    <Button onClick={handleCleanGameDistribution} disabled={cleaning} variant="outline" className="border-red-200 text-red-700 hover:bg-red-50">
+                        {cleaning ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        Excluir GameDistribution
+                    </Button>
                     <Button onClick={handleBatchImport} disabled={importing} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
                         {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
                         Importar Lote
