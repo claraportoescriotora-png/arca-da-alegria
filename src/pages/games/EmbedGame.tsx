@@ -30,18 +30,7 @@ export default function EmbedGame() {
       });
   }, [id]);
 
-  // Calculate aspect ratio padding for responsive iframe
-  const getAspectStyle = () => {
-    const w = game?.config?.width || 800;
-    const h = game?.config?.height || 600;
-    return { paddingBottom: `${(h / w) * 100}%` };
-  };
 
-  const isPortrait = () => {
-    const w = game?.config?.width || 800;
-    const h = game?.config?.height || 600;
-    return h > w;
-  };
 
   if (loading) {
     return (
@@ -91,42 +80,15 @@ export default function EmbedGame() {
       </header>
 
       {/* Game Area */}
-      <div className="flex-1 flex items-center justify-center p-2 overflow-hidden">
-        {isPortrait() ? (
-          // Portrait games: constrain by height
-          <div className="h-full max-h-[calc(100vh-60px)] w-full flex items-center justify-center">
-            <div
-              className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/50"
-              style={{
-                height: 'min(calc(100vh - 80px), 700px)',
-                aspectRatio: `${game.config?.width || 720} / ${game.config?.height || 1280}`,
-              }}
-            >
-              <iframe
-                key={iframeKey}
-                src={game.game_url}
-                className="w-full h-full border-0"
-                scrolling="no"
-                allowFullScreen
-                title={game.title}
-              />
-            </div>
-          </div>
-        ) : (
-          // Landscape games: fill width with aspect ratio
-          <div className="w-full max-w-3xl">
-            <div className="relative w-full rounded-xl overflow-hidden shadow-2xl shadow-black/50" style={getAspectStyle()}>
-              <iframe
-                key={iframeKey}
-                src={game.game_url}
-                className="absolute inset-0 w-full h-full border-0"
-                scrolling="no"
-                allowFullScreen
-                title={game.title}
-              />
-            </div>
-          </div>
-        )}
+      <div className="flex-1 w-full h-full p-0 overflow-hidden relative bg-black">
+        <iframe
+          key={iframeKey}
+          src={game.game_url}
+          className="absolute inset-0 w-full h-full border-0"
+          scrolling="no"
+          allowFullScreen
+          title={game.title}
+        />
       </div>
 
       {/* Footer hint */}
