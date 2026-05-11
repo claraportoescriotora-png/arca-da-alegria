@@ -110,49 +110,43 @@ export function AdminGames() {
     const [newGameUrl, setNewGameUrl] = useState("");
     const [creating, setCreating] = useState(false);
     const [cleaning, setCleaning] = useState(false);
-    const handleActivateSelection = async () => {
-        if (!confirm("Tem certeza que deseja ativar todos os 80 jogos da lista selecionada?")) return;
+    const handleFixPortrait = async () => {
+        if (!confirm("Tem certeza que deseja corrigir o formato (para Tela em Pé / Vertical) dos jogos listados?")) return;
         setCleaning(true);
         try {
-            const gamesToActivate = [
-                "2048 Bubble Box 3D", "2048 extended", "2048 Unicorn", "3D Breakfast Prepare",
-                "Aqua Park Drift.IO", "Aquapark.io Water Slide Park", "BACK TO SCHOOL PRINCESS PREPPY STYLE",
-                "Ball Runner 3D", "Barbie Creator", "Beauty Manicure Salon", "BINGO Real",
-                "Block Blast Puzzle", "Bridge Sort", "Bubble Shooter Pop: Fun Blast",
-                "Bugs Bunny Coloring Book", "Butterfly connect game", "Chicas Barbie",
-                "circles colors", "Color Adventure: Draw and Go", "Color Path IO",
-                "Connect Fruits", "Cute Pet Friends - Virtual Pet Care", "Dentist Games Inc: Dental Care",
-                "Drawaria.online", "Elsa Dresser Decorate And Makeup", "Escape Room: Mystery Word",
-                "Eye Art - Perfect Makeup Artist", "Falling Elevator", "fashion new haire style",
-                "Field of Dreams: Simulation Adventure", "Flappy Dunk Shoot", "FruitBasket",
-                "Gold Miner HD", "Golf Masters! 2", "Golf Masters! 3", "Halloween coloring books",
-                "Happy Farm Familly", "HelixJump.io", "High School Princess Date Spa", "Hoop Stars",
-                "Icy Dress Up - Girls Games", "Jewel Quest - Magic Match", "Jungle Mart idle game",
-                "Ludo Online", "Ludo Online Xmas", "Ludo Wizard", "Magic Dream Tiles",
-                "Magic Tiles - Piano Squid", "Marble Match Origin", "Masha Bee Hand Doctor Game",
-                "Mega Escape Car Parking Puzzle", "Merge Room", "Model Fashion Stylist: Dress Up",
-                "ONET FRUIT CLASSIC", "Panda Supermarket Manager", "Princess College Beauty Contest",
-                "Princess Dress Design", "Princess Eye Art Salon", "Princess Glitter Coloring - For Kids",
-                "Princess High School Dress up", "Real Car Parking : Driving Street", "Renovation!",
-                "Royal Girls - Princess Salon", "Shaun the Sheep - jump", "Shopping Mall Girl - Dress Up",
-                "Snake 2048: Cube Merge", "snake eat food game", "sonic jigsaw 2023",
-                "Space Rocket Star", "StackBall.io", "Tec Tak Toe Pro", "The Simple Piano",
-                "Tile Connect Pair Match Puzzle", "Traffic Road", "Unblock Car : Unblock Parking Car",
-                "WATER FLOW", "Weld It", "Whack The Mole!", "Wheelie Bike New", "Zumble Classic"
+            const portraitGames = [
+                "Dinosaur Evolution IO", "Ants IO", "Slither Mini Kindom", "Boss Office Life",
+                "Best Sonic Boom Mod", "Cute Pet Friends - Virtual Pet Care", "2d car Runner",
+                "Top Motorcycle Bike Racing Game", "Cute Snake io", "Beauty Manicure Salon",
+                "Gold Miner HD", "Jungle Adventures 3", "Jet Ski Racing", "Mega Escape Car Parking Puzzle",
+                "Tec Tak Toe Pro", "FruitBasket", "Marble Match Origin", "Field of Dreams: Simulation Adventure",
+                "Bubble Shooter Pop: Fun Blast", "sonic jigsaw 2023", "Escape Room: Mystery Word",
+                "High School Princess Date Spa", "Butterfly connect game", "Jewel Quest - Magic Match",
+                "Panda Supermarket Manager", "Golf Masters!", "Flappy Dunk Shoot", "Golf Masters! 2", "Golf Masters! 3",
+                "Ludo Wizard", "StackBall.io"
             ];
 
-            const { error } = await supabase
+            // Buscar todos para manter as configs antigas e só alterar width/height
+            const { data: gamesToFix } = await supabase
                 .from('games')
-                .update({ is_active: true })
-                .in('title', gamesToActivate);
-                
-            if (error) throw error;
+                .select('*')
+                .in('title', portraitGames);
+
+            if (gamesToFix) {
+                for (const game of gamesToFix) {
+                    const newConfig = { ...(game.config || {}), width: 720, height: 1280 };
+                    await supabase
+                        .from('games')
+                        .update({ config: newConfig })
+                        .eq('id', game.id);
+                }
+            }
             
-            toast({ title: "Jogos Ativados", description: `A lista de 80 jogos foi ativada com sucesso!` });
+            toast({ title: "Formato Corrigido", description: `Os jogos foram ajustados para tela vertical!` });
             fetchGames();
         } catch (error: any) {
             console.error(error);
-            toast({ variant: "destructive", title: "Erro ao ativar", description: error.message });
+            toast({ variant: "destructive", title: "Erro", description: error.message });
         } finally {
             setCleaning(false);
         }
@@ -272,9 +266,9 @@ export function AdminGames() {
                     <p className="text-slate-500">Ative, desative e configure os jogos do app.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={handleActivateSelection} disabled={cleaning} variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                    <Button onClick={handleFixPortrait} disabled={cleaning} variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50">
                         {cleaning ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                        Ativar Lista de 80 Jogos
+                        Corrigir Jogos Verticais
                     </Button>
                     <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <Gamepad2 className="w-4 h-4 mr-2" />
