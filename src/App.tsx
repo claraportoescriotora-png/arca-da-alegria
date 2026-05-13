@@ -45,7 +45,7 @@ const Store = lazy(() => import("./pages/Store"));
 const Admin = lazy(() => import("./pages/admin/Admin"));
 const EasterLanding = lazy(() => import("./pages/EasterLanding"));
 const MorehDashboard = lazy(() => import("./pages/moreh/MorehDashboard"));
-const RoutinePlanner = lazy(() => import("./pages/moreh/RoutinePlanner"));
+const MorehPackManager = lazy(() => import("./pages/moreh/MorehPackManager"));
 const TaskViewer = lazy(() => import("./pages/TaskViewer"));
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -67,14 +67,15 @@ const App = () => (
                 <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                   <Suspense fallback={null}>
                     <Routes>
-                      {/* Public Landing Page */}
+                      {/* Public */}
                       <Route path="/landing" element={<Landing />} />
                       <Route path="/pascoa" element={<EasterLanding />} />
-
                       <Route path="/" element={<Login />} />
                       <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
                       <Route path="/obrigado" element={<ThankYou />} />
                       <Route path="/paywall" element={<ProtectedRoute><Paywall /></ProtectedRoute>} />
+
+                      {/* App */}
                       <Route path="/home" element={<ProtectedRoute><SubscriptionGuard><Home /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/stories" element={<ProtectedRoute><SubscriptionGuard><Stories /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/story/:id" element={<ProtectedRoute><SubscriptionGuard><StoryDetail /></SubscriptionGuard></ProtectedRoute>} />
@@ -100,16 +101,14 @@ const App = () => (
                       <Route path="/privacy" element={<ProtectedRoute><SubscriptionGuard><Privacy /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/help" element={<ProtectedRoute><SubscriptionGuard><Help /></SubscriptionGuard></ProtectedRoute>} />
                       <Route path="/store" element={<ProtectedRoute><SubscriptionGuard><Store /></SubscriptionGuard></ProtectedRoute>} />
-
-                      {/* Admin Route - Checks permission inside the component */}
-                      <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-
-                      {/* Child Tasks Viewer */}
                       <Route path="/tasks/:taskId" element={<ProtectedRoute><SubscriptionGuard><TaskViewer /></SubscriptionGuard></ProtectedRoute>} />
 
-                      {/* Moreh / Routine Manager Routes */}
+                      {/* Admin */}
+                      <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+
+                      {/* Moreh (parent dashboard) */}
                       <Route path="/moreh" element={<ProtectedRoute><SubscriptionGuard><MorehGuard><MorehDashboard /></MorehGuard></SubscriptionGuard></ProtectedRoute>} />
-                      <Route path="/moreh/planner/:childId" element={<ProtectedRoute><SubscriptionGuard><MorehGuard><RoutinePlanner /></MorehGuard></SubscriptionGuard></ProtectedRoute>} />
+                      <Route path="/moreh/packs" element={<ProtectedRoute><SubscriptionGuard><MorehGuard><MorehPackManager /></MorehGuard></SubscriptionGuard></ProtectedRoute>} />
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
