@@ -318,9 +318,9 @@ export default function Home() {
                       </div>
                       <div>
                         <p className={`font-semibold ${isDone ? 'line-through opacity-80' : ''}`}>
-                          {task.template.title}
+                          {task.template?.title || 'Missão Órfã'}
                         </p>
-                        {task.template.is_mandatory && !isDone && (
+                        {task.template?.is_mandatory && !isDone && (
                           <span className="text-xs bg-red-500/20 text-red-200 px-2 py-0.5 rounded-full">Obrigatório</span>
                         )}
                       </div>

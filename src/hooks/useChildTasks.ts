@@ -45,7 +45,7 @@ export function useChildTasks(childId: string | null) {
           .lte('created_at', `${todayStr}T23:59:59Z`);
 
         // Filter by child_id
-        const childTasks = existingTasks?.filter(t => t.template.child_id === childId) || [];
+        const childTasks = existingTasks?.filter(t => t.template?.child_id === childId) || [];
 
         // 3. Fetch templates to see if we need to generate new tasks for today
         const { data: templates } = await supabase

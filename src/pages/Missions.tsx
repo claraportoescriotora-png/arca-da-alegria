@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { Trophy, Check, ChevronRight, AlertCircle } from 'lucide-react';
@@ -12,9 +12,11 @@ export default function Missions() {
     const [activeChildId, setActiveChildId] = useState<string | null>(children[0]?.id || null);
 
     // Ensure we have an active child selected if available
-    if (!activeChildId && children.length > 0) {
-        setActiveChildId(children[0].id);
-    }
+    useEffect(() => {
+        if (!activeChildId && children.length > 0) {
+            setActiveChildId(children[0].id);
+        }
+    }, [activeChildId, children]);
 
     const { tasks, loading } = useChildTasks(activeChildId);
 
@@ -99,9 +101,9 @@ export default function Missions() {
                                         </div>
                                         <div>
                                             <h3 className={`font-bold text-lg mb-1 ${isDone ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                                {task.template.title}
+                                                {task.template?.title || 'Missão Órfã'}
                                             </h3>
-                                            {task.template.is_mandatory && !isDone && (
+                                            {task.template?.is_mandatory && !isDone && (
                                                 <span className="text-xs font-medium bg-red-100 text-red-600 px-2 py-1 rounded-md">
                                                     Obrigatório
                                                 </span>
