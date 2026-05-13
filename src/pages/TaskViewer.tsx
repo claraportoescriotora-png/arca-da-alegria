@@ -181,24 +181,24 @@ export default function TaskViewer() {
         </div>
 
         {/* Justifications */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <p className="font-semibold text-muted-foreground">Não conseguiu fazer?</p>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🤒', 'Estou dodói')}>
-              <span className="text-2xl mb-1">🤒</span>
-              <span className="text-xs">Estou dodói</span>
-            </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('⏰', 'Acabou o tempo')}>
-              <span className="text-2xl mb-1">⏰</span>
-              <span className="text-xs">Acabou o tempo</span>
-            </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🚗', 'Estou fora de casa')}>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🚗', 'Tive que sair com a família')}>
               <span className="text-2xl mb-1">🚗</span>
-              <span className="text-xs">Estou fora</span>
+              <span className="text-xs text-center">Tive que sair com a família</span>
             </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🤷', 'Foi difícil')}>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('⏰', 'Faltou tempo')}>
+              <span className="text-2xl mb-1">⏰</span>
+              <span className="text-xs text-center">Faltou tempo</span>
+            </Button>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🤒', 'Não me senti bem')}>
+              <span className="text-2xl mb-1">🤒</span>
+              <span className="text-xs text-center">Não me senti bem</span>
+            </Button>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center" onClick={() => handleJustify('🤷', 'Esqueci / Outro motivo')}>
               <span className="text-2xl mb-1">🤷</span>
-              <span className="text-xs">Foi difícil</span>
+              <span className="text-xs text-center">Esqueci / Outro motivo</span>
             </Button>
           </div>
         </div>

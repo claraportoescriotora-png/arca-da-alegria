@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Target, ArrowLeft, Trophy, Pencil, Trash2, Check, ChevronRight } from "lucide-react";
+import { Loader2, Plus, Target, ArrowLeft, Trophy, Pencil, Trash2, Check, ChevronRight, Clock, Camera, Star, Link } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface Child { id: string; name: string; }
 interface MissionPack {
@@ -26,14 +27,18 @@ interface Mission {
 interface MissionTask {
   id: string; mission_id: string; description: string;
   xp_reward: number; order_index: number;
+  requires_photo: boolean; is_mandatory: boolean; schedule_time?: string | null;
   linked_content_type?: string | null; linked_content_id?: string | null;
 }
+type ContentType = 'story' | 'video' | 'game' | 'movie' | 'series';
+interface ContentItem { id: string; title: string; is_premium?: boolean; }
 
 export default function MorehPackManager() {
   const navigate = useNavigate();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { toast } = useToast();
   const userId = session?.user?.id ?? null;
+  const isPremium = profile?.plan_type === 'family_pass' || profile?.subscription_status === 'active';
 
   const [children, setChildren] = useState<Child[]>([]);
   const [packs, setPacks] = useState<MissionPack[]>([]);
@@ -51,12 +56,18 @@ export default function MorehPackManager() {
   const [isMissionDialogOpen, setIsMissionDialogOpen] = useState(false);
   const [missionForm, setMissionForm] = useState<Partial<Mission>>({});
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-  const [taskForm, setTaskForm] = useState<Partial<MissionTask>>({});
+  const [taskForm, setTaskForm] = useState<Partial<MissionTask>>({ requires_photo: false, is_mandatory: true });
   const [saving, setSaving] = useState(false);
+  const [contentCategory, setContentCategory] = useState<ContentType>('video');
+  const [availableContent, setAvailableContent] = useState<Record<ContentType, ContentItem[]>>({
+    story: [], video: [], game: [], movie: [], series: []
+  });
+  const [loadingContent, setLoadingContent] = useState(false);
 
   useEffect(() => { if (userId) { fetchChildren(); fetchPacks(); } }, [userId]);
   useEffect(() => { if (selectedPack) fetchMissions(selectedPack.id); }, [selectedPack]);
-  useEffect(() => { if (selectedTasksMission) fetchTasks(selectedTasksMission.id); }, [selectedTasksMission]);
+  useEffect(() => { if (selectedTasksMission) { fetchTasks(selectedTasksMission.id); fetchContent(); } }, [selectedTasksMission]);
+  useEffect(() => { fetchContent(); }, [contentCategory]);
 
   const fetchChildren = async () => {
     const { data } = await supabase.from('children').select('id, name').order('created_at');
@@ -87,6 +98,15 @@ export default function MorehPackManager() {
     const { data } = await supabase.from('mission_tasks').select('*').eq('mission_id', missionId).order('order_index');
     setTasks(data || []);
     setLoadingTasks(false);
+  };
+
+  const fetchContent = async () => {
+    setLoadingContent(true);
+    const tableMap: Record<ContentType, string> = { story: 'stories', video: 'videos', game: 'games', movie: 'movies', series: 'series' };
+    const table = tableMap[contentCategory];
+    const { data } = await supabase.from(table).select('id, title, is_premium').order('title');
+    setAvailableContent(prev => ({ ...prev, [contentCategory]: data || [] }));
+    setLoadingContent(false);
   };
 
   // --- Pack CRUD ---
@@ -167,6 +187,9 @@ export default function MorehPackManager() {
         description: taskForm.description,
         xp_reward: taskForm.xp_reward || 10,
         order_index: taskForm.order_index || (tasks.length + 1),
+        requires_photo: taskForm.requires_photo ?? false,
+        is_mandatory: taskForm.is_mandatory ?? true,
+        schedule_time: taskForm.schedule_time || null,
         linked_content_type: taskForm.linked_content_type || null,
         linked_content_id: taskForm.linked_content_id || null,
       };
@@ -176,7 +199,7 @@ export default function MorehPackManager() {
         await supabase.from('mission_tasks').insert(payload);
       }
       toast({ title: "Tarefa salva!" });
-      setTaskForm({});
+      setTaskForm({ requires_photo: false, is_mandatory: true });
       fetchTasks(selectedTasksMission.id);
     } catch (e: any) {
       toast({ variant: "destructive", title: "Erro", description: e.message });
@@ -207,14 +230,16 @@ export default function MorehPackManager() {
         <main className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
           {/* Add/Edit Task Form */}
           <div className="bg-card p-4 rounded-2xl border border-border space-y-4">
-            <h3 className="font-bold">{taskForm.id ? 'Editar Tarefa' : 'Adicionar Tarefa'}</h3>
+            <h3 className="font-bold">{taskForm.id ? 'Editar Tarefa' : 'Nova Tarefa'}</h3>
+
+            {/* Basic fields */}
             <div className="grid grid-cols-12 gap-3">
               <div className="col-span-2 space-y-1">
                 <Label className="text-xs">Ordem</Label>
                 <Input type="number" value={taskForm.order_index || ''} onChange={e => setTaskForm({ ...taskForm, order_index: +e.target.value })} placeholder="1" />
               </div>
               <div className="col-span-7 space-y-1">
-                <Label className="text-xs">Descrição</Label>
+                <Label className="text-xs">Descrição da Tarefa *</Label>
                 <Input value={taskForm.description || ''} onChange={e => setTaskForm({ ...taskForm, description: e.target.value })} placeholder="Ex: Orar de manhã" />
               </div>
               <div className="col-span-3 space-y-1">
@@ -222,8 +247,68 @@ export default function MorehPackManager() {
                 <Input type="number" value={taskForm.xp_reward || ''} onChange={e => setTaskForm({ ...taskForm, xp_reward: +e.target.value })} placeholder="10" />
               </div>
             </div>
+
+            {/* Toggles row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl">
+                <div>
+                  <p className="text-sm font-semibold flex items-center gap-1"><Camera className="w-3.5 h-3.5" /> Exige Foto/Vídeo</p>
+                  <p className="text-xs text-muted-foreground">Abre câmera no check-in</p>
+                </div>
+                <Switch checked={taskForm.requires_photo ?? false} onCheckedChange={v => setTaskForm({ ...taskForm, requires_photo: v })} />
+              </div>
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl">
+                <div>
+                  <p className="text-sm font-semibold flex items-center gap-1"><Star className="w-3.5 h-3.5" /> Essencial</p>
+                  <p className="text-xs text-muted-foreground">Conta para a meta diária</p>
+                </div>
+                <Switch checked={taskForm.is_mandatory ?? true} onCheckedChange={v => setTaskForm({ ...taskForm, is_mandatory: v })} />
+              </div>
+            </div>
+
+            {/* Schedule time */}
+            <div className="space-y-1">
+              <Label className="text-xs flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Horário do Lembrete (opcional)</Label>
+              <Input type="time" value={taskForm.schedule_time || ''} onChange={e => setTaskForm({ ...taskForm, schedule_time: e.target.value || null })} className="w-48" />
+            </div>
+
+            {/* Content link */}
+            <div className="space-y-2 p-3 bg-primary/5 rounded-xl border border-primary/10">
+              <Label className="text-xs font-semibold flex items-center gap-1"><Link className="w-3.5 h-3.5" /> Conectar Conteúdo Nativo (opcional)</Label>
+              <p className="text-xs text-muted-foreground">O filho verá um botão de atalho direto para o conteúdo.</p>
+              <div className="flex gap-2 flex-wrap">
+                {(['video','story','game','movie','series'] as ContentType[]).map(cat => (
+                  <button key={cat} onClick={() => setContentCategory(cat)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${
+                      contentCategory === cat ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border text-muted-foreground hover:border-primary/50'
+                    }`}>
+                    {{ video: '🎬 Vídeos', story: '📖 Histórias', game: '🎮 Games', movie: '🎥 Filmes', series: '📺 Séries' }[cat]}
+                  </button>
+                ))}
+              </div>
+              <Select
+                value={taskForm.linked_content_type === contentCategory ? (taskForm.linked_content_id || '') : ''}
+                onValueChange={v => setTaskForm({ ...taskForm, linked_content_type: v ? contentCategory : null, linked_content_id: v || null })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={loadingContent ? 'Carregando...' : 'Selecionar conteúdo...'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhum</SelectItem>
+                  {(availableContent[contentCategory] || []).map(item => (
+                    <SelectItem key={item.id} value={item.id} disabled={item.is_premium && !isPremium}>
+                      {item.title}{item.is_premium && !isPremium ? ' 🔒' : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {taskForm.linked_content_id && (
+                <p className="text-xs text-green-600 font-semibold">✅ Conteúdo vinculado!</p>
+              )}
+            </div>
+
             <div className="flex justify-end gap-2">
-              {taskForm.id && <Button variant="ghost" size="sm" onClick={() => setTaskForm({})}>Cancelar</Button>}
+              {taskForm.id && <Button variant="ghost" size="sm" onClick={() => setTaskForm({ requires_photo: false, is_mandatory: true })}>Cancelar</Button>}
               <Button size="sm" onClick={handleSaveTask} disabled={saving || !taskForm.description}>
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
                 {taskForm.id ? 'Atualizar' : 'Adicionar'}
@@ -247,7 +332,15 @@ export default function MorehPackManager() {
                 ) : tasks.map(t => (
                   <TableRow key={t.id}>
                     <TableCell className="font-bold text-center text-muted-foreground">{t.order_index}</TableCell>
-                    <TableCell>{t.description}</TableCell>
+                    <TableCell>
+                      <div>{t.description}</div>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {t.requires_photo && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">📷 Foto</span>}
+                        {t.is_mandatory && <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">⭐ Essencial</span>}
+                        {t.schedule_time && <span className="text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">⏰ {t.schedule_time.slice(0,5)}</span>}
+                        {t.linked_content_type && <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">🔗 {t.linked_content_type}</span>}
+                      </div>
+                    </TableCell>
                     <TableCell><span className="text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded-full text-xs font-bold">+{t.xp_reward}XP</span></TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => setTaskForm(t)}><Pencil className="w-4 h-4 text-slate-500" /></Button>

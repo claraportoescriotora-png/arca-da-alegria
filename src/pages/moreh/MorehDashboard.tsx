@@ -106,15 +106,18 @@ function AuditPanel() {
               </div>
             )}
 
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-col gap-2 mt-3">
               {task.status === 'completed_pending_review' && (
                 <>
-                  <Button className="flex-1 bg-green-500 hover:bg-green-600 text-white" onClick={() => handleAction(task.id, 'approved', 10, childId)}>Aprovar (+10 XP)</Button>
-                  <Button variant="outline" className="flex-1" onClick={() => handleAction(task.id, 'failed', 0, childId)}>Rejeitar</Button>
+                  <div className="flex gap-2">
+                    <Button className="flex-1 bg-green-500 hover:bg-green-600 text-white" onClick={() => handleAction(task.id, 'approved', 10, childId)}>✅ Aprovar (+10 XP)</Button>
+                    <Button variant="outline" className="flex-1 border-red-200 text-red-600 hover:bg-red-50" onClick={() => handleAction(task.id, 'failed', 0, childId)}>❌ Rejeitar</Button>
+                  </div>
+                  <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold" onClick={() => handleAction(task.id, 'grace_approved', 5, childId)}>🕊️ Conceder por Graça (+5 XP)</Button>
                 </>
               )}
               {task.status === 'failed' && (
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold" onClick={() => handleAction(task.id, 'grace_approved', 5, childId)}>Poder de Graça (+5 XP)</Button>
+                <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold" onClick={() => handleAction(task.id, 'grace_approved', 5, childId)}>🕊️ Poder de Graça — Perdoar (+5 XP)</Button>
               )}
               {(task.status === 'approved' || task.status === 'grace_approved') && task.evidence_url && (
                 <Button className="w-full font-bold" variant="outline" onClick={() => handleShare(task, childName)}>Compartilhar Evidência</Button>
@@ -206,7 +209,7 @@ export default function MorehDashboard() {
     <div className="min-h-screen bg-background pb-24">
       <header className="sticky top-0 z-40 bg-card border-b border-border shadow-sm">
         <div className="container max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors">
+          <button onClick={() => navigate('/missions')} className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="font-fredoka text-xl font-bold text-foreground">Painel do Moreh</h1>

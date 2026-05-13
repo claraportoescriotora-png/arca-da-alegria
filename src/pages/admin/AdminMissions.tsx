@@ -132,6 +132,7 @@ export function AdminMissions() {
         const { data, error } = await supabase
             .from('mission_packs')
             .select('*')
+            .is('user_id', null)
             .order('created_at', { ascending: false });
 
         if (error) {
