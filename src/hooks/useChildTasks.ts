@@ -69,7 +69,8 @@ export function useChildTasks(childId: string | null) {
           if (missingTemplates.length > 0) {
             const newTasksToInsert = missingTemplates.map(t => ({
               template_id: t.id,
-              user_id: session!.user!.id,
+              child_id: childId,
+              date: todayStr,
               status: 'pending'
             }));
 

@@ -45,8 +45,9 @@ export function useMoreh() {
         }
 
         // Run lazy cleanup for old evidences
-        if (profile) {
-          runHygieneCleanup(session.user.id, profile.hygiene_days || 30);
+        if (profile && childrenData && childrenData.length > 0) {
+          const childIds = childrenData.map(c => c.id);
+          runHygieneCleanup(childIds, profile.hygiene_days || 30);
         }
       } catch (err) {
         console.error('Error fetching Moreh data', err);
@@ -58,7 +59,7 @@ export function useMoreh() {
     fetchData();
   }, [session]);
 
-  const runHygieneCleanup = async (userId: string, days: number) => {
+  const runHygieneCleanup = async (childIds: string[], days: number) => {
     try {
       const thresholdDate = new Date();
       thresholdDate.setDate(thresholdDate.getDate() - days);
@@ -67,7 +68,7 @@ export function useMoreh() {
       const { data: oldTasks } = await supabase
         .from('daily_tasks')
         .select('id, evidence_url')
-        .eq('user_id', userId)
+        .in('child_id', childIds)
         .lt('created_at', thresholdDate.toISOString())
         .not('evidence_url', 'is', null);
 
