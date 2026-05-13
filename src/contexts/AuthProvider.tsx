@@ -17,6 +17,7 @@ export interface Profile {
     created_at?: string;
     failed_attempts?: number;
     locked_until?: string | null;
+    plan_type?: 'base' | 'family_pass';
 }
 
 interface AuthContextType {

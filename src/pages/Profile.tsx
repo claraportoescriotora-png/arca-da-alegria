@@ -189,6 +189,17 @@ export default function Profile() {
 
         {/* Menu Items */}
         <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
+          <button
+            onClick={() => navigate('/moreh')}
+            className="w-full flex items-center justify-between p-4 hover:bg-muted transition-colors border-b border-border bg-primary/5"
+          >
+            <div className="flex items-center gap-3">
+              <Shield className="w-5 h-5 text-primary" />
+              <span className="font-medium text-primary">Área dos Pais (Moreh)</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </button>
+          
           {menuItems.map(({ icon: Icon, label, path }, index) => (
             <button
               key={path}

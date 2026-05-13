@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, Moon, Sun, BookOpen, Gamepad2, Play, FileText, ChevronRight, Heart } from 'lucide-react';
+import { Bell, Moon, Sun, BookOpen, Gamepad2, Play, FileText, ChevronRight, Heart, Check } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useConfig } from '@/contexts/ConfigContext';
 import { useUser } from '@/contexts/UserContext';
@@ -18,6 +18,8 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
 import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushSubscription';
 import { checkIsItemLocked } from '@/hooks/useProductAccess';
+import { useMoreh } from '@/hooks/useMoreh';
+import { useChildTasks } from '@/hooks/useChildTasks';
 
 interface ContentItem {
   id: string;
@@ -53,15 +55,22 @@ export default function Home() {
   const [featuredCatalog, setFeaturedCatalog] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Mission Progress State
-  const [dailyProgress, setDailyProgress] = useState(0);
-  const [currentMission, setCurrentMission] = useState<{ packId: string, dayTitle: string } | null>(null);
+  const { children } = useMoreh();
+  const [activeChildId, setActiveChildId] = useState<string | null>(null);
+  const { tasks, loading: loadingTasks, updateTaskStatus } = useChildTasks(activeChildId);
+
+  // Auto-select first child if none selected
+  useEffect(() => {
+    if (children.length > 0 && !activeChildId) {
+      setActiveChildId(children[0].id);
+    }
+  }, [children, activeChildId]);
 
   useEffect(() => {
     fetchHomeContent();
     if (user) {
-      fetchMissionProgress();
-
+      // Mission progress calculation from old system removed in favor of daily tasks
+      
       // Request Push Notification Permission
       const initPush = async () => {
         if ('Notification' in window && Notification.permission !== 'denied') {
@@ -77,101 +86,13 @@ export default function Home() {
     }
   }, [user]);
 
-  const fetchMissionProgress = async () => {
-    if (!user) return;
-
-    try {
-      // 1. Get user's enrollment
-      const { data: enrollments } = await supabase
-        .from('user_mission_enrollments')
-        .select('pack_id')
-        .eq('user_id', user.id);
-
-      // If no enrollment, clear
-      if (!enrollments || enrollments.length === 0) {
-        setDailyProgress(0);
-        setCurrentMission(null);
-        return;
-      }
-
-      // 3. Get user's completed tasks FIRST to determine which enrollment is the "active" unfinished one
-      // If none, we can just show the latest one they were enrolled in.
-      const { data: userProgress } = await supabase
-        .from('user_mission_progress')
-        .select('task_id')
-        .eq('user_id', user.id);
-
-      const completedSet = new Set(userProgress?.map(p => p.task_id));
-
-      let targetPackId = enrollments[0].pack_id;
-
-      // Find the unfinished enrollment if multiple exist (to be safe)
-      for (const e of enrollments) {
-        const { data: mData } = await supabase.from('missions').select('mission_tasks(id)').eq('pack_id', e.pack_id);
-        let finished = true;
-        if (mData) {
-          for (const md of mData) {
-            for (const t of md.mission_tasks) {
-              if (!completedSet.has(t.id)) finished = false;
-            }
-          }
-        }
-        if (!finished) {
-          targetPackId = e.pack_id;
-          break;
-        }
-      }
-
-      const { data: pack } = await supabase
-        .from('mission_packs')
-        .select('id, title')
-        .eq('id', targetPackId)
-        .single();
-
-      if (!pack) return;
-
-      // 2. Get all days and tasks for THIS pack
-      const { data: days } = await supabase
-        .from('missions')
-        .select(`
-          id,
-          day_number,
-          title,
-          mission_tasks (id)
-        `)
-        .eq('pack_id', pack.id)
-        .order('day_number');
-
-      if (!days || days.length === 0) return;
-
-      // 4. Find current day
-      let activeDay = days[days.length - 1]; // Fallback to last day
-      let percent = 100;
-
-      for (const day of days) {
-        const totalTasks = day.mission_tasks.length;
-        if (totalTasks === 0) continue;
-
-        const completedTasks = day.mission_tasks.filter((t: any) => completedSet.has(t.id)).length;
-
-        if (completedTasks < totalTasks) {
-          // Found the unfinished day!
-          activeDay = day;
-          percent = Math.round((completedTasks / totalTasks) * 100);
-          break;
-        }
-      }
-
-      setDailyProgress(percent);
-      setCurrentMission({
-        packId: pack.id,
-        dayTitle: `Dia ${activeDay.day_number}: ${activeDay.title}`
-      });
-
-    } catch (error) {
-      console.error("Error fetching progress", error);
-    }
+  const calculateDailyProgress = () => {
+    if (tasks.length === 0) return 0;
+    const completedTasks = tasks.filter(t => t.status !== 'pending' && t.status !== 'failed');
+    return Math.round((completedTasks.length / tasks.length) * 100);
   };
+
+  const dailyProgress = calculateDailyProgress();
 
   const fetchHomeContent = async () => {
     try {
@@ -346,15 +267,70 @@ export default function Home() {
           )}
         </div>
 
-        {/* Journey Card */}
-        <div
-          onClick={() => currentMission && navigate(`/missions/${currentMission.packId}`)}
-          className="gradient-secondary rounded-3xl p-6 text-white cursor-pointer hover:opacity-95 transition-opacity"
-        >
-          <h2 className="font-fredoka text-xl font-bold mb-2">Sua Jornada de Fé 🏆</h2>
-          <p className="text-white/80 text-sm">
-            {currentMission ? currentMission.dayTitle : "Comece sua missão hoje!"}
-          </p>
+        {/* Child Selector & Tasks */}
+        {children.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+            {children.map(child => (
+              <button
+                key={child.id}
+                onClick={() => setActiveChildId(child.id)}
+                className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+                  activeChildId === child.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {child.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="gradient-secondary rounded-3xl p-6 text-white relative">
+          <h2 className="font-fredoka text-xl font-bold mb-4">Suas Missões de Hoje 🏆</h2>
+          
+          {loadingTasks ? (
+            <div className="animate-pulse space-y-3">
+              <div className="h-12 bg-white/20 rounded-xl" />
+              <div className="h-12 bg-white/20 rounded-xl" />
+            </div>
+          ) : tasks.length === 0 ? (
+            <p className="text-white/80 text-sm">O Moreh ainda não preparou suas missões hoje. Aproveite os jogos!</p>
+          ) : (
+            <div className="space-y-3">
+              {tasks.map(task => {
+                const isDone = task.status !== 'pending' && task.status !== 'failed';
+                return (
+                  <div 
+                    key={task.id} 
+                    className={`flex items-center justify-between p-3 rounded-xl transition-all ${
+                      isDone ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20 cursor-pointer'
+                    }`}
+                    onClick={() => {
+                      if (!isDone) {
+                        navigate(`/tasks/${task.id}`);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        isDone ? 'bg-green-500' : 'bg-white/20'
+                      }`}>
+                        {isDone ? <Check className="w-5 h-5 text-white" /> : <div className="w-3 h-3 rounded-full bg-white/50" />}
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${isDone ? 'line-through opacity-80' : ''}`}>
+                          {task.template.title}
+                        </p>
+                        {task.template.is_mandatory && !isDone && (
+                          <span className="text-xs bg-red-500/20 text-red-200 px-2 py-0.5 rounded-full">Obrigatório</span>
+                        )}
+                      </div>
+                    </div>
+                    {!isDone && <ChevronRight className="w-5 h-5 opacity-50" />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Progress */}

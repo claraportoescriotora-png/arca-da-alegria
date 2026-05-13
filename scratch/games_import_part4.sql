@@ -1,0 +1,245 @@
+INSERT INTO games (title, type, image_url, game_url, description, difficulty, xp_reward, config, is_active, status) VALUES
+('Brawl Guys', 'embed', 'https://img.gamemonetize.com/ddek6s43vtxox5ocpsctljrtny62f1ss/512x384.jpg', 'https://html5.gamemonetize.co/ddek6s43vtxox5ocpsctljrtny62f1ss/', 'Get ready for a brawl! Choose your character then jump into the arena as you try to be the first player to complete the goal of each game. Win the match to earn a trophy. Keep stacking up your trophies as you attempt to be the best player.
+
+Instruções: WASD keys to move Click to aim and shoot or use tap controls to move and shoot ', 'Fácil', 100, '{"width": 1280, "height": 720}', false, 'available'),
+('Fall Boys: Who will win', 'embed', 'https://img.gamemonetize.com/6gapvipbiw88hqgvmufgnslx720alrur/512x384.jpg', 'https://html5.gamemonetize.co/6gapvipbiw88hqgvmufgnslx720alrur/', 'Fall Boys: Who will win is best fun racing game. The most important thing is how to win the race and get first place. The principle of the game is to cross the doors, be careful some doors never open. be smart and find the best way to achieve finish line first. Enjoy !
+
+Instruções: Fall Boys Who will win is best funny racing game The most important thing is how to win the race and get first place The principle of the game is to cross the doors be careful some doors never open be smart and find the best way to achieve finish ', 'Médio', 100, '{"width": 600, "height": 960}', false, 'available'),
+('Nani Pelekai Hand Doctor Game Online', 'embed', 'https://img.gamemonetize.com/nhwptv75x02q1ngrg5qhkwtsnd5fnq6b/512x384.jpg', 'https://html5.gamemonetize.co/nhwptv75x02q1ngrg5qhkwtsnd5fnq6b/', 'Nani Peleka Get pain on hand and need doctor because hurt hand so in this Nani Peleka hand doctor game you will need to treat her, as she is now one of your patients. Have a fun time with Nani Peleka in your doctor office.
+
+Instruções: Use the mouse to treat Nani Peleka', 'Difícil', 100, '{"width": 850, "height": 480}', false, 'available'),
+('Perfect Cutter', 'embed', 'https://img.gamemonetize.com/wxtbvmnw0t854mirv37lambnsx9ecki9/512x384.jpg', 'https://html5.gamemonetize.co/wxtbvmnw0t854mirv37lambnsx9ecki9/', 'This Perfect game ''Perfect Cutter'' is a very addicting games for all kids and young with simple enjoyable to game play moods slicing animations. Being a chef, you have to cut all meat and mashrooms. you have to tap and hold the mobile screen and listen the knife Sounds. Perfect cutter sounds and animates with swiftness and difficulty will increase step by step with time. You have to lift your finger to raise the kitchen knife so it won’t slice the obstacles on the way. You should not chop of blocks or spikes that will dull your knife and make it harder to slice vegetables like a ninja slice.
+
+Instruções: Perfect Cutter like slice -slice vegetables like ninja slice', 'Fácil', 100, '{"width": 600, "height": 960}', false, 'available'),
+('Masha Bee Hand Doctor Game Online - Hospital Surge', 'embed', 'https://img.gamemonetize.com/fjhtxs1ifbbqk3d1tzjqlmy9rr5hw3bc/512x384.jpg', 'https://html5.gamemonetize.co/fjhtxs1ifbbqk3d1tzjqlmy9rr5hw3bc/', 'Masha Bee Get pain on hand and need doctor because hurt hand so in this Masha Bee hand doctor game you will need to treat her, as she is now one of your patients. Have a fun time with Masha Bee in your doctor office.
+
+Instruções: Use the mouse to treat Masha Bee', 'Médio', 100, '{"width": 850, "height": 480}', false, 'available'),
+('Cute Snake io', 'embed', 'https://img.gamemonetize.com/y13sm079jxrnyzu1fbpjgazqz6xylvmk/512x384.jpg', 'https://html5.gamemonetize.co/y13sm079jxrnyzu1fbpjgazqz6xylvmk/', 'Cute Snake io is a fun snake game with multiple customizations.
+
+Instruções: Tap to play', 'Difícil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('Slither Dragon.io', 'embed', 'https://img.gamemonetize.com/dcyl5dqzp9bw23wt5zrlxjn2q6p54yui/512x384.jpg', 'https://html5.gamemonetize.co/dcyl5dqzp9bw23wt5zrlxjn2q6p54yui/', 'Slither Dragon.io is an amazing game. Eat multicolored eggs from other players to grow your dragon in size. The objective of the game is to grow the longest Dragon Slither. If your dragon collides with the body of the enemies it will die.
+
+Instruções: Tap and hold your dragon and eat other dragons to become bigger', 'Fácil', 100, '{"width": 1280, "height": 720}', false, 'available'),
+('Arena Wars io', 'embed', 'https://img.gamemonetize.com/dylbqp715wpqev18kprel6j4d8zwvy49/512x384.jpg', 'https://html5.gamemonetize.co/dylbqp715wpqev18kprel6j4d8zwvy49/', 'Arena Wars is a fun io game where you can evolve by collecting gems and eliminating your enemies.
+
+Instruções: Left mouse click to attack Right mouse click to sprint Cursor to move', 'Médio', 100, '{"width": 960, "height": 600}', false, 'available'),
+('NoodlemanParty.io ', 'embed', 'https://img.gamemonetize.com/abbyohf4ry7eu1j3xqiv0tt9pm2yzfha/512x384.jpg', 'https://html5.gamemonetize.co/abbyohf4ry7eu1j3xqiv0tt9pm2yzfha/', 'In the 3D multiplayer game Party.io, all players will fight on the same platform. Once thrown out of the platform, they will fail. If you are attacked, you will faint. If you faint, you will be thrown out. So attack other players and don''t make them hit you. React faster to win the war, have fun in the Party.io!
+
+Instruções: Slide on the screen to move space-bar to hold up your opponent', 'Difícil', 100, '{"width": 720, "height": 1334}', false, 'available'),
+('Crowd City', 'embed', 'https://img.gamemonetize.com/l4vvgvsc8fj5p2m8beaaa3fe7119vf1g/512x384.jpg', 'https://html5.gamemonetize.co/l4vvgvsc8fj5p2m8beaaa3fe7119vf1g/', 'Population is a very important element of the city. Every crowd want people. The bigger number crowd can absorb smaller one. You need to keep running, find people, then invite them join in. You are racing with other players. Avoid the big crowd, to eat small one. I believe you could build the biggest crowd in this city.
+
+Instruções: joysitck to play', 'Fácil', 100, '{"width": 750, "height": 1334}', false, 'available'),
+('Xmas War - Multiplayer', 'embed', 'https://img.gamemonetize.com/0kp6n3rtvgo7ln1togs8k8u04bpjngso/512x384.jpg', 'https://html5.gamemonetize.co/0kp6n3rtvgo7ln1togs8k8u04bpjngso/', 'An addicting online/multiplayer game. Move your character cleverly and throw the ball at the others. Select your character and start fighting now! Have fun!
+
+Instruções: Virtual control on mobile Mouse on desktop ', 'Médio', 100, '{"width": 800, "height": 450}', false, 'available'),
+('Whack The Mole!', 'embed', 'https://img.gamemonetize.com/vxoll6bvnbnydpndle9sh7nxdzlj7272/512x384.jpg', 'https://html5.gamemonetize.co/vxoll6bvnbnydpndle9sh7nxdzlj7272/', 'Hit as many moles as possible before time runs out. Get the Super Hammer Power up to double your points
+
+Instruções: Hit as many moles as possible before time runs out ', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Jet Ski Racing Games', 'embed', 'https://img.gamemonetize.com/gzp1d00w7kjgkm5cvbrqguua792irfs7/512x384.jpg', 'https://html5.gamemonetize.co/gzp1d00w7kjgkm5cvbrqguua792irfs7/', 'Jet Ski Racing Games the engine and ride through three worlds with three different tracks of increasing difficulty each Avoid obstacles and complete all the laps before the time runs out
+
+Instruções: Up Arrow-Accelerate Left and right control steering Down arrow-slow down', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Nightwalkers.io', 'embed', 'https://img.gamemonetize.com/99mi8patiemjg6ns0m4apjv6p92csyt2/512x384.jpg', 'https://html5.gamemonetize.co/99mi8patiemjg6ns0m4apjv6p92csyt2/', 'Nightwalkers.io or in short, Nightwalkers, is a free Co-Op browser zombie survival game from JeFawk Games. It features unique gameplay elements such as Apocalypses and Noise which attracts zombies. Grab a friend and make an invincible base. Gather resources and build weapons, fight through endless waves of zombies to establish a new World Record...or don''t and just chill in the base and talk to one of the 1000+ daily people on the chat. However you play is up to you, but don''t forget, kill as many zombies as possible!
+
+Instruções: WASD - moves your character Left mouse button - shoots current weapon or places building Right mouse button - interacts with buildings 1 2 3 4 5 6 - equips weapon Q - equips event item ', 'Médio', 100, '{"width": 1366, "height": 768}', false, 'available'),
+('Among Us! Hide or Seek', 'embed', 'https://img.gamemonetize.com/3q222xuxipjscma64bwk09xynp9m5dm9/512x384.jpg', 'https://html5.gamemonetize.co/3q222xuxipjscma64bwk09xynp9m5dm9/', 'Among Us Hide or Seek. In the vast universe, our spaceship hides many enemies. Find them and kill them, let us continue to advance for the survival of mankind.
+
+Instruções: Click or drag obstacles to find enemies and kill them ', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Jump Pet Adventure', 'embed', 'https://img.gamemonetize.com/5hywj8g8k3mrx0btjkcp4ch2yulsfstk/512x384.jpg', 'https://html5.gamemonetize.co/5hywj8g8k3mrx0btjkcp4ch2yulsfstk/', 'Chase the monster by jumping the stairs, defeat him and rescue the Bunny.
+
+Instruções: Tap to jump be careful not to fall ', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('3D Forces', 'embed', 'https://img.gamemonetize.com/8j49yjk7axwazp7e5lqpkuymk0r6xm76/512x384.jpg', 'https://html5.gamemonetize.co/8j49yjk7axwazp7e5lqpkuymk0r6xm76/', 'Join your team and try to gun down the opposing team as you attempt to win each match in this crazy 3D shooting game.
+
+Instruções: WASD Keys to move Mouse to aim and shoot or use tap controls', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Murder.io', 'embed', 'https://img.gamemonetize.com/6v82k3mwcyl5d0ltv0cghkc1w7hsqdsx/512x384.jpg', 'https://html5.gamemonetize.co/6v82k3mwcyl5d0ltv0cghkc1w7hsqdsx/', 'The long awaited sequel to Killer.io. Now you must take out as many victims as possible within the time limit. Epic 3D graphics! Compete against two other players in this real online multiplayer game where you have one goal: Murder.
+
+Instruções: Arrow keys to move Z key to attack X key for action', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Void City', 'embed', 'https://img.gamemonetize.com/0s6eo5gnndu1myds72ljohb2z4xbh4bh/512x384.jpg', 'https://html5.gamemonetize.co/0s6eo5gnndu1myds72ljohb2z4xbh4bh/', 'Void City is a recreational competitive game in which the player grows a void hole by devouring a city.
+
+Instruções: WASD or swipe to control your void hole', 'Fácil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('Fall Guys', 'embed', 'https://img.gamemonetize.com/cfipwmjrgu4jqwxftrz1spb1djl8ev9r/512x384.jpg', 'https://html5.gamemonetize.co/cfipwmjrgu4jqwxftrz1spb1djl8ev9r/', 'Hold it and throw it guys
+
+Instruções: Mouse Mouse Left Click', 'Médio', 100, '{"width": 1000, "height": 600}', false, 'available'),
+('The Ball Girl', 'embed', 'https://img.gamemonetize.com/agaex58whuhss0qf2ikeiyszz1ji4fif/512x384.jpg', 'https://html5.gamemonetize.co/agaex58whuhss0qf2ikeiyszz1ji4fif/', 'Milly and her mother are invited to a big ball where they will see famous actors. They want to wear matching dresses. Can you find these dresses for them? You can dress them up in different styles too! You know, just make them stand out at the ball! All eyes should be on them!
+
+Instruções: MOUSE', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Lucky Star Dressup	', 'embed', 'https://img.gamemonetize.com/x633p3k4mt0suwmd30w6m686zc99qo9n/512x384.jpg', 'https://html5.gamemonetize.co/x633p3k4mt0suwmd30w6m686zc99qo9n/', 'These girls are about to sing on stage. Make sure their outfits are as coordinated as their dance moves!
+
+Instruções: MOUSE', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Princess Dress Design', 'embed', 'https://img.gamemonetize.com/49u5o7jmfbqng7bn43phgoa073b8rg8v/512x384.jpg', 'https://html5.gamemonetize.co/49u5o7jmfbqng7bn43phgoa073b8rg8v/', 'It''s time to open your fashion studio for this lovely princess too! She needs a new dress and your are the best designer in the world. Can you spoil her with a lovely makeover? Select 4 garments and pick a nice color and pattern for each item. Next take your fabrics, cut them and sew them up with the sewing machine. In the end she must show your beautiful creation to her prince charming. Will he like it?
+
+Instruções: MOUSE', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Beauty Manicure Salon	', 'embed', 'https://img.gamemonetize.com/jsi40x2yy6lcutfkgedzyz38tzthwmkg/512x384.jpg', 'https://html5.gamemonetize.co/jsi40x2yy6lcutfkgedzyz38tzthwmkg/', 'In this manicure game you need to style up and design the nails in professional style. You have so many options to style up, so get ready to envy your friends.
+
+Instruções: MOUSE', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Pretty Cure 4', 'embed', 'https://img.gamemonetize.com/qr9tjsluunzdm9nn1li15jicbnn3n33e/512x384.jpg', 'https://html5.gamemonetize.co/qr9tjsluunzdm9nn1li15jicbnn3n33e/', 'Join the Pretty Cure gang for another round of fashion and fun.
+
+Instruções: MOUSE', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Pretty Cure 1	', 'embed', 'https://img.gamemonetize.com/1631726wkmflkwh4rmgtagdnvlzm7in9/512x384.jpg', 'https://html5.gamemonetize.co/1631726wkmflkwh4rmgtagdnvlzm7in9/', 'The legendary warriors are about to save the planet from monsters, but they need to fix their outfits first.
+
+Instruções: MOUSE', 'Médio', 100, '{"width": 700, "height": 500}', false, 'available'),
+('Ludo Wizard', 'embed', 'https://img.gamemonetize.com/12j2wvfgmxag90kn7e1shpiqu13ehcei/512x384.jpg', 'https://html5.gamemonetize.co/12j2wvfgmxag90kn7e1shpiqu13ehcei/', 'Have fun with friends by playing the game Ludo Wizard. The game has 3 modes: - Vs Bot: Playing against the computer (offline) - Online: Playing with randomly matched people - With friends (private): Playing with your friends. Simply share a private code and connect to each other. PLAY NOW!
+
+Instruções: Click to roll a dice and move your tokens to reach the center of the Ludo board ', 'Difícil', 100, '{"width": 624, "height": 351}', false, 'available'),
+('Party.io 2', 'embed', 'https://img.gamemonetize.com/aar5ztvewer8eug68ooepdrygm7z62zg/512x384.jpg', 'https://html5.gamemonetize.co/aar5ztvewer8eug68ooepdrygm7z62zg/', 'Party.io 2 is much more fun now with its renewed backgrounds! You can choose one of the fun characters and start the game. All you have to do in the game is to touch the players and throw them out of the arena. You can see the kill count on the left of the screen. Be the last person in the arena and be the winner of the game! Have fun!
+
+Instruções: Game Controls LEFT CLICK', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Bigmonsterz.io', 'embed', 'https://img.gamemonetize.com/if6cwng6pkjl3a9fztj6lsbii2klh6lz/512x384.jpg', 'https://html5.gamemonetize.co/if6cwng6pkjl3a9fztj6lsbii2klh6lz/', 'Bigmonsterz.io-Hop into a vast world filled with weak and strong monsters,you start out as the weakest of the bunch,try and work your way to the very top and become the Biggest Monsterz in the Big mon world
+
+Instruções: Use the mouse to move', 'Médio', 100, '{"width": 1280, "height": 720}', false, 'available'),
+('Dungeon.ro', 'embed', 'https://img.gamemonetize.com/ix3vyqu9hjldoiqel62yw12lgu5kf3ky/512x384.jpg', 'https://html5.gamemonetize.co/ix3vyqu9hjldoiqel62yw12lgu5kf3ky/', 'Dungeon.ro is a new 2D shooting game with RPG elements like level system and upgrades.
+
+Instruções: WASD to move Mouse to fire and aim Space to dash', 'Difícil', 100, '{"width": 1060, "height": 650}', false, 'available'),
+('Snake.IO : Angry Slither Worm ', 'embed', 'https://img.gamemonetize.com/cq1w4465kb23vvz3xykws4db3ax5bz6n/512x384.jpg', 'https://html5.gamemonetize.co/cq1w4465kb23vvz3xykws4db3ax5bz6n/', 'Snake.io - Fun Addicting Arcade Battle .io Games Slither through a new competitive version of Snake and survive as long as you can! Challenge your friends and try to be the biggest worm in Snake.io!
+
+Instruções: try to survive', 'Fácil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('ForceZ.io', 'embed', 'https://img.gamemonetize.com/i0dzmc0qg2b3zgaa3o6e4fvlsjpldtgw/512x384.jpg', 'https://html5.gamemonetize.co/i0dzmc0qg2b3zgaa3o6e4fvlsjpldtgw/', 'Enjoy the new game ForceZ.io, where you can explore 5 arenas and also you can choose the multiplayer mode. The variety of weapons will make you stronger in defeating the enemies. Features: • Single-player and multiplayer gameplay • 5 Maps • Room options like double speed, double jump, double hp • 10+ Weapons • Armor shop
+
+Instruções:  WASD or arrow keys to move Left click to shoot Right click to aim R to reload 1 2 3 9 or Mouse wheel to cycle through weapons Space to jump Tab to toggle pause menu ', 'Médio', 100, '{"width": 1060, "height": 650}', false, 'available'),
+('Party.io', 'embed', 'https://img.gamemonetize.com/v9e6bigeaiayvlfosir6mukwcqueloyh/512x384.jpg', 'https://html5.gamemonetize.co/v9e6bigeaiayvlfosir6mukwcqueloyh/', 'Get ready for a fun arena game where you will face powerful opponents! All you have to do is touch the other players and throw them out of the arena. Be the last person in the arena and win the game. You can choose one of the fun characters before you start. Have fun!
+
+Instruções: Game Controls LEFT CLICK', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Knight Arena.io', 'embed', 'https://img.gamemonetize.com/jk1td0afcrs97lw6bdk8grh4huukppu8/512x384.jpg', 'https://html5.gamemonetize.co/jk1td0afcrs97lw6bdk8grh4huukppu8/', 'KnightArena.io is a unique battle in the arena. Choose your character and get ready for a battle with your opponents waiting for you. You have to choose your favorite weapon in the game where you can play as a multiplayer. This choice will determine your fate in the arena. During the war, you can collect power by collecting rewards and defeat your opponents by having unique weapons. You can play KnightArena.io in the same arena with your friends.A unique battle arena, unique knights, unique game
+
+Instruções: Move WASD or Arrow Keys - Attack Mouse Left Button', 'Fácil', 100, '{"width": 940, "height": 540}', false, 'available'),
+('Gold Miner HD', 'embed', 'https://img.gamemonetize.com/fwxlngwo2kcvqiw7qvxd1y9rudjj9nwo/512x384.jpg', 'https://html5.gamemonetize.co/fwxlngwo2kcvqiw7qvxd1y9rudjj9nwo/', 'Get all the gold on screen and complete level
+
+Instruções: Click to play', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Stick Man', 'embed', 'https://img.gamemonetize.com/sf3xpe2dc1sna0129sqmjlzxj6it1fnt/512x384.jpg', 'https://html5.gamemonetize.co/sf3xpe2dc1sna0129sqmjlzxj6it1fnt/', 'Stretch the stick in order to reach and walk on the platforms. Watch out! If the stick is not long enough, you will fall down!
+
+Instruções: Click and hold the make the ladder', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Flappy Bird .io ', 'embed', 'https://img.gamemonetize.com/5rn49bwgdwelc4zr2zvj4xtle2n4ecnj/512x384.jpg', 'https://html5.gamemonetize.co/5rn49bwgdwelc4zr2zvj4xtle2n4ecnj/', 'Play flappy bird .io here online for free. Click on the screen, to get started. Fly the bird as far as you can without hitting a pipe.
+
+Instruções: Click on the screen', 'Fácil', 100, '{"width": 440, "height": 750}', false, 'available'),
+('Tanked.io', 'embed', 'https://img.gamemonetize.com/z55wdqfkl6ycmh6qtl3zowov82eb6vl5/512x384.jpg', 'https://html5.gamemonetize.co/z55wdqfkl6ycmh6qtl3zowov82eb6vl5/', '- Tanked.io is a real-time survival and tank fighting web game. Collect experience, kill your opponents to become stronger and more resilient, and survive for as long as possible ! - You can upgrade your characteristics with points earned every few levels, and use a smoke skill to hide from others. - You play with AI tanks who fight and defend you. - Tanked.io offers a fun gameplay with various animations and graphical effects to give you more pleasure. Do not wait and join the fight! Survive and dominate the other players on Tanked.io.
+
+Instruções:  - Move with WASD ZQSD arrows - Attack and control your weapon with your mouse - Use smoke skill by clicking on the icon or by pressing the X key ', 'Médio', 100, '{"width": 1200, "height": 1000}', false, 'available'),
+('Drawaria.online', 'embed', 'https://img.gamemonetize.com/cfb7u76zlh8ql1sb8dm3hfcb7624aw1m/512x384.jpg', 'https://html5.gamemonetize.co/cfb7u76zlh8ql1sb8dm3hfcb7624aw1m/', 'Drawaria.online is amazing multiplayer game in which players draw and guess random words. A group of players takes turns drawing an image of a secret word, while others try to guess the word before the time expires. Player what guesses the word gets a score point, and the fastest also gets additional bonus points. Person who scores the most points in a series of rounds wins the game.
+
+Instruções: Left mouse button Draw Right mouse button Erase Mouse wheel Change brush size Keyboard to chat', 'Difícil', 100, '{"width": 1200, "height": 750}', false, 'available'),
+('HappySharks.io', 'embed', 'https://img.gamemonetize.com/wp7qm9bsc6stwwb92sy3rkid0b516vo2/512x384.jpg', 'https://html5.gamemonetize.co/wp7qm9bsc6stwwb92sy3rkid0b516vo2/', 'Happy Sharks multiplayer game! Hunt smaller shark and avoid bigger sharks. Eat gems to grow bigger. Customize your shark with colors and hats.
+
+Instruções: Mouse to move Press mouse or space to boost', 'Fácil', 100, '{"width": 1200, "height": 720}', false, 'available'),
+('Virus War - Multiplayer', 'embed', 'https://img.gamemonetize.com/pqqb7z8zhczvhd5xpu0tgbne4exl0buq/512x384.jpg', 'https://html5.gamemonetize.co/pqqb7z8zhczvhd5xpu0tgbne4exl0buq/', 'An addicting online/multiplayer game. Move your virus cleverly and shoot out the others. Select your virus and start fighting now! Have fun!
+
+Instruções: Virtual control on mobile Mouse on desktop ', 'Médio', 100, '{"width": 800, "height": 450}', false, 'available'),
+('King War IO', 'embed', 'https://img.gamemonetize.com/r09397amvveeclpiyf72fkol4kk4b302/512x384.jpg', 'https://html5.gamemonetize.co/r09397amvveeclpiyf72fkol4kk4b302/', 'King War IO is a strategy game in which the player can build it''s empire and use his hero archer to defend against endless waves of zombies. Features: - Endless levels - Multiple buildings - Upgrades - Strategy gameplay
+
+Instruções: Mouse To Play', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('KnifeBlades', 'embed', 'https://img.gamemonetize.com/jp0fqp8nxem3tla5eu0e6fypytgtcg5v/512x384.jpg', 'https://html5.gamemonetize.co/jp0fqp8nxem3tla5eu0e6fypytgtcg5v/', 'Pick up knives and wrap them around yourself to fight with other guys in the arena.Use both offensive and defensive modes to defeat your enemies smartly!
+
+Instruções: Pick up knives and wrap them around yourself to fight with other guys in the arena Use both offensive and defensive modes to defeat your enemies smartly ', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('CoronaVirus19', 'embed', 'https://img.gamemonetize.com/oajr2x9fx08a83nc80g1t7pvqfx2t7eh/512x384.jpg', 'https://html5.gamemonetize.co/oajr2x9fx08a83nc80g1t7pvqfx2t7eh/', 'CoronaVirus19.fun is a fun browser game about people and coronavirus. We made a game for you so you can collect toilet paper here too, but just do not get infected with this coronavirus, otherwise you will have to look for a doctor and die from coughing, vomiting and dudes with bats. There are 4 kinds of people in the game: Healthy person - can walk or run on the map and look for a disinfector or bat to become a doctor or a killer. Infected with coronavirus - can cough and puke, cannot run. The task is to infect as many people as possible or find a doctor and recover. The doctor is a player with a disinfector in his hands. Can squirts out of the disinfector and run around. The task is to cure as many infected with coronavirus as possible. The killer is a batsman. Can beat and run. The task is to kill as many infected as possible. Coronavirus infected each action loses a certain amount of health, in order to replenish it, it is necessary to collect toilet paper.
+
+Instruções: Mouse - Move Left Mouse Button - Attack Right Mouse Button - Speed Up', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Bump.iо', 'embed', 'https://img.gamemonetize.com/6cxdgtbrdiyailrdq4v55g5pyfgfu3e1/512x384.jpg', 'https://html5.gamemonetize.co/6cxdgtbrdiyailrdq4v55g5pyfgfu3e1/', 'There are 16 cars are involved in competition.you must avoid collisions with monsters and boundaries for win.Impact vehicles get energy and Kill vehicles to get volume growth.
+
+Instruções: There are 16 cars are involved in competition you must avoid collisions with monsters and boundaries for win Impact vehicles get energy and Kill vehicles to get volume growth ', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Speedy Corona Virus.IO', 'embed', 'https://img.gamemonetize.com/bpf4xkv00swxxcnqjabrvwzmf2287jpj/512x384.jpg', 'https://html5.gamemonetize.co/bpf4xkv00swxxcnqjabrvwzmf2287jpj/', 'Viruses are about to spread all over the world, and these viruses are very fast. Stop them before taking over all the cities.
+
+Instruções: Game Controls Mouse and Left Clicks', 'Fácil', 100, '{"width": 854, "height": 480}', false, 'available'),
+('Rooftop Royale', 'embed', 'https://img.gamemonetize.com/t96cewpbmg013sfcn6dv3qbvkwlcp4vi/512x384.jpg', 'https://html5.gamemonetize.co/t96cewpbmg013sfcn6dv3qbvkwlcp4vi/', 'Survive on the roof as you try to knock your 3 opponents off of the edge. 4 player rooftop battle game with a variety of maps, skins and weapons.
+
+Instruções: Use tap controls or W key to jump E key to shoot', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Shark io', 'embed', 'https://img.gamemonetize.com/vequb7u0k31344qxsy4qwru9ay767zx2/512x384.jpg', 'https://html5.gamemonetize.co/vequb7u0k31344qxsy4qwru9ay767zx2/', 'The big fish eats the little one.....!
+
+Instruções: Mouse or Touch', 'Difícil', 100, '{"width": 1280, "height": 720}', false, 'available'),
+('Shrek.fun', 'embed', 'https://img.gamemonetize.com/q1r7xhak8npz6jo8x73jnd1rd9z2zxfq/512x384.jpg', 'https://html5.gamemonetize.co/q1r7xhak8npz6jo8x73jnd1rd9z2zxfq/', 'Shreks.io - it is a free browser multiplayer Shrek style game. Shrek and the donkey are two inseparable friends who are ready for anything for the first place in this difficult battle for Fiona. Do not let other Shreks win the heart of Fiona, destroy the castle and save her first! Use the left mouse button to use the head of your faithful friend Donkey for attack. Use your right mouse button to save your ass and donkey''s head from large Shreks. If the shrek has little health, feed him cookies, they restore health. With each defeated enemy, Shrek becomes bigger and stronger, and Fiona gives him super strength. When Shreks dying, they leave you their cookies. Run shrek, collect cookies, beat other shrek with a strong head of a faithful friend - a donkey. Shrek hits on the left mouse button. Shrek can run on the right mouse button. Get to top 1 and become the most powerful shrek.
+
+Instruções: Shrek hits on the left mouse button Shrek can run on the right mouse button ', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('MineStrike.fun', 'embed', 'https://img.gamemonetize.com/bgkaq5jchbya9rff5jw6gnkwceukg16s/512x384.jpg', 'https://html5.gamemonetize.co/bgkaq5jchbya9rff5jw6gnkwceukg16s/', 'MineStrike.fun is a fun Minecraft style game. Eat cakes, cookies, cooked fish and everything you find to grow in size while you are small, most importantly do not eat poisonous potatoes, because it reduces your experience and you become smaller! Attack smaller enemies, so you have a better chance of staying alive. You can insurance yourself just run away from large enemies so that they do not kill you with one fell swoop of their powerful weapon! Or you can donate your experience to the enemy. The game has only 15 levels: 1. Steve with a wooden sword 2. A bee with a sunflower 3. Pumpkin with a stick 4. Fish with a fishing rod 5. Ocelot with a stone sword 6. A pig with a stone pickaxe 7. Zombies with an iron shovel 8. Skeleton with bone 9. Creeper with an iron pickaxe 10. Drowned man with a trident 11. Enderman with a diamond sword 12. Zombie Pigman with a golden sword 13. Blaze with an blaze rod 14. Witch with an Enchanted diamond sword 15. Herobrine with nanosable Can you get to level 15 and become the biggest and strongest in the game? Hint: for players who disable the ad blocker, an additional 20% of experience is awarded! One of the effective attack tactics: approach the enemy on the left side so that it is to your right and from your sword, then - immediately attack first! MineStrike will let you have fun and not let you get bored!
+
+Instruções: Move - mouse Attack - left mouse button Speed Up - right mouse button', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available');
+
+
+
+INSERT INTO games (title, type, image_url, game_url, description, difficulty, xp_reward, config, is_active, status) VALUES
+('Aquapark', 'embed', 'https://img.gamemonetize.com/81ricqu9kxmp1h1somvh8iacvz0069ve/512x384.jpg', 'https://html5.gamemonetize.co/81ricqu9kxmp1h1somvh8iacvz0069ve/', 'Reach to the end of the water slide, try to be the first. Bump other players during the race and have fun playing this colorful and sunny water slide game.
+
+Instruções: Use Mouse to Play', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('SlidePark.io', 'embed', 'https://img.gamemonetize.com/awwswmwimbehs4jb9m8vge2ux6npl5cw/512x384.jpg', 'https://html5.gamemonetize.co/awwswmwimbehs4jb9m8vge2ux6npl5cw/', 'Enter in the craziest aqua park in a competition on the biggest slide ever seen, you will find this game easy to play and funny. Features • Simple, fun, gameplay • Good graphics
+
+Instruções:  AD or left right arrow keys to control rotation ', 'Fácil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('HelixJump.io', 'embed', 'https://img.gamemonetize.com/kvyfnkejdvili3aakmfjiy2ddojtpura/512x384.jpg', 'https://html5.gamemonetize.co/kvyfnkejdvili3aakmfjiy2ddojtpura/', 'Help bringing down the ball without touching the red tiles in this amazing and addictive Helix maze game.
+
+Instruções:  AD left right arrow keys or mouse to move', 'Médio', 100, '{"width": 960, "height": 600}', false, 'available'),
+('StackBall.io', 'embed', 'https://img.gamemonetize.com/lq11iewcalri209etbq9g7trr20y5u9q/512x384.jpg', 'https://html5.gamemonetize.co/lq11iewcalri209etbq9g7trr20y5u9q/', 'Bring the ball to the bottom and win the game in this highly addicting Helix game. Features: • Addictive gameplay • Smash, bump and bounce gameplay
+
+Instruções:  Use mouse touch to play', 'Difícil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('Hole IO', 'embed', 'https://img.gamemonetize.com/b1x9qp14oxl36rwmt0vmu63az35ytda4/512x384.jpg', 'https://html5.gamemonetize.co/b1x9qp14oxl36rwmt0vmu63az35ytda4/', 'About Hole IO games: Hole IO is a recreational competitive game in which the player grows a void hole by devouring a city.
+
+Instruções: Mouse to Play', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('PixelForces.io', 'embed', 'https://img.gamemonetize.com/xz06sj0djvspye9diy5lzaz0f0kxx2rv/512x384.jpg', 'https://html5.gamemonetize.co/xz06sj0djvspye9diy5lzaz0f0kxx2rv/', 'Pixel Forces is a challenging 3D shooting online game. You can choose from five different multiplayer modes and maps and customize your character. The environment is structured like a vertical maze with trampolines. You can create a room to play, or enter in an already created room. Features: • Five multiplayer game modes: RPG, Deathmatch, Team Deathmatch, Explore, and Battle Royale • 5 amazing and unique maps with trampoline platforms • Room options • 12 character skins
+
+Instruções:  WASD or arrow keys to move Space bar to jump Right mouse button to aim Left mouse button to shoot L for toggle flashlight in night mode Esc or tab to toggle pause ', 'Médio', 100, '{"width": 960, "height": 540}', false, 'available'),
+('gulper.io', 'embed', 'https://img.gamemonetize.com/zzoj6ylxx9fs4g0c66ewr2k2fq6glj0l/512x384.jpg', 'https://html5.gamemonetize.co/zzoj6ylxx9fs4g0c66ewr2k2fq6glj0l/', 'Gulper.io is an awesome multiplayer snake game that takes inspiration from Slither.io. You must take control of a small glowing worm and try to grow bigger so that you can destroy the other worms on the playing field. You can grow bigger by gulping the glowing dots scattered around the map. You must move quickly and keep an eye out for enemies approaching as they will try and catch you out. Destroy your enemies by trapping them and making them slither into your own body. Can you become the largest glow worm?
+
+Instruções: Mouse to move hold left button for speed boost', 'Difícil', 100, '{"width": 900, "height": 550}', false, 'available'),
+('Multiplayer Tanks', 'embed', 'https://img.gamemonetize.com/rs89t4aihwn8rfzls68e42qvg0vyd5s5/512x384.jpg', 'https://html5.gamemonetize.co/rs89t4aihwn8rfzls68e42qvg0vyd5s5/', 'First HTML5 tank game with real multiplayer. Good old deathmatch mode. Endless replayability.
+
+Instruções: - Create or join the server - Use WASD and mouse to control your tank - Destroy enemy tanks to win the deathmatch', 'Fácil', 100, '{"width": 1920, "height": 1080}', false, 'available'),
+('Xmas Rooftop Battles', 'embed', 'https://img.gamemonetize.com/qul59ivj9q8phmv4kmjm0lh8zal4ar81/512x384.jpg', 'https://html5.gamemonetize.co/qul59ivj9q8phmv4kmjm0lh8zal4ar81/', 'Time to put on your Santa hat and get ready for some action packed fun. Try to shoot your opponent off of the rooftop in this fun Christmas themed shooter game.
+
+Instruções: Tap controls or use W E or O P to shoot jump', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Ludo Online Xmas', 'embed', 'https://img.gamemonetize.com/5bhq6b55mpkspxnmjjbsi213ig3ie3lj/512x384.jpg', 'https://html5.gamemonetize.co/5bhq6b55mpkspxnmjjbsi213ig3ie3lj/', 'Have fun with friends during Christmas holidays by playing Ludo Online Xmas game. The game has 3 modes: - Vs Bot: Playing against the computer (offline) - Online: Playing with randomly matched people - Private: Playing with your friends, simply share a private code and connect to each other. Merry Christmas! Play now!
+
+Instruções: Click to roll a dice and move your tokens to reach the center of the Ludo board ', 'Difícil', 100, '{"width": 624, "height": 351}', false, 'available'),
+('Bump.io', 'embed', 'https://img.gamemonetize.com/6ei41d81g4bj7alkgvudj88fvws7y5n4/512x384.jpg', 'https://html5.gamemonetize.co/6ei41d81g4bj7alkgvudj88fvws7y5n4/', 'There are 16 cars are involved in competition.you must avoid collisions with monsters and boundaries for win.Impact vehicles get energy and Kill vehicles to get volume growth.
+
+Instruções: Use Mouse To Play', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Paper.IO 2', 'embed', 'https://img.gamemonetize.com/1skj7a1hu68a1p31ag4ywljq4gb18oma/512x384.jpg', 'https://html5.gamemonetize.co/1skj7a1hu68a1p31ag4ywljq4gb18oma/', 'Capture new territories and defeat enemies in the new exciting game Paper.io 2Each player starts out with a small island, make it larger by adding new areas to it, but watch out for enemies. You are safe on your own turf but once you are outside you become vulnerable. Protect your tail from opponents and don''t hesitate to counter attack!
+
+Instruções: Control - mouse and keyboard WASD cursor keys ', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Ludo Online', 'embed', 'https://img.gamemonetize.com/8qdk9clkiv3bzcmbgkh0ehtxwpgzjhjr/512x384.jpg', 'https://html5.gamemonetize.co/8qdk9clkiv3bzcmbgkh0ehtxwpgzjhjr/', 'Have fun with friends by playing Ludo Online game. The game has 3 modes: - Vs Bot: Playing against the computer (offline) - Online: Playing with randomly matched people - Private: Playing with your friends. Simply share a private code and connect to each other. Play now!
+
+Instruções: Click to roll a dice and move your tokens to reach the center of the Ludo board ', 'Difícil', 100, '{"width": 624, "height": 351}', false, 'available'),
+('Crazynite.io', 'embed', 'https://img.gamemonetize.com/zlmz9xiuo5s5dntkcmx2cw2vvto5ox0o/512x384.jpg', 'https://html5.gamemonetize.co/zlmz9xiuo5s5dntkcmx2cw2vvto5ox0o/', 'Crazynite.io was inspired by popular new game Fortnite. Is a free unblocked online 2d io game with elements from Fortnite. Battles take place on an island full of explosive barrels. It is better to stay away from them, otherwise you can be exploded to pieces, if an clever player notices you near the barrel - he will shoot it. Ammunition: a knife, a revolver, a shotgun, a double-barrel, a tommy gun, a machine gun, a grenade launcher, a rocket launcher, a cannon, a sniper rifle and a laser, a bandage, a armor. You can save yourself by building walls. You will need the wood for the wooden wall, the bricks for the brick wall and the iron for the iron wall. Wood can be made from trees and wooden objects, bricks from brick houses walls and stones, iron from cars and suitable garbage. In Crazynite.io players can gain achievements during the battle: a butcher, a executioner, a exterminator, a hunter, a killer, a ninja, a veteran, a warrior, a sniper and a legendary. And skins for unblocked achievements. The io game Crazynite.io has different game modes: 1. The popular battle royale mode with the opportunity to build walls for shelter anywhere. Players landing by parachute, discover the map for weapons, ammunition and armor, use wood for building walls and kill other players. All this is complicated by a narrowing zone, outside of which all players die. Therefore, if you want to survive, you need to be in the zone. The last surviving player becomes the winner! 2. Death match mode is real bloody mess! Players descend by parachute and endlessly fighting. After you are killed, you can continue the battle again by parachuting and try to get the top 1. Only true master can get the top 1, the game determines your skill level using the following formula: <span class=''formula''>Damage done * Kills / Death + Victim skill * Magic</span>. 3. Zombie mode. Players can not kill you, because you guys have a more serious problem - zombies! You are safe until the sun shines, but when night falls - zombies will come. If you do not have time reach agreement with other players and build a strong defense, then you might not survive a night. Every night will increase zombies. Try to survive as long as you can! 4. Single weapon mode is very similar to the death match mode, but here you don’t have to discover for weapons in the boxes, here they are immediately in your hands, and in the hands of other players exactly the same weapon. Players after a certain period of time is given a new weapon. It can be anything from a knife to a machine gun or the cannon. In the boxes scattered inside the map, you will not be able to find another weapon, only bandages or something else...
+
+Instruções: Mouse move - Aim Left mouse button - Shot Right mouse button - Build a wall WASD - Move E - Action Shift - Run', 'Fácil', 100, '{"width": 1000, "height": 800}', false, 'available'),
+('Mine-Craft.io', 'embed', 'https://img.gamemonetize.com/i004avdmt9jezvey9tjvuzv9h1l2e9kx/512x384.jpg', 'https://html5.gamemonetize.co/i004avdmt9jezvey9tjvuzv9h1l2e9kx/', 'Mine-craft.io is a game based on minecraft. In Mine Craft, you can do the same thing as in a regular minecraft and even more! Get resources, build houses and various mechanisms, make friends, protect themselves from evil mobs at night and aggressive players.
+
+Instruções: Controls WASD - move E - open close player inventory Left Shift - run Enter - chat Left Mouse Button - attack Right Mouse Button - action 1-8 - change active item ', 'Médio', 100, '{"width": 1000, "height": 800}', false, 'available'),
+('SlitherCraft.io', 'embed', 'https://img.gamemonetize.com/evckpufpla0xoqwf0ihlwvxy3pc04dzi/512x384.jpg', 'https://html5.gamemonetize.co/evckpufpla0xoqwf0ihlwvxy3pc04dzi/', 'SlitherCraft.io - is MINECRAFT + SLITHER.IO in one dynamic io game! Grow a snake by eating different Minecraft blocks. Eating a diamond block you get the maximum number of points. Speed up on the left mouse button, but be careful you reduce the length of the snake. Throw TNT at enemies with the right mouse button and get to top one! You can provide insurance for your snake by surrounding yourself with your tail. In this case, you are in safe! You can get a score and blocks by killing enemy snake. Or you can donate your blocks to the enemy. And you can recover your snake by finding your place of death and pick up blocks. Slither craft will allow you to have fun and not let you get bored!
+
+Instruções: Mouse move - Move Left mouse button - Speed Up Right mouse button - Throw TNT Enter - Chat', 'Difícil', 100, '{"width": 1000, "height": 800}', false, 'available'),
+('ShooterZ.io', 'embed', 'https://img.gamemonetize.com/6x8pxf5ylzyu7e1nk19hddg7dl71vb01/512x384.jpg', 'https://html5.gamemonetize.co/6x8pxf5ylzyu7e1nk19hddg7dl71vb01/', 'ShooterZ.io is a cool game where you can have a lot of fun with your friends. Enter now and create a lobby as you like, or chose one which is created by someone else and fight in the craziest combat that exists. Features: • Multiplayer game rooms • Multiple environments • Good graphics
+
+Instruções:  Left mouse button to shoot Right mouse button to aim R to reload C to crouch P to pause 1-9 key to change weapon T to open chat and enter to send ', 'Fácil', 100, '{"width": 960, "height": 600}', false, 'available'),
+('Clash Blade IO', 'embed', 'https://img.gamemonetize.com/pg8l1zut8pv47cjqeudrdo7q5mcde184/512x384.jpg', 'https://html5.gamemonetize.co/pg8l1zut8pv47cjqeudrdo7q5mcde184/', 'How To Play ClashBlade.com – Clash Balde io is have two mode. + Rank mode: this is mode rank war. you will fighting with 50 user more and 90 second to play in 1 room. You will get coin and exp if you reach top 1,2,3. + Endless mode: This is game for fun and you will play with hundred user on the world. Let remember it is for fun, you will not get coin or exp. – Best to collect orb when in low level – Higher level make your move slow but your sword bigger. Use your skill to get high score. Foxzin.com with tons of games for all ages and bringing fun to player Play free online games.
+
+Instruções: Mouse or Touch', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Raft Royale', 'embed', 'https://img.gamemonetize.com/chelhusdfimisgjwk1rjllvct64erpk4/512x384.jpg', 'https://html5.gamemonetize.co/chelhusdfimisgjwk1rjllvct64erpk4/', 'Build your raft as you try to destroy your enemies rafts. Keep building so that you can top the leaderboard on your server.
+
+Instruções: Mouse or finger to move', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Killer.io', 'embed', 'https://img.gamemonetize.com/niseadlbd8923kfntkyjjy1ftloz4wss/512x384.jpg', 'https://html5.gamemonetize.co/niseadlbd8923kfntkyjjy1ftloz4wss/', 'Kill and hide bodies in this fun online murder game. Try to kill as many people at the Halloween party as possible. Try not to get caught!
+
+Instruções: Arrow keys or Tap controls to move', 'Fácil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Sonic.io', 'embed', 'https://img.gamemonetize.com/fx569hmddhs57tgur1ysblb7lomadz3s/512x384.jpg', 'https://html5.gamemonetize.co/fx569hmddhs57tgur1ysblb7lomadz3s/', 'Sonic.io is an action io game where your goal is to run away and dodge everything coming at you while collecting rings.
+
+Instruções: Use your mouse to move', 'Médio', 100, '{"width": 1200, "height": 720}', false, 'available'),
+('Rooftop Shooters', 'embed', 'https://img.gamemonetize.com/2wba9raumb0w8zfhtrqllct22n8vi89l/512x384.jpg', 'https://html5.gamemonetize.co/2wba9raumb0w8zfhtrqllct22n8vi89l/', 'Try to shoot your opponent off of the rooftop in this action packed shooter game. 3 different modes to play: Online multiplayer, local two player and local practice mode. Win matches to unlock new skins in the latest .io game from Lagged.com.
+
+Instruções: W E or O P keys to shoot jump', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Fidget Spinner.io', 'embed', 'https://img.gamemonetize.com/mjmcfuzbsy8eblsvnhfxyh9d3gf2hjp3/512x384.jpg', 'https://html5.gamemonetize.co/mjmcfuzbsy8eblsvnhfxyh9d3gf2hjp3/', 'Fidget Spinner.io is an online game that you can play for free. Fidget Spinner.io is a fun io game suitable for all ages. The operation of the game is very simple. You just need to control your fidget spinner to move on the map by mouse or simply tap on the screen. Absorb the energy points on the map to make you stronger. Destroy your enemy by letting them crash on your trail. Have fun playing.
+
+Instruções: Mouse or tap to play ', 'Fácil', 100, '{"width": 854, "height": 480}', false, 'available'),
+('Inky Snakes', 'embed', 'https://img.gamemonetize.com/5s5zgsz0oejgblg3h7a8ycib7u1cwtg1/512x384.jpg', 'https://html5.gamemonetize.co/5s5zgsz0oejgblg3h7a8ycib7u1cwtg1/', 'Paper snakes is slithering io snake game with a touch of paper theme, there is only one rule to play game. Eat others to grow bigger. Choose awesome snakes and join the battle. Good Luck
+
+Instruções: On Desktop - Use mouse cursor and buttons to control your snake On Mobile - Use hud controller to control your snake', 'Médio', 100, '{"width": 960, "height": 540}', false, 'available'),
+('Table Tug Online', 'embed', 'https://img.gamemonetize.com/sagqonptsz8pz6dzhbdugmdo2wz5to6m/512x384.jpg', 'https://html5.gamemonetize.co/sagqonptsz8pz6dzhbdugmdo2wz5to6m/', 'Try to tug the table and bring your opponent across the line. Play local two player mode or challenge players online from around the world.
+
+Instruções: Spacebar or tap to tug', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Knife.io', 'embed', 'https://img.gamemonetize.com/98fobvogybhln41bs1hwj35wfuvfllku/512x384.jpg', 'https://html5.gamemonetize.co/98fobvogybhln41bs1hwj35wfuvfllku/', 'Knife.io is multiplayer new io game. Addictive and innovative io game! Collect blades, knife, weapon and use your spin to slay your enemies in this furious sword mayhem! Who will survive in this crazy IO battle of guts and steel?
+
+Instruções: Use mouse to play', 'Fácil', 100, '{"width": 480, "height": 800}', false, 'available'),
+('Worms Zone a Slithery Snake', 'embed', 'https://img.gamemonetize.com/vz6qfngm0al4ggz8f3lrvrfrqrm1q19m/512x384.jpg', 'https://html5.gamemonetize.co/vz6qfngm0al4ggz8f3lrvrfrqrm1q19m/', 'Worms Zone is a game with a dynamic storyline. Start growing your worm right now. Having tried to get a real anaconda, a small worm never gets stuck in one place – he’s ready to bite everyone. However, there is a danger to be eaten by a more successful player. The Worms are real gourmets. They love trying various gelatinous goodies and everything they meet on their route.
+
+Instruções: Use the mouse to control the worm s direction and space bar to speed up it ', 'Médio', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Shark Attack', 'embed', 'https://img.gamemonetize.com/4pf45zrkuykkl00bji0x8owfj6w4ia9m/512x384.jpg', 'https://html5.gamemonetize.co/4pf45zrkuykkl00bji0x8owfj6w4ia9m/', 'Try to become the biggest shark on the server in this fun online .io game.
+
+Instruções: Mouse or touch to move', 'Difícil', 100, '{"width": 800, "height": 600}', false, 'available'),
+('Angry Checkers', 'embed', 'https://img.gamemonetize.com/skma0pcrooj5rpuhitzk7etjqfsctr3l/512x384.jpg', 'https://html5.gamemonetize.co/skma0pcrooj5rpuhitzk7etjqfsctr3l/', 'Common checkers are boring? Try angry checkers! Try to beat enemy checkers out of the board. there are 3 game modes. 1. Multiplayer - you play versus another random player via internet. 2. Single Player - you play versus AI. 3. Hot Seat - you play versus your friend on the same device.
+
+Instruções: Touch Mouse', 'Fácil', 100, '{"width": 960, "height": 640}', false, 'available'),
+('Airplane IO', 'embed', 'https://img.gamemonetize.com/1i9ar314046uj5v6p91kcl8em378zm60/512x384.jpg', 'https://html5.gamemonetize.co/1i9ar314046uj5v6p91kcl8em378zm60/', 'Airplan io is an online game that you can play for free Airplan Io is a fun game suitable for all ages The operation of the game is very simple You just need to control your airplan to move on the map Absorb the energy points on the map to make you stronger Be careful not to hit your enemy or you will lose the game Have fun playing with Airplanio
+
+Instruções: Mouse or tap to play ', 'Médio', 100, '{"width": 854, "height": 480}', false, 'available');

@@ -44,9 +44,13 @@ const MissionDetail = lazy(() => import("./pages/MissionDetail"));
 const Store = lazy(() => import("./pages/Store"));
 const Admin = lazy(() => import("./pages/admin/Admin"));
 const EasterLanding = lazy(() => import("./pages/EasterLanding"));
+const MorehDashboard = lazy(() => import("./pages/moreh/MorehDashboard"));
+const RoutinePlanner = lazy(() => import("./pages/moreh/RoutinePlanner"));
+const TaskViewer = lazy(() => import("./pages/TaskViewer"));
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import SubscriptionGuard from "./components/SubscriptionGuard";
+import MorehGuard from "./components/MorehGuard";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +103,13 @@ const App = () => (
 
                       {/* Admin Route - Checks permission inside the component */}
                       <Route path="/admin/*" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+
+                      {/* Child Tasks Viewer */}
+                      <Route path="/tasks/:taskId" element={<ProtectedRoute><SubscriptionGuard><TaskViewer /></SubscriptionGuard></ProtectedRoute>} />
+
+                      {/* Moreh / Routine Manager Routes */}
+                      <Route path="/moreh" element={<ProtectedRoute><SubscriptionGuard><MorehGuard><MorehDashboard /></MorehGuard></SubscriptionGuard></ProtectedRoute>} />
+                      <Route path="/moreh/planner/:childId" element={<ProtectedRoute><SubscriptionGuard><MorehGuard><RoutinePlanner /></MorehGuard></SubscriptionGuard></ProtectedRoute>} />
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
