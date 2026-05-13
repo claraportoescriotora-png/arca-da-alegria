@@ -11,13 +11,17 @@ export interface Child {
 
 export function useMoreh() {
   const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
   const [morehPin, setMorehPin] = useState<string | null>(null);
   const [hygieneDays, setHygieneDays] = useState<number>(30);
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
     async function fetchData() {
       setLoading(true);
@@ -26,7 +30,7 @@ export function useMoreh() {
         const { data: profile } = await supabase
           .from('profiles')
           .select('moreh_pin, hygiene_days')
-          .eq('id', session.user.id)
+          .eq('id', userId)
           .single();
 
         if (profile) {
@@ -57,7 +61,8 @@ export function useMoreh() {
     }
 
     fetchData();
-  }, [session]);
+    // Use userId (string) not session (object) to avoid infinite re-renders
+  }, [userId]);
 
   const runHygieneCleanup = async (childIds: string[], days: number) => {
     try {
